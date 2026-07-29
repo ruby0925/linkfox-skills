@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — search_package_list (v2.order.search_package_list)
+Shopee Store — search_package_list
+
 官方: https://open.shopee.com/documents/v2/v2.order.search_package_list?module=94&type=1
+
+入参说明见 references/apis/search-package-list.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _order_api_runner import run_order_api
-from _shopee_orders_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: search_package_list.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_order_api("search_package_list", params, "search_package_list.py"), inline)
+    print(json.dumps(run_order_api("search_package_list", params, "search_package_list.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

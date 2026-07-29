@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — add_discount_item (v2.discount.add_discount_item)
+Shopee Store — add_discount_item
+
 官方: https://open.shopee.com/documents/v2/v2.discount.add_discount_item?module=99&type=1
+
+入参说明见 references/apis/add-discount-item.md。
 """
 
 from __future__ import annotations
-from _shopee_discount_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: add_discount_item.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_discount_api("add_discount_item", params, "add_discount_item.py"), inline)
+    print(json.dumps(run_discount_api("add_discount_item", params, "add_discount_item.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

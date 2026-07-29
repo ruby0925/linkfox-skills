@@ -5,13 +5,13 @@ description: 从智慧芽（PatSnap）数据库查询专利法律状态信息。
 
 # Zhihuiya Patent Legal Status
 
-This skill guides you on how to query patent legal status information via the Zhihuiya (PatSnap) platform, helping users quickly determine the current legal standing and event history of one or more patents.
+This skill guides you on how to query patent legal status information via the Zhihuiya (PatSnap) platform, helping users quickly determine the current legal standing and event history of a single patent.
 
 ## 调用方式
 
 - **API 端点**：`POST /zhihuiya/legalStatus`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_legal_status.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-legal-status-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -43,18 +43,20 @@ The Zhihuiya Patent Legal Status tool returns three layers of legal information 
 2. **Legal Status** -- A detailed status describing the patent's lifecycle stage (e.g., Published, Examining, Granted, Abandoned, Withdrawn, Rejected, Expired, Revoked, Ceased, Restoration, etc.).
 3. **Legal Events** -- Specific legal actions that have occurred on the patent (e.g., Transfer, License, Pledge, Opposition, Litigation, Re-examination, Customs, Preservation, Invalid-procedure, Oral-procedure, Declassification, Double application, Trust).
 
-**Patent identification**: Patents can be looked up by either patent ID or publication (announcement) number. When both are provided, patent ID takes priority. Multiple values can be submitted in a single request (comma-separated, up to 100).
+**Patent identification**: Patents can be looked up by either patent ID or publication (announcement) number. When both are provided, patent ID takes priority. Only one patent may be passed per request.
 
 ## Parameter Guide
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| patentId | Conditionally | Patent ID. At least one of patentId or patentNumber must be provided. Comma-separated for multiple values, up to 100. |
-| patentNumber | Conditionally | Publication (announcement) number. At least one of patentId or patentNumber must be provided. Comma-separated for multiple values, up to 100. |
+| patentId | Conditionally | Patent ID. At least one of patentId or patentNumber must be provided. Single patent ID only. Do NOT pass comma-separated multiple IDs. |
+| patentNumber | Conditionally | Publication (announcement) number. At least one of patentId or patentNumber must be provided. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. |
 
 - If the user provides a publication number (e.g., CN115xxxxxxA, US11xxxxxxB2, EP3xxxxxxA1), use `patentNumber`.
 - If the user provides an internal patent ID, use `patentId`.
 - When both are supplied, `patentId` takes precedence.
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Response Fields
 
@@ -74,11 +76,6 @@ The Zhihuiya Patent Legal Status tool returns three layers of legal information 
 Query the legal status for patent publication number CN115000000A.
 ```
 
-**2. Batch-check legal status for multiple patents**
-```
-Look up the legal status for patents US11000000B2, EP3000000A1, and CN115000001A.
-```
-
 **3. Identify legal events on a patent**
 ```
 Has patent CN115000000A been involved in any litigation, transfer, or pledge events?
@@ -89,11 +86,6 @@ Has patent CN115000000A been involved in any litigation, transfer, or pledge eve
 Check if patent US10000000B1 is expired, revoked, or still in force.
 ```
 
-**5. Look up patents by patent ID**
-```
-Query the legal status for patent IDs abc123, def456.
-```
-
 ## Display Rules
 
 1. **Present data clearly**: Show results in a structured table. Include the publication number, simple legal status, detailed legal status, and legal events for each patent.
@@ -101,10 +93,10 @@ Query the legal status for patent IDs abc123, def456.
 3. **Highlight key findings**: If the user is checking validity, prominently state whether each patent is Active, Inactive, or Pending at the top of the response.
 4. **Legal date context**: When `legalDate` is available, include it so users know how recent the status information is.
 5. **Error handling**: If the query fails or returns no results, explain the possible reasons (invalid patent number format, patent not found in database) and suggest the user double-check the input.
-6. **Volume notice**: When querying many patents, present a summary table and note the total count returned.
+6. **Single patent result**: Results contain a single patent's data.
 ## Important Limitations
 
-- **Up to 100 patents per request**: The maximum number of patent IDs or publication numbers in a single call is 100.
+- **Single patent per request**: Only one patent ID or publication number may be passed per call (no comma-separated batches).
 - **At least one identifier required**: Either `patentId` or `patentNumber` must be provided; the request will fail if both are empty.
 - **Patent ID priority**: When both `patentId` and `patentNumber` are provided, the system uses `patentId` and ignores `patentNumber`.
 - **Data coverage**: Results depend on the Zhihuiya (PatSnap) database coverage; some very recent filings may not yet be reflected.
@@ -118,7 +110,6 @@ Query the legal status for patent IDs abc123, def456.
 | "Is this patent still valid/active" | Simple legal status check |
 | "What is the legal status of patent XX" | Detailed status lookup |
 | "Has this patent been transferred or licensed" | Legal event query |
-| "Check if these patents are expired" | Batch validity check |
 | "Any litigation on this patent" | Legal event filtering |
 | "Patent legal status for CN115XXXXXXA" | Direct publication number lookup |
 
@@ -135,6 +126,8 @@ Query the legal status for patent IDs abc123, def456.
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利法律状态结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

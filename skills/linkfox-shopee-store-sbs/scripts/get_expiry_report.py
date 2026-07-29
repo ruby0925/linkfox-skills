@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_expiry_report (v2.sbs.get_expiry_report)
+Shopee Store — get_expiry_report
+
 官方: https://open.shopee.com/documents/v2/v2.sbs.get_expiry_report?module=124&type=1
+
+入参说明见 references/apis/get-expiry-report.md。
 """
 
 from __future__ import annotations

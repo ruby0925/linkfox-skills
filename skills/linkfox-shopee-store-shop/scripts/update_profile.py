@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — update_profile (v2.shop.update_profile)
+Shopee Store — update_profile
+
 官方: https://open.shopee.com/documents/v2/v2.shop.update_profile?module=92&type=1
+
+入参说明见 references/apis/update-profile.md。
 """
 
 from __future__ import annotations

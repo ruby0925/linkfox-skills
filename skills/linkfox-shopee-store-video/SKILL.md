@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺视频 Video（与 linkfox-shopee-store-aut
 
 # Shopee 店铺 Video
 
-Shopee Open Platform **Video 模块**（15 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/video/...`）。
+Shopee Open Platform **Video 模块**（15 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/video/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ Video 模块索引：[v2.video.get_cover_list](https://open.shopee.com/documents
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **视频管理**：`get_cover_list` → `post_video` → `get_video_list` / `edit_video_info`
 - **效果分析**：`get_overview_performance`、`get_video_detail_performance` 等
 - **官方拼写**：`get_prodcut_performance_list`（product 为 prodcut）
@@ -66,6 +66,30 @@ Video 模块索引：[v2.video.get_cover_list](https://open.shopee.com/documents
 | 通用入口 | `video_api.py`（JSON 含 `api` 字段） |
 
 共享：`_shopee_video_common.py`、`_video_endpoints.py`、`_video_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `delete_video` | [references/apis/delete-video.md](./references/apis/delete-video.md) |
+| `edit_video_info` | [references/apis/edit-video-info.md](./references/apis/edit-video-info.md) |
+| `get_cover_list` | [references/apis/get-cover-list.md](./references/apis/get-cover-list.md) |
+| `get_metric_trend` | [references/apis/get-metric-trend.md](./references/apis/get-metric-trend.md) |
+| `get_overview_performance` | [references/apis/get-overview-performance.md](./references/apis/get-overview-performance.md) |
+| `get_prodcut_performance_list` | [references/apis/get-prodcut-performance-list.md](./references/apis/get-prodcut-performance-list.md) |
+| `get_user_demographics` | [references/apis/get-user-demographics.md](./references/apis/get-user-demographics.md) |
+| `get_video_detail` | [references/apis/get-video-detail.md](./references/apis/get-video-detail.md) |
+| `get_video_detail_audience_distribution` | [references/apis/get-video-detail-audience-distribution.md](./references/apis/get-video-detail-audience-distribution.md) |
+| `get_video_detail_metric_trend` | [references/apis/get-video-detail-metric-trend.md](./references/apis/get-video-detail-metric-trend.md) |
+| `get_video_detail_performance` | [references/apis/get-video-detail-performance.md](./references/apis/get-video-detail-performance.md) |
+| `get_video_detail_product_performance` | [references/apis/get-video-detail-product-performance.md](./references/apis/get-video-detail-product-performance.md) |
+| `get_video_list` | [references/apis/get-video-list.md](./references/apis/get-video-list.md) |
+| `get_video_performance_list` | [references/apis/get-video-performance-list.md](./references/apis/get-video-performance-list.md) |
+| `post_video` | [references/apis/post-video.md](./references/apis/post-video.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

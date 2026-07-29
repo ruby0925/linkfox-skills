@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — update_top_picks (v2.top_picks.update_top_picks)
+Shopee Store — update_top_picks
+
 官方: https://open.shopee.com/documents/v2/v2.top_picks.update_top_picks?module=100&type=1
+
+入参说明见 references/apis/update-top-picks.md。
 """
 
 from __future__ import annotations

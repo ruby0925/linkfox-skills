@@ -9,7 +9,7 @@ This skill guides you on how to query patent description (specification) data fr
 
 ## Core Concepts
 
-A patent description (also called the specification) is the detailed technical document that accompanies a patent filing. It discloses how the invention works, preferred embodiments, and other technical details required by patent law. This tool queries the Zhihuiya database to return description data for one or more patents identified by their internal patent ID or public publication number.
+A patent description (also called the specification) is the detailed technical document that accompanies a patent filing. It discloses how the invention works, preferred embodiments, and other technical details required by patent law. This tool queries the Zhihuiya database to return description data for a single patent per request, identified by its internal patent ID or public publication number.
 
 **Identifier priority**: When both a patent ID and a publication number are provided for the same query, the patent ID takes precedence.
 
@@ -19,9 +19,11 @@ A patent description (also called the specification) is the detailed technical d
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| patentId | string | Conditionally | Internal patent ID. At least one of patentId or patentNumber must be provided. Multiple values separated by commas; max 100. |
-| patentNumber | string | Conditionally | Publication / announcement number. At least one of patentId or patentNumber must be provided. Multiple values separated by commas; max 100. |
+| patentId | string | Conditionally | Internal patent ID. At least one of patentId or patentNumber must be provided. Single patent ID only. Do NOT pass comma-separated multiple IDs. |
+| patentNumber | string | Conditionally | Publication / announcement number. At least one of patentId or patentNumber must be provided. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. |
 | replaceByRelated | string | No | Whether to substitute a family patent's description when the target patent's description is unavailable. `1` = yes, `0` = no. |
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Response Fields
 
@@ -41,7 +43,7 @@ A patent description (also called the specification) is the detailed technical d
 
 - **API 端点**：`POST /zhihuiya/descriptionData`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_description_data.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-description-data-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -83,12 +85,12 @@ When users provide internal Zhihuiya patent IDs, pass them via the `patentId` pa
 patentId: "abc123def456"
 ```
 
-### Batch Queries
+### Single-Patent Queries
 
-Both `patentId` and `patentNumber` accept comma-separated values for batch lookups (up to 100):
+Only one patent may be passed per request. If the user has multiple patents, obtain explicit consent and make a separate call for each. Do NOT pass comma-separated values to `patentId` or `patentNumber`.
 
 ```
-patentNumber: "CN115099012A,US20230012345A1,EP4123456A1"
+patentNumber: "CN115099012A"
 ```
 
 ### Family Substitution
@@ -107,11 +109,6 @@ replaceByRelated: "1"
 patentNumber: "CN115099012A"
 ```
 
-**2. Look up descriptions for multiple patents at once**
-```
-patentNumber: "CN115099012A,US20230012345A1"
-```
-
 **3. Look up with family substitution enabled**
 ```
 patentNumber: "CN115099012A"
@@ -128,13 +125,13 @@ patentId: "some-patent-id"
 1. **Present data faithfully**: Show the returned description content clearly without altering technical details or adding subjective interpretation.
 2. **Structured output**: When the description contains multiple sections (background, summary, detailed description, claims, etc.), present them with clear headings for readability.
 3. **Family substitution notice**: If the response includes a `pnRelated` field, explicitly inform the user that the description was sourced from a related family patent and state the substitute publication number.
-4. **Batch results**: When multiple patents are returned, clearly separate each patent's content with its publication number as a heading.
+4. **Single-patent results**: Results contain a single patent's data per call. If the user needs multiple patents, make separate single-patent calls (with explicit consent).
 5. **Error handling**: When a query fails or returns no data, explain the reason and suggest the user verify the patent ID or publication number.
 6. **Large content warning**: Patent descriptions can be very long. Summarize key sections first and offer to show the full text if the user wants it.
 ## Important Limitations
 
 - **Identifier requirement**: At least one of `patentId` or `patentNumber` must be provided; the tool cannot search by keyword or applicant name.
-- **Batch limit**: A maximum of 100 patents can be queried in a single request.
+- **Single patent per request**: Only one patent ID or publication number may be passed per call (no comma-separated batches).
 - **Availability**: Not all patents have descriptions available in the database. Use `replaceByRelated: "1"` to attempt family substitution when needed.
 - **Priority rule**: If both `patentId` and `patentNumber` are supplied, `patentId` takes precedence.
 
@@ -145,7 +142,6 @@ patentId: "some-patent-id"
 | User Says | Scenario |
 |-----------|----------|
 | "Show me the description of patent XX" | Single patent description lookup |
-| "Get the full specification for these patents" | Batch patent description retrieval |
 | "I need the detailed text of CN115099012A" | Lookup by publication number |
 | "Can you find a family patent's description instead" | Family substitution query |
 | "What does this patent describe technically" | Description content review |
@@ -162,6 +158,8 @@ patentId: "some-patent-id"
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利说明书结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

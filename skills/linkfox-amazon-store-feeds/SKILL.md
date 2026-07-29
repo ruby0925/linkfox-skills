@@ -5,7 +5,7 @@ description: 亚马逊店铺 Feeds（与 linkfox-amazon-store-auth / report / li
 
 # Amazon 店铺 Feeds
 
-本 skill 与 **`linkfox-amazon-store-auth`** 等同属 **Amazon Store** 系列：先 **`POST /spApi/storeTokens`**，再 **`POST /spApi/developerProxy`** 转发 **GET / POST / DELETE**。
+本 skill 与 **`linkfox-amazon-store-auth`** 等同属 **Amazon Store** 系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发 **GET / POST / DELETE**。
 
 ## 调用方式
 

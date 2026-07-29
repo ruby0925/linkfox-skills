@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_product_campaign_daily_performance (v2.ads.get_product_campaign_daily_performance)
+Shopee Store — get_product_campaign_daily_performance
+
 官方: https://open.shopee.com/documents/v2/v2.ads.get_product_campaign_daily_performance?module=117&type=1
+
+入参说明见 references/apis/get-product-campaign-daily-performance.md。
 """
 
 from __future__ import annotations
-from _shopee_ads_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_product_campaign_daily_performance.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ads_api("get_product_campaign_daily_performance", params, "get_product_campaign_daily_performance.py"), inline)
+    print(json.dumps(run_ads_api("get_product_campaign_daily_performance", params, "get_product_campaign_daily_performance.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

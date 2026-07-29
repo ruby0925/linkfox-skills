@@ -34,7 +34,7 @@ def _mask_phone(phone: str) -> str:
     return phone
 
 
-def _login(phone: str, code: str) -> dict:
+def _login(phone: str, code: str, channel: str) -> dict:
     """v3 登录，返回 {access_token, refresh_token, user_id, nick_name, is_new_user} 或 {error}。"""
     body = {
         "type": "sms",
@@ -44,7 +44,7 @@ def _login(phone: str, code: str) -> dict:
             "areaCode": "+86",
             "authPhone": phone,
             "authCode": code,
-            "sourceChannel": "skill",
+            "sourceChannel": channel or "skill",
         },
     }
     resp = login_post("/user/v3/web/login", body, with_uid=True)
@@ -214,14 +214,14 @@ def _extract_token(resp: dict) -> str:
     return ""
 
 
-def login_and_get_key(phone: str, code: str) -> dict:
+def login_and_get_key(phone: str, code: str, channel: str) -> dict:
     masked = _mask_phone(phone)
     if not re.fullmatch(r"\d{11}", phone):
         return {"error": f"login: 手机号格式不正确: {phone}", "phone": masked}
     if not re.fullmatch(r"\d{4,8}", code):
         return {"error": f"login: 验证码格式不正确: {code}", "phone": masked}
 
-    login_res = _login(phone, code)
+    login_res = _login(phone, code, channel)
     if "error" in login_res:
         return {"error": login_res["error"], "phone": masked}
     access_token = login_res["access_token"]
@@ -262,7 +262,8 @@ def main(argv: list[str]) -> int:
         return 2
     phone = argv[1].strip()
     code = argv[2].strip()
-    result = login_and_get_key(phone, code)
+    channel = argv[3].strip()
+    result = login_and_get_key(phone, code, channel)
     print(json.dumps(result, ensure_ascii=False))
     if "api_key" in result:
         print(

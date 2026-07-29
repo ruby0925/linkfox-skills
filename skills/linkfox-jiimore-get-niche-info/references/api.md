@@ -210,7 +210,7 @@ POST Body（JSON）：
 | sponsoredProductsPercentageT360T90Before | number | 已进行商品推广的商品的百分比(360 天统计)(90天前) |
 | sponsoredProductsPercentageT360T360Before | number | 已进行商品推广的商品的百分比(360 天统计)(360天前) |
 | profitMarginGt50PctSkuRatio | number | 利润率大于50%的商品比例 |
-| breakEvenRatio | number | 盈亏平衡比率 |
+| breakEvenRatio | number | 盈亏平衡自然占比 |
 | returnRateAnnual | number | 退货率（全年数据） |
 | cpc | object | CPC（每次点击费用）数据 |
 

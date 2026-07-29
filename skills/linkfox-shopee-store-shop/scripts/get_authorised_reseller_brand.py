@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_authorised_reseller_brand (v2.shop.get_authorised_reseller_brand)
+Shopee Store — get_authorised_reseller_brand
+
 官方: https://open.shopee.com/documents/v2/v2.shop.get_authorised_reseller_brand?module=92&type=1
+
+入参说明见 references/apis/get-authorised-reseller-brand.md。
 """
 
 from __future__ import annotations

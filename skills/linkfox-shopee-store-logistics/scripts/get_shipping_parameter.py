@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_shipping_parameter (v2.logistics.get_shipping_parameter)
+Shopee Store — get_shipping_parameter
+
 官方: https://open.shopee.com/documents/v2/v2.logistics.get_shipping_parameter?module=95&type=1
+
+入参说明见 references/apis/get-shipping-parameter.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _logistics_api_runner import run_logistics_api
-from _shopee_logistics_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_shipping_parameter.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_logistics_api("get_shipping_parameter", params, "get_shipping_parameter.py"), inline)
+    print(json.dumps(run_logistics_api("get_shipping_parameter", params, "get_shipping_parameter.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

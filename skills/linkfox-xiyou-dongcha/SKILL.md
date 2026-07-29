@@ -182,7 +182,7 @@ $env:XIYOU_CLIENT_SECRET = "your-24-char-secret"
 
 ## 积分消耗规则
 
-按动态规则计费：消耗积分 = {"按ASIN数量计":{"asinTraffic":"⌈ASIN数量 ÷ 10⌉ × 1.5","asinInfo":"⌈ASIN数量 ÷ 5⌉ × 1.5"},"按时间区间计":{"asinInfoChangeTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinTrafficScoreTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinAdvertisingChangeTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinBsrTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinInfoDailyTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinSearchTermTrafficTrend":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinSearchTermRankTrendDaily":"⌈查询天数（含首尾） ÷ 10⌉ × 1.5","asinOrdersTrend":"⌈查询月数（含首尾） ÷ 6⌉ × 1.5"},"按返回条数计":{"asinResearchPeriod":"⌈返回关键词条数 ÷ 50⌉ × 1.5","asinResearchMonthly":"⌈返回关键词条数 ÷ 50⌉ × 1.5","searchTermInfo":"⌈返回关键词条数 ÷ 50⌉ × 1.5","searchTermAnalysisPeriod":"⌈返回结果条数 ÷ 50⌉ × 1.5"},"固定值":{"asinVariations":"2 × 1.5","asinSearchTermRankTrendHourly":"2 × 1.5"},"组合计费":{"searchTermAbaWeeklyTrend":"⌈关键词数 ÷ 50⌉ × 周数（周数 = ⌈查询天数（含首尾） ÷ 7⌉，最多 52 周） × 1.5"}}。
+不消耗积分，需要卖家自行购买西柚找词套餐。
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
 

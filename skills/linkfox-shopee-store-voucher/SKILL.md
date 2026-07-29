@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺优惠券 Voucher（与 linkfox-shopee-stor
 
 # Shopee 店铺优惠券 Voucher
 
-Shopee Open Platform **Voucher 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/voucher/...`）。
+Shopee Open Platform **Voucher 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/voucher/...`）。
 
 ## 调用方式
 
@@ -57,6 +57,21 @@ Voucher 模块索引：[v2.voucher.add_voucher](https://open.shopee.com/document
 | `get_voucher.py` | get_voucher | GET |
 | `get_voucher_list.py` | get_voucher_list | GET |
 | `voucher_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_voucher` | [references/apis/add-voucher.md](./references/apis/add-voucher.md) |
+| `delete_voucher` | [references/apis/delete-voucher.md](./references/apis/delete-voucher.md) |
+| `end_voucher` | [references/apis/end-voucher.md](./references/apis/end-voucher.md) |
+| `get_voucher` | [references/apis/get-voucher.md](./references/apis/get-voucher.md) |
+| `get_voucher_list` | [references/apis/get-voucher-list.md](./references/apis/get-voucher-list.md) |
+| `update_voucher` | [references/apis/update-voucher.md](./references/apis/update-voucher.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

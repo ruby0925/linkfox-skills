@@ -5,7 +5,7 @@ description: Shopee（虾皮）套装优惠 Bundle Deal（与 linkfox-shopee-sto
 
 # Shopee 套装优惠 Bundle Deal
 
-Shopee Open Platform **Bundle Deal 模块**（10 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/bundle_deal/...`）。
+Shopee Open Platform **Bundle Deal 模块**（10 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/bundle_deal/...`）。
 
 ## 调用方式
 
@@ -61,6 +61,25 @@ Bundle Deal 模块索引：[v2.bundle_deal.add_bundle_deal](https://open.shopee.
 | `delete_bundle_deal.py` | delete_bundle_deal | POST |
 | `delete_bundle_deal_item.py` | delete_bundle_deal_item | POST |
 | `bundle_deal_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_bundle_deal` | [references/apis/add-bundle-deal.md](./references/apis/add-bundle-deal.md) |
+| `add_bundle_deal_item` | [references/apis/add-bundle-deal-item.md](./references/apis/add-bundle-deal-item.md) |
+| `delete_bundle_deal` | [references/apis/delete-bundle-deal.md](./references/apis/delete-bundle-deal.md) |
+| `delete_bundle_deal_item` | [references/apis/delete-bundle-deal-item.md](./references/apis/delete-bundle-deal-item.md) |
+| `end_bundle_deal` | [references/apis/end-bundle-deal.md](./references/apis/end-bundle-deal.md) |
+| `get_bundle_deal` | [references/apis/get-bundle-deal.md](./references/apis/get-bundle-deal.md) |
+| `get_bundle_deal_item` | [references/apis/get-bundle-deal-item.md](./references/apis/get-bundle-deal-item.md) |
+| `get_bundle_deal_list` | [references/apis/get-bundle-deal-list.md](./references/apis/get-bundle-deal-list.md) |
+| `update_bundle_deal` | [references/apis/update-bundle-deal.md](./references/apis/update-bundle-deal.md) |
+| `update_bundle_deal_item` | [references/apis/update-bundle-deal-item.md](./references/apis/update-bundle-deal-item.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

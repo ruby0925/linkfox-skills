@@ -1,14 +1,15 @@
 # linkfox-shopee-store-payment — 参数与字段参考
 
+> 单接口入参/响应说明已拆到 **`apis/`**（按 API 一份）；本文件保留模块总览与 Feedback。
 Shopee **Payment 模块**全部 18 个 API，经 **`POST /shopee/developerProxy`** 转发。
 
 授权见 **`linkfox-shopee-store-auth`**。官方索引：[v2.payment.get_escrow_detail](https://open.shopee.com/documents/v2/v2.payment.get_escrow_detail?module=97&type=1)
 
 ## 通用约定
 
-- **Base URL**：`${LINKFOX_TOOL_GATEWAY}`
+- **Base URL**：`https://tool-gateway.linkfox.com`
 - **Method**：POST（网关），上游 Method 见各接口
-- **Auth**：Header `Authorization: <api_key>`（从 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取）（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **Auth**：Header `Authorization: <api_key>`（`LINKFOXAGENT_API_KEY`）
 - **流程**：`POST /shopee/storeTokens` → `POST /shopee/developerProxy`
 - **path**：须 `api/v2/payment/...`
 - **标识**：店铺级 API，通常传 **`shopId`**
@@ -20,24 +21,24 @@ Shopee **Payment 模块**全部 18 个 API，经 **`POST /shopee/developerProxy`
 
 | # | API | Method | path | 脚本 | 官方文档 |
 |---|-----|--------|------|------|----------|
-| 1 | generate_income_report | POST | `api/v2/payment/generate_income_report` | `generate_income_report.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.generate_income_report?module=97&type=1) |
-| 2 | generate_income_statement | POST | `api/v2/payment/generate_income_statement` | `generate_income_statement.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.generate_income_statement?module=97&type=1) |
-| 3 | get_billing_transaction_info | GET | `api/v2/payment/get_billing_transaction_info` | `get_billing_transaction_info.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_billing_transaction_info?module=97&type=1) |
-| 4 | get_escrow_detail | GET | `api/v2/payment/get_escrow_detail` | `get_escrow_detail.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_escrow_detail?module=97&type=1) |
-| 5 | get_escrow_detail_batch | POST | `api/v2/payment/get_escrow_detail_batch` | `get_escrow_detail_batch.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_escrow_detail_batch?module=97&type=1) |
-| 6 | get_escrow_list | GET | `api/v2/payment/get_escrow_list` | `get_escrow_list.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_escrow_list?module=97&type=1) |
-| 7 | get_income_detail | GET | `api/v2/payment/get_income_detail` | `get_income_detail.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_income_detail?module=97&type=1) |
-| 8 | get_income_overview | GET | `api/v2/payment/get_income_overview` | `get_income_overview.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_income_overview?module=97&type=1) |
-| 9 | get_income_report | GET | `api/v2/payment/get_income_report` | `get_income_report.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_income_report?module=97&type=1) |
-| 10 | get_income_statement | GET | `api/v2/payment/get_income_statement` | `get_income_statement.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_income_statement?module=97&type=1) |
-| 11 | get_item_installment_status | GET | `api/v2/payment/get_item_installment_status` | `get_item_installment_status.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_item_installment_status?module=97&type=1) |
-| 12 | get_payment_method_list | GET | `api/v2/payment/get_payment_method_list` | `get_payment_method_list.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_payment_method_list?module=97&type=1) |
-| 13 | get_payout_detail | GET | `api/v2/payment/get_payout_detail` | `get_payout_detail.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_payout_detail?module=97&type=1) |
-| 14 | get_payout_info | GET | `api/v2/payment/get_payout_info` | `get_payout_info.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_payout_info?module=97&type=1) |
-| 15 | get_shop_installment_status | GET | `api/v2/payment/get_shop_installment_status` | `get_shop_installment_status.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_shop_installment_status?module=97&type=1) |
-| 16 | get_wallet_transaction_list | GET | `api/v2/payment/get_wallet_transaction_list` | `get_wallet_transaction_list.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.get_wallet_transaction_list?module=97&type=1) |
-| 17 | set_item_installment_status | POST | `api/v2/payment/set_item_installment_status` | `set_item_installment_status.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.set_item_installment_status?module=97&type=1) |
-| 18 | set_shop_installment_status | POST | `api/v2/payment/set_shop_installment_status` | `set_shop_installment_status.py` | [doc](https://open.shopee.com/documents/v2/v2.payment.set_shop_installment_status?module=97&type=1) |
+| 1 | generate_income_report | POST | `api/v2/payment/generate_income_report` | `generate_income_report.py` | [apis/generate-income-report.md](./apis/generate-income-report.md) |
+| 2 | generate_income_statement | POST | `api/v2/payment/generate_income_statement` | `generate_income_statement.py` | [apis/generate-income-statement.md](./apis/generate-income-statement.md) |
+| 3 | get_billing_transaction_info | GET | `api/v2/payment/get_billing_transaction_info` | `get_billing_transaction_info.py` | [apis/get-billing-transaction-info.md](./apis/get-billing-transaction-info.md) |
+| 4 | get_escrow_detail | GET | `api/v2/payment/get_escrow_detail` | `get_escrow_detail.py` | [apis/get-escrow-detail.md](./apis/get-escrow-detail.md) |
+| 5 | get_escrow_detail_batch | POST | `api/v2/payment/get_escrow_detail_batch` | `get_escrow_detail_batch.py` | [apis/get-escrow-detail-batch.md](./apis/get-escrow-detail-batch.md) |
+| 6 | get_escrow_list | GET | `api/v2/payment/get_escrow_list` | `get_escrow_list.py` | [apis/get-escrow-list.md](./apis/get-escrow-list.md) |
+| 7 | get_income_detail | GET | `api/v2/payment/get_income_detail` | `get_income_detail.py` | [apis/get-income-detail.md](./apis/get-income-detail.md) |
+| 8 | get_income_overview | GET | `api/v2/payment/get_income_overview` | `get_income_overview.py` | [apis/get-income-overview.md](./apis/get-income-overview.md) |
+| 9 | get_income_report | GET | `api/v2/payment/get_income_report` | `get_income_report.py` | [apis/get-income-report.md](./apis/get-income-report.md) |
+| 10 | get_income_statement | GET | `api/v2/payment/get_income_statement` | `get_income_statement.py` | [apis/get-income-statement.md](./apis/get-income-statement.md) |
+| 11 | get_item_installment_status | GET | `api/v2/payment/get_item_installment_status` | `get_item_installment_status.py` | [apis/get-item-installment-status.md](./apis/get-item-installment-status.md) |
+| 12 | get_payment_method_list | GET | `api/v2/payment/get_payment_method_list` | `get_payment_method_list.py` | [apis/get-payment-method-list.md](./apis/get-payment-method-list.md) |
+| 13 | get_payout_detail | GET | `api/v2/payment/get_payout_detail` | `get_payout_detail.py` | [apis/get-payout-detail.md](./apis/get-payout-detail.md) |
+| 14 | get_payout_info | GET | `api/v2/payment/get_payout_info` | `get_payout_info.py` | [apis/get-payout-info.md](./apis/get-payout-info.md) |
+| 15 | get_shop_installment_status | GET | `api/v2/payment/get_shop_installment_status` | `get_shop_installment_status.py` | [apis/get-shop-installment-status.md](./apis/get-shop-installment-status.md) |
+| 16 | get_wallet_transaction_list | GET | `api/v2/payment/get_wallet_transaction_list` | `get_wallet_transaction_list.py` | [apis/get-wallet-transaction-list.md](./apis/get-wallet-transaction-list.md) |
+| 17 | set_item_installment_status | POST | `api/v2/payment/set_item_installment_status` | `set_item_installment_status.py` | [apis/set-item-installment-status.md](./apis/set-item-installment-status.md) |
+| 18 | set_shop_installment_status | POST | `api/v2/payment/set_shop_installment_status` | `set_shop_installment_status.py` | [apis/set-shop-installment-status.md](./apis/set-shop-installment-status.md) |
 通用入口：`payment_api.py`（JSON 含 `"api": "<上表 API 名>"`）。
 
 ---
@@ -48,18 +49,18 @@ Shopee **Payment 模块**全部 18 个 API，经 **`POST /shopee/developerProxy`
 
 | API | 要点 |
 |-----|------|
-| `get_escrow_detail` | 必填 `order_sn`；订单托管/结算明细 |
-| `get_escrow_list` | 托管列表；时间范围筛选 |
-| `get_escrow_detail_batch` | POST 批量查 escrow |
+| `get_escrow_detail` | 必填 `order_sn`；订单托管/结算明细 — [apis/get-escrow-detail.md](./apis/get-escrow-detail.md) |
+| `get_escrow_list` | 托管列表；时间范围筛选 — [apis/get-escrow-list.md](./apis/get-escrow-list.md) |
+| `get_escrow_detail_batch` | POST 批量查 escrow — [apis/get-escrow-detail-batch.md](./apis/get-escrow-detail-batch.md) |
 
 ### 打款/钱包
 
 | API | 要点 |
 |-----|------|
-| `get_payout_detail` | 打款明细 |
-| `get_payout_info` | 打款汇总 |
-| `get_wallet_transaction_list` | 钱包流水 |
-| `get_billing_transaction_info` | 账单交易信息 |
+| `get_payout_detail` | 打款明细 — [apis/get-payout-detail.md](./apis/get-payout-detail.md) |
+| `get_payout_info` | 打款汇总 — [apis/get-payout-info.md](./apis/get-payout-info.md) |
+| `get_wallet_transaction_list` | 钱包流水 — [apis/get-wallet-transaction-list.md](./apis/get-wallet-transaction-list.md) |
+| `get_billing_transaction_info` | 账单交易信息 — [apis/get-billing-transaction-info.md](./apis/get-billing-transaction-info.md) |
 
 ### 分期
 
@@ -80,7 +81,7 @@ Shopee **Payment 模块**全部 18 个 API，经 **`POST /shopee/developerProxy`
 
 | API | 要点 |
 |-----|------|
-| `get_payment_method_list` | 可用支付方式 |
+| `get_payment_method_list` | 可用支付方式 — [apis/get-payment-method-list.md](./apis/get-payment-method-list.md) |
 
 ---
 

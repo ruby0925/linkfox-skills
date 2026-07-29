@@ -242,7 +242,3 @@ description: 品牌基因样式提取原子技能。根据商品图片与用户�
 - 背景策略的文化本土化依赖 salesRegion 的语义理解，非结构化地域数据库
 - 品牌基因 JSON 必须经 `save_brand_gene.py` 落盘到会话 `data/`，不可仅存于对话上下文
 - 依赖 `linkfox-aigc-textgen` skill 可用；若 textgen 调用失败，品牌基因提取无法完成
-
-## 积分消耗规则
-
-不消耗积分。

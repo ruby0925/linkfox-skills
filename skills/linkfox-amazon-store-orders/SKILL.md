@@ -5,7 +5,7 @@ description: 亚马逊店铺订单（与 linkfox-amazon-store-auth / report / li
 
 # Amazon 店铺 Orders
 
-本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`**、**`linkfox-amazon-store-listings`**、**`linkfox-amazon-store-pricing`** 同属 **Amazon Store** 系列：先 **`POST /spApi/storeTokens`** 取 **`accessToken`**，再 **`POST /spApi/developerProxy`** 转发上游 **`GET` / `POST` / `PATCH`**。
+本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`**、**`linkfox-amazon-store-listings`**、**`linkfox-amazon-store-pricing`** 同属 **Amazon Store** 系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发上游 **`GET` / `POST` / `PATCH`**。
 
 ## 调用方式
 

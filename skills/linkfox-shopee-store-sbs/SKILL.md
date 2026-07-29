@@ -5,7 +5,7 @@ description: Shopee（虾皮）SBS 仓储服务（与 linkfox-shopee-store-auth 
 
 # Shopee SBS 仓储服务
 
-Shopee Open Platform **SBS 模块**（5 个 API，均为 GET）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/sbs/...`）。
+Shopee Open Platform **SBS 模块**（5 个 API，均为 GET）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/sbs/...`）。
 
 ## 调用方式
 
@@ -56,6 +56,20 @@ SBS 模块索引：[v2.sbs.get_bound_whs_info](https://open.shopee.com/documents
 | `get_stock_aging.py` | get_stock_aging | GET |
 | `get_stock_movement.py` | get_stock_movement | GET |
 | `sbs_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `get_bound_whs_info` | [references/apis/get-bound-whs-info.md](./references/apis/get-bound-whs-info.md) |
+| `get_current_inventory` | [references/apis/get-current-inventory.md](./references/apis/get-current-inventory.md) |
+| `get_expiry_report` | [references/apis/get-expiry-report.md](./references/apis/get-expiry-report.md) |
+| `get_stock_aging` | [references/apis/get-stock-aging.md](./references/apis/get-stock-aging.md) |
+| `get_stock_movement` | [references/apis/get-stock-movement.md](./references/apis/get-stock-movement.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

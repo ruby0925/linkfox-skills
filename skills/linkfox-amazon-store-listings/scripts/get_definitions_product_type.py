@@ -122,14 +122,14 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_get(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     query_string: str,
 ) -> dict:
     params: dict = {
         "region": region,
         "path": path,
         "method": "GET",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
         "queryString": query_string,
     }
     return call_api(DEVELOPER_PROXY_ENDPOINT, params)
@@ -220,12 +220,7 @@ def main() -> None:
         sys.exit(1)
 
     path = _path_for_product_type(product_type)
-    tokens = get_store_tokens(seller_id, region)
-    if "error" in tokens or "accessToken" not in tokens:
-        print(json.dumps(tokens, indent=2, ensure_ascii=False))
-        sys.exit(1)
-
-    proxy = developer_proxy_get(region, path, tokens["accessToken"], query_string)
+    proxy = developer_proxy_get(region, path, seller_id, query_string)
     out = {
         "developerProxy": proxy,
         "resolvedPath": path,

@@ -5,7 +5,7 @@ description: 亚马逊店铺商品定价（与 linkfox-amazon-store-auth / linkf
 
 # Amazon 店铺 Product Pricing
 
-本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`**、**`linkfox-amazon-store-listings`** 同属 **Amazon Store** 系列：先 **`POST /spApi/storeTokens`** 取 `accessToken`，再 **`POST /spApi/developerProxy`** 转发上游 **GET** 或 **POST**（与 listings 的 PUT/PATCH 代理方式一致）。
+本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`**、**`linkfox-amazon-store-listings`** 同属 **Amazon Store** 系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发上游 **GET** 或 **POST**。
 
 ## 调用方式
 

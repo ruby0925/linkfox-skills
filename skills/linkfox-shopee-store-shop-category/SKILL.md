@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺分类 Shop Category（与 linkfox-shopee-s
 
 # Shopee 店铺分类 Shop Category
 
-Shopee Open Platform **Shop Category 模块**（7 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/shop_category/...`）。
+Shopee Open Platform **Shop Category 模块**（7 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/shop_category/...`）。
 
 ## 调用方式
 
@@ -58,6 +58,22 @@ Shop Category 模块索引：[v2.shop_category.add_shop_category](https://open.s
 | `get_item_list.py` | get_item_list | GET |
 | `delete_item_list.py` | delete_item_list | POST |
 | `shop_category_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_item_list` | [references/apis/add-item-list.md](./references/apis/add-item-list.md) |
+| `add_shop_category` | [references/apis/add-shop-category.md](./references/apis/add-shop-category.md) |
+| `delete_item_list` | [references/apis/delete-item-list.md](./references/apis/delete-item-list.md) |
+| `delete_shop_category` | [references/apis/delete-shop-category.md](./references/apis/delete-shop-category.md) |
+| `get_item_list` | [references/apis/get-item-list.md](./references/apis/get-item-list.md) |
+| `get_shop_category_list` | [references/apis/get-shop-category-list.md](./references/apis/get-shop-category-list.md) |
+| `update_shop_category` | [references/apis/update-shop-category.md](./references/apis/update-shop-category.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

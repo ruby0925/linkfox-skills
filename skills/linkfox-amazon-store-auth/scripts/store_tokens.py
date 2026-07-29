@@ -13,6 +13,7 @@ import sys
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 from _lf_output import emit_result, lf_inline_flag
+from _token_status_output import strip_raw_tokens, print_status_note
 
 API_BASE_URL = (
     os.environ.get("LINKFOX_TOOL_GATEWAY")
@@ -86,21 +87,9 @@ def main():
         sys.exit(1)
 
     result = call_api(params)
-
-    # Mask tokens in output for security
-    if "accessToken" in result:
-        result["accessToken"] = result["accessToken"][:10] + "..." if len(result["accessToken"]) > 10 else result["accessToken"]
-    if "refreshToken" in result:
-        result["refreshToken"] = result["refreshToken"][:10] + "..." if len(result["refreshToken"]) > 10 else result["refreshToken"]
-
+    result = strip_raw_tokens(result)
     emit_result(result, lf_inline_flag())
-
-    # If successful, print helpful info
-    if "expiresIn" in result:
-        expires_in = result.get("expiresIn", "0")
-        print(f"\n✓ Tokens retrieved successfully", file=sys.stderr)
-        print(f"Token expires in: {expires_in} seconds", file=sys.stderr)
-        print("Note: Tokens have been masked for security.", file=sys.stderr)
+    print_status_note(result)
 
 
 if __name__ == "__main__":

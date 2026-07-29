@@ -5,7 +5,7 @@ description: 亚马逊广告（Amazon Ads）管理技能，覆盖 SP/SB/SD 三�
 
 # Amazon Ads 广告管理
 
-Amazon Ads 广告管理 skill，支持 list（查询）和 create / update（创建与修改）操作，自动处理 token、分页、过滤字段规范化。
+Amazon Ads 广告管理 skill，支持 list（查询）和 create / update（创建与修改）操作；经 `developerProxy` 传 `profileId`，由服务端解析 token（勿先 `storeTokens` 取 raw token）。自动处理分页、过滤字段规范化。
 
 | 广告产品 | 覆盖实体 | 脚本子目录 | 详细参数 |
 |---------|---------|-----------|---------|

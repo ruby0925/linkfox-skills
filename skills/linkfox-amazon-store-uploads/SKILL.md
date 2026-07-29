@@ -5,7 +5,7 @@ description: 亚马逊店铺文件上传（与 linkfox-amazon-store-auth 等同�
 
 # Amazon 店铺 Uploads（文件上传）
 
-本 skill 专用于 **向 Amazon 申请上传目的地并上传文件**，与 **`linkfox-amazon-store-auth`** 同系列：先 **`storeTokens`**，再 **`developerProxy`** 调用 **createUploadDestinationForResource**，最后用 **`upload_to_destination.py`** 对返回的 URL 执行 **PUT**（不经网关）。
+本 skill 专用于 **向 Amazon 申请上传目的地并上传文件**，与 **`linkfox-amazon-store-auth`** 同系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region` 调用 **createUploadDestinationForResource**，最后用 **`upload_to_destination.py`** 对返回的 URL 执行 **PUT**（不经网关）。
 
 > 这是 **Uploads API**，不是 Orders 订单接口。订单见 **`linkfox-amazon-store-orders`**；批量 Feed 文件见 **`linkfox-amazon-store-feeds`**。
 

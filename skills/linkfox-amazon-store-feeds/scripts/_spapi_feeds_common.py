@@ -108,7 +108,7 @@ def developer_proxy_call(
     region: str,
     path: str,
     method: str,
-    access_token: str,
+    seller_id: str,
     *,
     query_string: Optional[str] = None,
     body: Optional[str] = None,
@@ -119,7 +119,7 @@ def developer_proxy_call(
         "region": region,
         "path": path,
         "method": method,
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
     }
     if query_string:
         params["queryString"] = query_string

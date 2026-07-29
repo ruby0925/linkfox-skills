@@ -1,11 +1,11 @@
 ---
 name: linkfox-amazon-store-auth
-description: 亚马逊店铺授权与管理技能，提供完整的授权流程、令牌刷新、已授权店铺查询以及访问令牌获取能力。获取授权链接时店铺名 sellerName 为必填，用于区分已授权店铺。当用户提到亚马逊店铺授权、绑定亚马逊店铺、刷新令牌、查询店铺令牌、管理授权店铺、Amazon seller authorization, bind Amazon seller account, refresh access token, query store tokens, manage authorized stores时触发此技能。只要其需求涉及亚马逊卖家账号授权、访问令牌管理或店铺列表查询，也应触发此技能。
+description: 亚马逊店铺授权与管理技能，提供完整的授权流程、令牌刷新、已授权店铺查询以及授权状态查询能力。获取授权链接时店铺名 sellerName 为必填，用于区分已授权店铺。当用户提到亚马逊店铺授权、绑定亚马逊店铺、刷新令牌、查询店铺授权状态、管理授权店铺、Amazon seller authorization, bind Amazon seller account, refresh access token, query store token status, manage authorized stores时触发此技能。只要其需求涉及亚马逊卖家账号授权、令牌生命周期管理或店铺列表查询，也应触发此技能。
 ---
 
 # Amazon 店铺授权与管理
 
-本 skill 负责 **亚马逊卖家店铺的 OAuth 授权、已授权店铺列表、访问令牌获取与刷新**，是拉取报告、查询库存、同步订单等所有下游操作的前置依赖。
+本 skill 负责 **亚马逊卖家店铺的 OAuth 授权、已授权店铺列表、授权状态查询与令牌刷新**，是拉取报告、查询库存、同步订单等所有下游操作的前置依赖。下游业务经 `developerProxy` 传入 `sellerId`+`region` 即可，**无需**先取 raw token。
 
 > 📌 **Related skill**：如果用户需要 **拉取亚马逊店铺报告**（库存 / 订单 / 销售 / 财务报告等），请切换到 `linkfox-amazon-store-report`。该 skill 依赖本 skill 提供的授权与令牌能力。
 
@@ -35,14 +35,20 @@ Selling Partner API 是亚马逊为卖家提供的官方接口。本 skill 负�
 | sellerName | string | 店铺名（授权时必填） |
 | region | string | 市场区域代码 NA / EU / FE |
 
-### Store Tokens
+### Store Tokens（授权状态，非 raw token 下发）
+
+`POST /spApi/storeTokens` 返回**状态与元数据**（具体字段以网关为准），供确认授权是否有效、何时过期。**不要**将响应当作下游 `developerProxy` 的 token 来源。
 
 | Field | Type | Description |
 |-------|------|-------------|
-| accessToken | string | 调用亚马逊开放接口的凭证 |
-| refreshToken | string | 用于续签 accessToken |
-| expiresIn | integer | accessToken 过期秒数 |
-| tokenType | string | 通常为 "bearer" |
+| status | string | 授权/令牌状态（如有效、过期、缺失） |
+| authRecordId | integer | 授权记录 ID（如有） |
+| expiresIn | integer | 距 accessToken 过期的秒数（如有） |
+| tokenExpiresAt | string | 绝对过期时间（如有） |
+| message | string | 补充说明 |
+| errcode / errmsg | integer / string | 网关错误（失败时） |
+
+> 兼容说明：旧版网关可能仍返回 `accessToken`/`refreshToken`；Agent **不应**优先读取或传递给下游。下游应使用 `sellerId`+`region` 调 `developerProxy`。
 
 ## Supported Regions
 
@@ -110,37 +116,38 @@ Selling Partner API 是亚马逊为卖家提供的官方接口。本 skill 负�
 
 **Steps**：
 1. 调用 `/spApi/refreshToken`，传入 `sellerId`（可选 `region`）
-2. 返回新的 `accessToken` / `refreshToken`
-3. 数据库自动更新令牌信息
+2. 返回刷新**状态与元数据**（如 `status`、`message`、`expiresIn`）；服务端更新令牌
+3. 下游可直接重试 `developerProxy`（传入相同 `sellerId`+`region`），**无需**读取 raw token
 
-### Scenario 4: Query Store Tokens
+### Scenario 4: Query Store Token Status
 
-**User request**：「获取北美站点 A123 店铺的访问令牌」
+**User request**：「查一下北美站点 A123 店铺的授权/令牌状态」
 
 **Steps**：
 1. 调用 `/spApi/storeTokens`，传入 `sellerId` 与 `region`
-2. 返回全部令牌信息（供下游业务调用）
+2. 向用户展示**状态字段**（`status`、`expiresIn`、`tokenExpiresAt`、`message` 等）
+3. **不要**把响应当作下游 proxy 的 token；业务调用直接带 `sellerId`+`region`
 
-### Scenario 5: Prepare Tokens for Any Store Operation (Standard Preparation Workflow)
+### Scenario 5: Prepare Account Selector for Any Store Operation (Standard Preparation Workflow)
 
-当用户提出任何涉及卖家后台数据的请求（拉报告、查库存、看订单等），**本 skill 负责前置的"选店 → 取令牌"流程**，具体业务由相应的下游 skill 接手。
+当用户提出任何涉及卖家后台数据的请求（拉报告、查库存、看订单等），**本 skill 负责前置的「选店 → 确认授权」**，具体业务由相应的下游 skill 接手。
 
 **Steps**：
 1. **列出已授权店铺**：调用 `/spApi/authorizedStores`
-2. **让用户选择店铺**：如果有多家店铺，请用户明确选哪一家
-3. **获取该店铺令牌**：调用 `/spApi/storeTokens`，传入所选店铺的 `sellerId` 与 `region`
-4. **把 `accessToken` 交给下游 skill**（例如 `linkfox-amazon-store-report`）执行具体操作
+2. **让用户选择店铺**：如果有多家店铺，请用户明确选哪一家，确定 `sellerId` 与 `region`
+3. （可选）调用 `/spApi/storeTokens` **仅作状态确认**（过期则先 `refreshToken`）
+4. **把 `sellerId`+`region` 交给下游 skill**（例如 `linkfox-amazon-store-report`），由下游直接调 `developerProxy`
 
 **Why this workflow is critical**：
 - 用户可能同时授权了多家不同区域的店铺
 - 每家店铺的令牌与权限彼此独立
-- 调用必须使用与店铺匹配的令牌，跳过"选店"会导致歧义和错误
+- 必须使用与店铺匹配的 `sellerId`+`region`，跳过「选店」会导致歧义和错误
 
 ## Display Rules
 
 1. **先有店铺名再生成授权链接**：若用户未提供 `sellerName`，**必须先问**，不允许带空值调用 `/spApi/authorizeUrl`。
 2. **只呈现数据**：展示授权结果、店铺列表、令牌信息即可，不做业务建议。
-3. **安全意识**：不要明文显示完整的 `accessToken`/`refreshToken`，只展示前 10 个字符等掩码形式。
+3. **安全意识**：响应若含 legacy token 字段，不要明文展示；优先呈现 `status` / 过期时间等元数据。
 4. **清晰引导**：返回授权链接时，明确告知用户在浏览器中打开并完成授权。
 5. **错误说明**：授权失败时，基于错误码解释原因并给出建议。
 6. **成功确认**：授权完成后与用户确认，可选择展示该店铺基本信息。
@@ -162,7 +169,7 @@ Selling Partner API 是亚马逊为卖家提供的官方接口。本 skill 负�
 | "授权我的亚马逊店铺" / "Authorize my Amazon store" | 新店铺授权 |
 | "看看已授权的亚马逊店铺" / "Show my authorized stores" | 列出已授权店铺 |
 | "令牌过期了" / "My token expired" | 刷新令牌 |
-| "获取 XXX 店铺的访问令牌" / "Get access token for store" | 查询店铺令牌 |
+| "查 XXX 店铺授权状态" / "Check store token status" | 查询授权状态（storeTokens） |
 | "绑定我的亚马逊账号" / "Connect my Amazon seller account" | 新店铺授权 |
 
 **Not applicable** — 超出本 skill 的业务：
@@ -171,10 +178,11 @@ Selling Partner API 是亚马逊为卖家提供的官方接口。本 skill 负�
 - 产品 listing 管理、订单处理、库存管理、广告投放 → 由其他 skill 负责
 
 **Boundary judgment**：
-- 本 skill 只负责「授权 + 管店铺 + 管令牌 + 为下游准备 accessToken」。
+- 本 skill 只负责「授权 + 管店铺 + 令牌刷新/状态查询 + 为下游准备 `sellerId`+`region` 选店信息」。
+- **不要**为下游 `developerProxy` 调用 `storeTokens` 取 raw `accessToken`（除非兼容极旧客户端且用户明确要求）。
 - 当用户要做具体卖家后台业务（如拉报告）时：
-  1. 本 skill 执行 Scenario 5 的标准前置流程
-  2. 随后切换到对应下游 skill 完成业务逻辑
+  1. 本 skill 执行 Scenario 5 的标准前置流程（选店）
+  2. 随后切换到对应下游 skill，直接 `developerProxy` + `sellerId`+`region`
 - 不要直接越过本 skill 去调具体 Amazon 开放接口。
 
 ## Quick Reference
@@ -186,7 +194,7 @@ Selling Partner API 是亚马逊为卖家提供的官方接口。本 skill 负�
 | Get Authorization URL | /spApi/authorizeUrl | 生成授权链接（需要 sellerName） | ✅ Yes |
 | List Authorized Stores | /spApi/authorizedStores | 查询用户的店铺列表 | ✅ Yes |
 | Refresh Token | /spApi/refreshToken | 刷新访问令牌 | ✅ Yes |
-| Query Store Tokens | /spApi/storeTokens | 获取某店铺的令牌（给下游 skill 用） | ✅ Yes |
+| Query Store Token Status | /spApi/storeTokens | 查询某店铺授权/令牌状态（非下游 token 来源） | ✅ Yes |
 
 详细请求参数、响应结构、错误码，见 `references/api.md`。完整授权流程图，见 `references/authorization-flow.md`。快速上手示例，见 `references/quick-start.md`。
 

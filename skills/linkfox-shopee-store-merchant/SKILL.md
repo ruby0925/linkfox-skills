@@ -5,7 +5,7 @@ description: Shopee（虾皮）跨境商户信息（与 linkfox-shopee-store-aut
 
 # Shopee 商户 Merchant
 
-Shopee Open Platform **Merchant 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/merchant/...`）。
+Shopee Open Platform **Merchant 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/merchant/...`）。
 
 ## 调用方式
 
@@ -51,7 +51,7 @@ Merchant 模块索引：[v2.merchant.get_merchant_info](https://open.shopee.com/
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **商户 vs 店铺**：本 skill 查商户信息及下属店铺；单店资料见 `linkfox-shopee-store-shop`
 - **全球商品**：商户下全球 listing 见 `linkfox-shopee-store-global-product`
 - **典型用法**：`get_merchant_info` 确认 region/currency → `get_shop_list_by_merchant` 列出授权店铺
@@ -69,6 +69,21 @@ Merchant 模块索引：[v2.merchant.get_merchant_info](https://open.shopee.com/
 | `merchant_api.py` | 通用入口（JSON 含 `api` 字段） | — |
 
 共享：`_shopee_merchant_common.py`、`_merchant_endpoints.py`、`_merchant_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `get_merchant_info` | [references/apis/get-merchant-info.md](./references/apis/get-merchant-info.md) |
+| `get_merchant_prepaid_account_list` | [references/apis/get-merchant-prepaid-account-list.md](./references/apis/get-merchant-prepaid-account-list.md) |
+| `get_merchant_warehouse_list` | [references/apis/get-merchant-warehouse-list.md](./references/apis/get-merchant-warehouse-list.md) |
+| `get_merchant_warehouse_location_list` | [references/apis/get-merchant-warehouse-location-list.md](./references/apis/get-merchant-warehouse-location-list.md) |
+| `get_shop_list_by_merchant` | [references/apis/get-shop-list-by-merchant.md](./references/apis/get-shop-list-by-merchant.md) |
+| `get_warehouse_eligible_shop_list` | [references/apis/get-warehouse-eligible-shop-list.md](./references/apis/get-warehouse-eligible-shop-list.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

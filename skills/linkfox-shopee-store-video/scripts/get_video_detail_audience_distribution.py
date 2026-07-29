@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_video_detail_audience_distribution (v2.video.get_video_detail_audience_distribution)
+Shopee Store — get_video_detail_audience_distribution
+
 官方: https://open.shopee.com/documents/v2/v2.video.get_video_detail_audience_distribution?module=129&type=1
+
+入参说明见 references/apis/get-video-detail-audience-distribution.md。
 """
 
 from __future__ import annotations
@@ -9,7 +12,7 @@ from __future__ import annotations
 import json
 import sys
 
-from _video_api_runner import emit_result, lf_inline_flag, run_video_api
+from _video_api_runner import run_video_api
 
 
 def main() -> None:
@@ -17,8 +20,7 @@ def main() -> None:
         print("Usage: get_video_detail_audience_distribution.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_video_api("get_video_detail_audience_distribution", params, "get_video_detail_audience_distribution.py"), inline)
+    print(json.dumps(run_video_api("get_video_detail_audience_distribution", params, "get_video_detail_audience_distribution.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

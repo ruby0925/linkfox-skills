@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — add_item_list (v2.shop_category.add_item_list)
+Shopee Store — add_item_list
+
 官方: https://open.shopee.com/documents/v2/v2.shop_category.add_item_list?module=101&type=1
+
+入参说明见 references/apis/add-item-list.md。
 """
 
 from __future__ import annotations

@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺站内广告 Ads（与 linkfox-shopee-store
 
 # Shopee 店铺 Ads
 
-Shopee Open Platform **Ads 模块**（23 个 API，不含即将下线的 auto product ads）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/ads/...`）。
+Shopee Open Platform **Ads 模块**（23 个 API，不含即将下线的 auto product ads）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/ads/...`）。
 
 ## 调用方式
 
@@ -51,7 +51,7 @@ Ads 模块索引：[v2.ads.get_total_balance](https://open.shopee.com/documents/
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **余额**：`get_total_balance` 查广告账户余额
 - **手动商品广告**：`create_manual_product_ads` → `edit_manual_product_ads` / `edit_manual_product_ad_keywords`
 - **效果报表**：`get_all_cpc_ads_*_performance`、`get_product_campaign_*_performance`
@@ -70,6 +70,38 @@ Ads 模块索引：[v2.ads.get_total_balance](https://open.shopee.com/documents/
 | 通用入口 | `ads_api.py`（JSON 含 `api` 字段） |
 
 完整列表见 `references/api.md`。共享：`_shopee_ads_common.py`、`_ads_endpoints.py`、`_ads_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `check_create_gms_product_campaign_eligibility` | [references/apis/check-create-gms-product-campaign-eligibility.md](./references/apis/check-create-gms-product-campaign-eligibility.md) |
+| `create_gms_product_campaign` | [references/apis/create-gms-product-campaign.md](./references/apis/create-gms-product-campaign.md) |
+| `create_manual_product_ads` | [references/apis/create-manual-product-ads.md](./references/apis/create-manual-product-ads.md) |
+| `edit_gms_item_product_campaign` | [references/apis/edit-gms-item-product-campaign.md](./references/apis/edit-gms-item-product-campaign.md) |
+| `edit_gms_product_campaign` | [references/apis/edit-gms-product-campaign.md](./references/apis/edit-gms-product-campaign.md) |
+| `edit_manual_product_ad_keywords` | [references/apis/edit-manual-product-ad-keywords.md](./references/apis/edit-manual-product-ad-keywords.md) |
+| `edit_manual_product_ads` | [references/apis/edit-manual-product-ads.md](./references/apis/edit-manual-product-ads.md) |
+| `get_ads_facil_shop_rate` | [references/apis/get-ads-facil-shop-rate.md](./references/apis/get-ads-facil-shop-rate.md) |
+| `get_all_cpc_ads_daily_performance` | [references/apis/get-all-cpc-ads-daily-performance.md](./references/apis/get-all-cpc-ads-daily-performance.md) |
+| `get_all_cpc_ads_hourly_performance` | [references/apis/get-all-cpc-ads-hourly-performance.md](./references/apis/get-all-cpc-ads-hourly-performance.md) |
+| `get_create_product_ad_budget_suggestion` | [references/apis/get-create-product-ad-budget-suggestion.md](./references/apis/get-create-product-ad-budget-suggestion.md) |
+| `get_gms_campaign_performance` | [references/apis/get-gms-campaign-performance.md](./references/apis/get-gms-campaign-performance.md) |
+| `get_gms_item_performance` | [references/apis/get-gms-item-performance.md](./references/apis/get-gms-item-performance.md) |
+| `get_product_campaign_daily_performance` | [references/apis/get-product-campaign-daily-performance.md](./references/apis/get-product-campaign-daily-performance.md) |
+| `get_product_campaign_hourly_performance` | [references/apis/get-product-campaign-hourly-performance.md](./references/apis/get-product-campaign-hourly-performance.md) |
+| `get_product_level_campaign_id_list` | [references/apis/get-product-level-campaign-id-list.md](./references/apis/get-product-level-campaign-id-list.md) |
+| `get_product_level_campaign_setting_info` | [references/apis/get-product-level-campaign-setting-info.md](./references/apis/get-product-level-campaign-setting-info.md) |
+| `get_product_recommended_roi_target` | [references/apis/get-product-recommended-roi-target.md](./references/apis/get-product-recommended-roi-target.md) |
+| `get_recommended_item_list` | [references/apis/get-recommended-item-list.md](./references/apis/get-recommended-item-list.md) |
+| `get_recommended_keyword_list` | [references/apis/get-recommended-keyword-list.md](./references/apis/get-recommended-keyword-list.md) |
+| `get_shop_toggle_info` | [references/apis/get-shop-toggle-info.md](./references/apis/get-shop-toggle-info.md) |
+| `get_total_balance` | [references/apis/get-total-balance.md](./references/apis/get-total-balance.md) |
+| `list_gms_user_deleted_item` | [references/apis/list-gms-user-deleted-item.md](./references/apis/list-gms-user-deleted-item.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

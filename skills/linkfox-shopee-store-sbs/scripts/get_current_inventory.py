@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_current_inventory (v2.sbs.get_current_inventory)
+Shopee Store — get_current_inventory
+
 官方: https://open.shopee.com/documents/v2/v2.sbs.get_current_inventory?module=124&type=1
+
+入参说明见 references/apis/get-current-inventory.md。
 """
 
 from __future__ import annotations

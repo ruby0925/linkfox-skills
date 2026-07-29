@@ -182,10 +182,6 @@ python ../linkfox-aigc-imagegen/scripts/aigc_imagegen.py "$PARAMS"
 - 视频生成 → `linkfox-aigc-videogen`
 - 报告格式输出 → `linkfox-report-generator`
 
-## 积分消耗规则
-
-不消耗积分。
-
 ## 反馈
 
 参见 `references/api.md`。

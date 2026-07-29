@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — end_follow_prize (v2.follow_prize.end_follow_prize)
+Shopee Store — end_follow_prize
+
 官方: https://open.shopee.com/documents/v2/v2.follow_prize.end_follow_prize?module=113&type=1
+
+入参说明见 references/apis/end-follow-prize.md。
 """
 
 from __future__ import annotations

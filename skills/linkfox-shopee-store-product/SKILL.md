@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺商品管理（与 linkfox-shopee-store-aut
 
 # Shopee 店铺 Product
 
-Shopee Open Platform **Product 模块**（57 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/product/...`）。
+Shopee Open Platform **Product 模块**（57 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/product/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ Product 模块索引：[v2.product.get_category](https://open.shopee.com/documen
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **上架流程**：`get_category` → `get_attribute_tree` → `add_item`（复杂 body 建议传 `body` 字段）
 - **日常运营**：`get_item_list` / `get_item_base_info` 查商品；`update_price` / `update_stock` 改价改库存；`unlist_item` 上下架
 - **SKU**：`init_tier_variation` / `get_model_list` / `add_model` 等
@@ -68,6 +68,72 @@ Product 模块索引：[v2.product.get_category](https://open.shopee.com/documen
 | 通用入口 | `product_api.py`（JSON 含 `api` 字段） |
 
 共享：`_shopee_product_common.py`、`_product_endpoints.py`、`_product_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_item` | [references/apis/add-item.md](./references/apis/add-item.md) |
+| `add_kit_item` | [references/apis/add-kit-item.md](./references/apis/add-kit-item.md) |
+| `add_model` | [references/apis/add-model.md](./references/apis/add-model.md) |
+| `boost_item` | [references/apis/boost-item.md](./references/apis/boost-item.md) |
+| `category_recommend` | [references/apis/category-recommend.md](./references/apis/category-recommend.md) |
+| `delete_item` | [references/apis/delete-item.md](./references/apis/delete-item.md) |
+| `delete_model` | [references/apis/delete-model.md](./references/apis/delete-model.md) |
+| `generate_kit_image` | [references/apis/generate-kit-image.md](./references/apis/generate-kit-image.md) |
+| `get_aitem_by_pitem_id` | [references/apis/get-aitem-by-pitem-id.md](./references/apis/get-aitem-by-pitem-id.md) |
+| `get_all_vehicle_list` | [references/apis/get-all-vehicle-list.md](./references/apis/get-all-vehicle-list.md) |
+| `get_attribute_tree` | [references/apis/get-attribute-tree.md](./references/apis/get-attribute-tree.md) |
+| `get_boosted_list` | [references/apis/get-boosted-list.md](./references/apis/get-boosted-list.md) |
+| `get_brand_list` | [references/apis/get-brand-list.md](./references/apis/get-brand-list.md) |
+| `get_category` | [references/apis/get-category.md](./references/apis/get-category.md) |
+| `get_comment` | [references/apis/get-comment.md](./references/apis/get-comment.md) |
+| `get_direct_item_list` | [references/apis/get-direct-item-list.md](./references/apis/get-direct-item-list.md) |
+| `get_direct_shop_recommended_price` | [references/apis/get-direct-shop-recommended-price.md](./references/apis/get-direct-shop-recommended-price.md) |
+| `get_item_base_info` | [references/apis/get-item-base-info.md](./references/apis/get-item-base-info.md) |
+| `get_item_content_diagnosis_result` | [references/apis/get-item-content-diagnosis-result.md](./references/apis/get-item-content-diagnosis-result.md) |
+| `get_item_extra_info` | [references/apis/get-item-extra-info.md](./references/apis/get-item-extra-info.md) |
+| `get_item_limit` | [references/apis/get-item-limit.md](./references/apis/get-item-limit.md) |
+| `get_item_list` | [references/apis/get-item-list.md](./references/apis/get-item-list.md) |
+| `get_item_list_by_content_diagnosis` | [references/apis/get-item-list-by-content-diagnosis.md](./references/apis/get-item-list-by-content-diagnosis.md) |
+| `get_item_promotion` | [references/apis/get-item-promotion.md](./references/apis/get-item-promotion.md) |
+| `get_item_violation_info` | [references/apis/get-item-violation-info.md](./references/apis/get-item-violation-info.md) |
+| `get_kit_item_info` | [references/apis/get-kit-item-info.md](./references/apis/get-kit-item-info.md) |
+| `get_kit_item_limit` | [references/apis/get-kit-item-limit.md](./references/apis/get-kit-item-limit.md) |
+| `get_main_item_list` | [references/apis/get-main-item-list.md](./references/apis/get-main-item-list.md) |
+| `get_mart_item_by_outlet_item_id` | [references/apis/get-mart-item-by-outlet-item-id.md](./references/apis/get-mart-item-by-outlet-item-id.md) |
+| `get_mart_item_mapping_by_id` | [references/apis/get-mart-item-mapping-by-id.md](./references/apis/get-mart-item-mapping-by-id.md) |
+| `get_model_list` | [references/apis/get-model-list.md](./references/apis/get-model-list.md) |
+| `get_product_certification_rule` | [references/apis/get-product-certification-rule.md](./references/apis/get-product-certification-rule.md) |
+| `get_recommend_attribute` | [references/apis/get-recommend-attribute.md](./references/apis/get-recommend-attribute.md) |
+| `get_size_chart_detail` | [references/apis/get-size-chart-detail.md](./references/apis/get-size-chart-detail.md) |
+| `get_size_chart_list` | [references/apis/get-size-chart-list.md](./references/apis/get-size-chart-list.md) |
+| `get_ssp_info` | [references/apis/get-ssp-info.md](./references/apis/get-ssp-info.md) |
+| `get_ssp_list` | [references/apis/get-ssp-list.md](./references/apis/get-ssp-list.md) |
+| `get_variations` | [references/apis/get-variations.md](./references/apis/get-variations.md) |
+| `get_vehicle_list_by_compatibility_detail` | [references/apis/get-vehicle-list-by-compatibility-detail.md](./references/apis/get-vehicle-list-by-compatibility-detail.md) |
+| `get_weight_recommendation` | [references/apis/get-weight-recommendation.md](./references/apis/get-weight-recommendation.md) |
+| `init_tier_variation` | [references/apis/init-tier-variation.md](./references/apis/init-tier-variation.md) |
+| `link_ssp` | [references/apis/link-ssp.md](./references/apis/link-ssp.md) |
+| `publish_item_to_outlet_shop` | [references/apis/publish-item-to-outlet-shop.md](./references/apis/publish-item-to-outlet-shop.md) |
+| `register_brand` | [references/apis/register-brand.md](./references/apis/register-brand.md) |
+| `reply_comment` | [references/apis/reply-comment.md](./references/apis/reply-comment.md) |
+| `search_attribute_value_list` | [references/apis/search-attribute-value-list.md](./references/apis/search-attribute-value-list.md) |
+| `search_item` | [references/apis/search-item.md](./references/apis/search-item.md) |
+| `search_unpackaged_model_list` | [references/apis/search-unpackaged-model-list.md](./references/apis/search-unpackaged-model-list.md) |
+| `unlink_ssp` | [references/apis/unlink-ssp.md](./references/apis/unlink-ssp.md) |
+| `unlist_item` | [references/apis/unlist-item.md](./references/apis/unlist-item.md) |
+| `update_item` | [references/apis/update-item.md](./references/apis/update-item.md) |
+| `update_kit_item` | [references/apis/update-kit-item.md](./references/apis/update-kit-item.md) |
+| `update_model` | [references/apis/update-model.md](./references/apis/update-model.md) |
+| `update_price` | [references/apis/update-price.md](./references/apis/update-price.md) |
+| `update_sip_item_price` | [references/apis/update-sip-item-price.md](./references/apis/update-sip-item-price.md) |
+| `update_stock` | [references/apis/update-stock.md](./references/apis/update-stock.md) |
+| `update_tier_variation` | [references/apis/update-tier-variation.md](./references/apis/update-tier-variation.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

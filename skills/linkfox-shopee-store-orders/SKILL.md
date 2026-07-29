@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺订单（与 linkfox-shopee-store-auth 同�
 
 # Shopee 店铺 Orders
 
-Shopee Open Platform **Order 模块**（22 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/order/...`）。
+Shopee Open Platform **Order 模块**（22 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/order/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ Order 模块索引：[Shopee Open Platform — Order](https://open.shopee.com/do
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API（`partner_id`/`sign` 由代理自动处理）
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API（`partner_id`/`sign` 由代理自动处理）
 - **列表 → 详情**：`get_order_list` 得 `order_sn` → `get_order_detail` 拉全量字段（≤50 个/次）
 - **包裹流**：`search_package_list` / `get_package_detail` / `get_shipment_list` 用于发货前包裹视图
 - **写操作**：`split_order`、`cancel_order`、`set_note` 等为 **POST JSON body**
@@ -84,7 +84,38 @@ Order 模块索引：[Shopee Open Platform — Order](https://open.shopee.com/do
 | `get_estimiate_cancel_value.py` | get_estimiate_cancel_value | POST |
 | `order_api.py` | 通用入口（JSON 含 `api` 字段） | — |
 
-共享：`_shopee_orders_common.py`、`_order_endpoints.py`、`_order_api_runner.py`。入参详见 `references/api.md`。
+共享：`_shopee_orders_common.py`、`_order_endpoints.py`、`_order_api_runner.py`。入参见 `references/apis/`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `cancel_order` | [references/apis/cancel-order.md](./references/apis/cancel-order.md) |
+| `download_fbs_invoices` | [references/apis/download-fbs-invoices.md](./references/apis/download-fbs-invoices.md) |
+| `download_invoice_doc` | [references/apis/download-invoice-doc.md](./references/apis/download-invoice-doc.md) |
+| `generate_fbs_invoices` | [references/apis/generate-fbs-invoices.md](./references/apis/generate-fbs-invoices.md) |
+| `get_booking_detail` | [references/apis/get-booking-detail.md](./references/apis/get-booking-detail.md) |
+| `get_booking_list` | [references/apis/get-booking-list.md](./references/apis/get-booking-list.md) |
+| `get_buyer_invoice_info` | [references/apis/get-buyer-invoice-info.md](./references/apis/get-buyer-invoice-info.md) |
+| `get_estimiate_cancel_value` | [references/apis/get-estimiate-cancel-value.md](./references/apis/get-estimiate-cancel-value.md) |
+| `get_fbs_invoices_result` | [references/apis/get-fbs-invoices-result.md](./references/apis/get-fbs-invoices-result.md) |
+| `get_order_detail` | [references/apis/get-order-detail.md](./references/apis/get-order-detail.md) |
+| `get_order_list` | [references/apis/get-order-list.md](./references/apis/get-order-list.md) |
+| `get_package_detail` | [references/apis/get-package-detail.md](./references/apis/get-package-detail.md) |
+| `get_pending_buyer_invoice_order_list` | [references/apis/get-pending-buyer-invoice-order-list.md](./references/apis/get-pending-buyer-invoice-order-list.md) |
+| `get_shipment_list` | [references/apis/get-shipment-list.md](./references/apis/get-shipment-list.md) |
+| `get_warehouse_filter_config` | [references/apis/get-warehouse-filter-config.md](./references/apis/get-warehouse-filter-config.md) |
+| `handle_buyer_cancellation` | [references/apis/handle-buyer-cancellation.md](./references/apis/handle-buyer-cancellation.md) |
+| `handle_prescription_check` | [references/apis/handle-prescription-check.md](./references/apis/handle-prescription-check.md) |
+| `search_package_list` | [references/apis/search-package-list.md](./references/apis/search-package-list.md) |
+| `set_note` | [references/apis/set-note.md](./references/apis/set-note.md) |
+| `split_order` | [references/apis/split-order.md](./references/apis/split-order.md) |
+| `unsplit_order` | [references/apis/unsplit-order.md](./references/apis/unsplit-order.md) |
+| `upload_invoice_doc` | [references/apis/upload-invoice-doc.md](./references/apis/upload-invoice-doc.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

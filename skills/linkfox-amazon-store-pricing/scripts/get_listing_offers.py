@@ -126,14 +126,14 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_get(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     query_string: Optional[str] = None,
 ) -> dict:
     params: dict = {
         "region": region,
         "path": path,
         "method": "GET",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
     }
     if query_string:
         params["queryString"] = query_string
@@ -218,13 +218,7 @@ def main() -> None:
     query_string = _build_query_string(marketplace_id, item_condition, customer_type)
     path = _path_for_listing_offers(sku)
 
-    tokens = get_store_tokens(seller_id, region)
-    if "error" in tokens or "accessToken" not in tokens:
-        print(json.dumps(tokens, indent=2, ensure_ascii=False))
-        sys.exit(1)
-
-    access_token = tokens["accessToken"]
-    proxy = developer_proxy_get(region, path, access_token, query_string)
+    proxy = developer_proxy_get(region, path, seller_id, query_string)
 
     out: dict = {
         "developerProxy": proxy,

@@ -5,7 +5,7 @@ description: Shopee（虾皮）精选商品 Top Picks（与 linkfox-shopee-store
 
 # Shopee 精选商品 Top Picks
 
-Shopee Open Platform **Top Picks 模块**（4 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/top_picks/...`）。
+Shopee Open Platform **Top Picks 模块**（4 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/top_picks/...`）。
 
 ## 调用方式
 
@@ -55,6 +55,19 @@ Top Picks 模块索引：[v2.top_picks.get_top_picks_list](https://open.shopee.c
 | `update_top_picks.py` | update_top_picks | POST |
 | `delete_top_picks.py` | delete_top_picks | POST |
 | `top_picks_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_top_picks` | [references/apis/add-top-picks.md](./references/apis/add-top-picks.md) |
+| `delete_top_picks` | [references/apis/delete-top-picks.md](./references/apis/delete-top-picks.md) |
+| `get_top_picks_list` | [references/apis/get-top-picks-list.md](./references/apis/get-top-picks-list.md) |
+| `update_top_picks` | [references/apis/update-top-picks.md](./references/apis/update-top-picks.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

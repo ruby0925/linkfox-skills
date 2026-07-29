@@ -5,7 +5,7 @@ description: Shopee（虾皮）媒体上传 MediaSpace（与 linkfox-shopee-stor
 
 # Shopee 媒体 MediaSpace
 
-Shopee Open Platform **MediaSpace 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/media_space/...`）。
+Shopee Open Platform **MediaSpace 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/media_space/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ MediaSpace 模块索引：[v2.media_space.init_video_upload](https://open.shopee
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **图片上传**：`upload_image` → 返回 Shopee 图片 URL（供 `add_item` 等使用）
 - **视频分片上传**：`init_video_upload` → `upload_video_part`(×N) → `complete_video_upload` → `get_video_upload_result`
 - **视频发布/管理** → `linkfox-shopee-store-video`（Video 模块，非上传）
@@ -69,6 +69,21 @@ MediaSpace 模块索引：[v2.media_space.init_video_upload](https://open.shopee
 | `media_space_api.py` | 通用入口（JSON 含 `api` 字段） | — |
 
 共享：`_shopee_media_space_common.py`、`_media_space_endpoints.py`、`_media_space_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `cancel_video_upload` | [references/apis/cancel-video-upload.md](./references/apis/cancel-video-upload.md) |
+| `complete_video_upload` | [references/apis/complete-video-upload.md](./references/apis/complete-video-upload.md) |
+| `get_video_upload_result` | [references/apis/get-video-upload-result.md](./references/apis/get-video-upload-result.md) |
+| `init_video_upload` | [references/apis/init-video-upload.md](./references/apis/init-video-upload.md) |
+| `upload_image` | [references/apis/upload-image.md](./references/apis/upload-image.md) |
+| `upload_video_part` | [references/apis/upload-video-part.md](./references/apis/upload-video-part.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

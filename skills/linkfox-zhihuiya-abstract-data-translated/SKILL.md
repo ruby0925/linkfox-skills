@@ -9,7 +9,7 @@ This skill guides you on how to retrieve translated patent titles and abstracts 
 
 ## Core Concepts
 
-Zhihuiya (PatSnap) is a leading patent intelligence platform. This tool queries its database to return translated titles and abstracts for one or more patents. You can look up patents by **patent ID** or **publication (announcement) number**, and receive translations in Chinese, English, or Japanese.
+Zhihuiya (PatSnap) is a leading patent intelligence platform. This tool queries its database to return translated titles and abstracts for a single patent per request. You can look up patents by **patent ID** or **publication (announcement) number**, and receive translations in Chinese, English, or Japanese.
 
 **Patent identification**: Each patent can be identified by either a `patentId` (internal Zhihuiya identifier) or a `patentNumber` (public publication/announcement number such as `US20200012345A1` or `CN112345678A`). If both are provided, the patent ID takes priority.
 
@@ -19,17 +19,19 @@ Zhihuiya (PatSnap) is a leading patent intelligence platform. This tool queries 
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| patentId | string | At least one of patentId or patentNumber | Zhihuiya internal patent ID. Separate multiple IDs with commas. Max length 60,000 characters. |
-| patentNumber | string | At least one of patentId or patentNumber | Publication (announcement) number. Separate multiple numbers with commas. Max length 60,000 characters. |
+| patentId | string | At least one of patentId or patentNumber | Zhihuiya internal patent ID. Single patent ID only. Do NOT pass comma-separated multiple IDs. Max length 60,000 characters. |
+| patentNumber | string | At least one of patentId or patentNumber | Publication (announcement) number. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. Max length 60,000 characters. |
 | replaceByRelated | integer | No | Whether to substitute a family patent abstract when the original is unavailable. `1` = yes, `0` = no. Default `0`. |
 | lang | string | No | Target translation language. `en` = English (default), `cn` = Chinese, `jp` = Japanese. |
 
 ### Key Rules
 
 1. **At least one identifier is required**: You must provide either `patentId` or `patentNumber` (or both). If both are supplied, `patentId` takes priority.
-2. **Batch queries**: Multiple patents can be queried at once by separating values with commas.
+2. **Single patent per request**: Only one patent may be passed per request. If the user has multiple patents, obtain explicit consent and make a separate call for each.
 3. **Default language is English**: When the user does not specify a language, use `en`.
 4. **Family fallback**: Set `replaceByRelated` to `1` only when the user explicitly wants a substitute abstract from a family patent if the original is missing.
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Response Fields
 
@@ -52,23 +54,11 @@ Look up patent number US20200012345A1 and give me the English abstract.
 ```
 Parameters: `patentNumber = "US20200012345A1"`, `lang = "en"`
 
-**2. Translate multiple patents to Chinese**
-```
-Get the Chinese translation of abstracts for patents CN112345678A and US20200067890A1.
-```
-Parameters: `patentNumber = "CN112345678A,US20200067890A1"`, `lang = "cn"`
-
 **3. Look up by patent ID with family fallback**
 ```
 Get the Japanese abstract for patent ID 12345678. If the abstract is unavailable, use a family patent instead.
 ```
 Parameters: `patentId = "12345678"`, `lang = "jp"`, `replaceByRelated = 1`
-
-**4. Batch query by patent IDs**
-```
-Translate the titles and abstracts for these patent IDs: 111111, 222222, 333333.
-```
-Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 
 ## Display Rules
 
@@ -82,7 +72,7 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 
 - **API 端点**：`POST /zhihuiya/abstractDataTranslated`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_abstract_translated.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-abstract-data-translated-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -123,7 +113,6 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 | "What does patent XX say / what is it about" | Abstract lookup |
 | "Get the Chinese/Japanese version of this patent" | Specific language translation |
 | "Look up the abstract for patent number XX" | Publication number lookup |
-| "Translate these patents in batch" | Batch translation |
 | "The abstract is missing, try a family patent" | Family patent fallback |
 
 **Not applicable** -- Needs beyond abstract translation:
@@ -138,6 +127,8 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利摘要翻译结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

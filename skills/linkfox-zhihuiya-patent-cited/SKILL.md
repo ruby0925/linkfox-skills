@@ -24,10 +24,12 @@ You must provide at least one of the following identifiers. If both are supplied
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| patentId | Zhihuiya internal patent ID. Multiple IDs separated by commas (max 100). | abc123def456 |
-| patentNumber | Publication / announcement number. Multiple numbers separated by commas (max 100). | US10123456B2, CN112345678A |
+| patentId | Zhihuiya internal patent ID. Single patent ID only. Do NOT pass comma-separated multiple IDs. | abc123def456 |
+| patentNumber | Publication / announcement number. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. | US10123456B2 |
 
 **Important**: At least one of `patentId` or `patentNumber` is required. When the user provides a publication number (e.g., "US10123456B2"), use `patentNumber`. When they provide internal IDs, use `patentId`.
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Usage Examples
 
@@ -39,14 +41,6 @@ Query: "How many citations does patent US10123456B2 have?"
 }
 ```
 
-**2. Multiple patents citation comparison**
-Query: "Compare citations for CN112345678A and CN113456789B"
-```json
-{
-  "patentNumber": "CN112345678A,CN113456789B"
-}
-```
-
 **3. Lookup by patent ID**
 Query: "Get citation data for patent ID abc123def456"
 ```json
@@ -55,18 +49,10 @@ Query: "Get citation data for patent ID abc123def456"
 }
 ```
 
-**4. Batch query with multiple IDs**
-Query: "Citation info for these patent IDs: id001, id002, id003"
-```json
-{
-  "patentId": "id001,id002,id003"
-}
-```
-
 ## Display Rules
 
 1. **Present data in tables**: Show citation results in clear, structured tables. Include the publication number, 3-year citations, 5-year citations, and family citation counts.
-2. **Highlight key metrics**: When comparing multiple patents, highlight the one with the highest citation counts.
+2. **Highlight key metrics**: Each call returns a single patent's data; highlight its citation counts across the 3-year, 5-year, and family metrics.
 3. **Explain family types**: If the user is unfamiliar with patent families, briefly explain the difference between Simple, INPADOC, and PatSnap family definitions.
 4. **Citing patent details**: If the response includes a `citedByPatents` array with details of citing patents, present them in a sub-table or expandable list.
 5. **Error handling**: When a query fails, explain the reason based on the response and suggest checking whether the patent number or ID is correct.
@@ -76,7 +62,7 @@ Query: "Citation info for these patent IDs: id001, id002, id003"
 
 - **API 端点**：`POST /zhihuiya/patentCited`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_cited_by.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-patent-cited-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -109,7 +95,6 @@ Query: "Citation info for these patent IDs: id001, id002, id003"
 | "How many times has this patent been cited" | Basic citation count |
 | "Which patents cite this one" | Citing patent list |
 | "Patent influence analysis" | Citation-based impact |
-| "Compare citations between patents" | Multi-patent comparison |
 | "3-year / 5-year citation count" | Time-windowed citation metrics |
 | "Patent family citation data" | Family-level citation analysis |
 | "Forward citations for patent X" | Synonym for cited-by lookup |
@@ -125,6 +110,8 @@ Query: "Citation info for these patent IDs: id001, id002, id003"
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利被引证结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

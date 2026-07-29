@@ -5,7 +5,7 @@ description: Shopee（虾皮）跨境全球商品 GlobalProduct（与 linkfox-sh
 
 # Shopee 全球商品 GlobalProduct
 
-Shopee Open Platform **GlobalProduct 模块**（34 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/global_product/...`）。
+Shopee Open Platform **GlobalProduct 模块**（34 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/global_product/...`）。
 
 ## 调用方式
 
@@ -51,7 +51,7 @@ GlobalProduct 模块索引：[v2.global_product.get_category](https://open.shope
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **Product vs GlobalProduct**：`linkfox-shopee-store-product` 管单店 listing；本 skill 管**跨境全球商品**及发布到各站点
 - **典型流程**：`get_category` → `get_attribute_tree` → `add_global_item` → `create_publish_task` → `get_publish_task_result`
 - **SKU**：`init_tier_variation` / `get_global_model_list` / `add_global_model` 等
@@ -70,6 +70,49 @@ GlobalProduct 模块索引：[v2.global_product.get_category](https://open.shope
 | 通用入口 | `global_product_api.py`（JSON 含 `api` 字段） |
 
 共享：`_shopee_global_product_common.py`、`_global_product_endpoints.py`、`_global_product_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_global_item` | [references/apis/add-global-item.md](./references/apis/add-global-item.md) |
+| `add_global_model` | [references/apis/add-global-model.md](./references/apis/add-global-model.md) |
+| `category_recommend` | [references/apis/category-recommend.md](./references/apis/category-recommend.md) |
+| `create_publish_task` | [references/apis/create-publish-task.md](./references/apis/create-publish-task.md) |
+| `delete_global_item` | [references/apis/delete-global-item.md](./references/apis/delete-global-item.md) |
+| `delete_global_model` | [references/apis/delete-global-model.md](./references/apis/delete-global-model.md) |
+| `get_attribute_tree` | [references/apis/get-attribute-tree.md](./references/apis/get-attribute-tree.md) |
+| `get_brand_list` | [references/apis/get-brand-list.md](./references/apis/get-brand-list.md) |
+| `get_category` | [references/apis/get-category.md](./references/apis/get-category.md) |
+| `get_global_item_id` | [references/apis/get-global-item-id.md](./references/apis/get-global-item-id.md) |
+| `get_global_item_info` | [references/apis/get-global-item-info.md](./references/apis/get-global-item-info.md) |
+| `get_global_item_limit` | [references/apis/get-global-item-limit.md](./references/apis/get-global-item-limit.md) |
+| `get_global_item_list` | [references/apis/get-global-item-list.md](./references/apis/get-global-item-list.md) |
+| `get_global_model_list` | [references/apis/get-global-model-list.md](./references/apis/get-global-model-list.md) |
+| `get_local_adjustment_rate` | [references/apis/get-local-adjustment-rate.md](./references/apis/get-local-adjustment-rate.md) |
+| `get_publish_task_result` | [references/apis/get-publish-task-result.md](./references/apis/get-publish-task-result.md) |
+| `get_publishable_shop` | [references/apis/get-publishable-shop.md](./references/apis/get-publishable-shop.md) |
+| `get_published_list` | [references/apis/get-published-list.md](./references/apis/get-published-list.md) |
+| `get_recommend_attribute` | [references/apis/get-recommend-attribute.md](./references/apis/get-recommend-attribute.md) |
+| `get_shop_publishable_status` | [references/apis/get-shop-publishable-status.md](./references/apis/get-shop-publishable-status.md) |
+| `get_size_chart_detail` | [references/apis/get-size-chart-detail.md](./references/apis/get-size-chart-detail.md) |
+| `get_size_chart_list` | [references/apis/get-size-chart-list.md](./references/apis/get-size-chart-list.md) |
+| `get_variations` | [references/apis/get-variations.md](./references/apis/get-variations.md) |
+| `init_tier_variation` | [references/apis/init-tier-variation.md](./references/apis/init-tier-variation.md) |
+| `search_global_attribute_value_list` | [references/apis/search-global-attribute-value-list.md](./references/apis/search-global-attribute-value-list.md) |
+| `set_sync_field` | [references/apis/set-sync-field.md](./references/apis/set-sync-field.md) |
+| `support_size_chart` | [references/apis/support-size-chart.md](./references/apis/support-size-chart.md) |
+| `update_global_item` | [references/apis/update-global-item.md](./references/apis/update-global-item.md) |
+| `update_global_model` | [references/apis/update-global-model.md](./references/apis/update-global-model.md) |
+| `update_local_adjustment_rate` | [references/apis/update-local-adjustment-rate.md](./references/apis/update-local-adjustment-rate.md) |
+| `update_price` | [references/apis/update-price.md](./references/apis/update-price.md) |
+| `update_size_chart` | [references/apis/update-size-chart.md](./references/apis/update-size-chart.md) |
+| `update_stock` | [references/apis/update-stock.md](./references/apis/update-stock.md) |
+| `update_tier_variation` | [references/apis/update-tier-variation.md](./references/apis/update-tier-variation.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

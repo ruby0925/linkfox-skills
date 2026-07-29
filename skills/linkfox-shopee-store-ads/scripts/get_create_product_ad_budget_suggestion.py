@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_create_product_ad_budget_suggestion (v2.ads.get_create_product_ad_budget_suggestion)
+Shopee Store — get_create_product_ad_budget_suggestion
+
 官方: https://open.shopee.com/documents/v2/v2.ads.get_create_product_ad_budget_suggestion?module=117&type=1
+
+入参说明见 references/apis/get-create-product-ad-budget-suggestion.md。
 """
 
 from __future__ import annotations
-from _shopee_ads_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_create_product_ad_budget_suggestion.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ads_api("get_create_product_ad_budget_suggestion", params, "get_create_product_ad_budget_suggestion.py"), inline)
+    print(json.dumps(run_ads_api("get_create_product_ad_budget_suggestion", params, "get_create_product_ad_budget_suggestion.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

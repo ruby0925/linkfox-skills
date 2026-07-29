@@ -20,14 +20,15 @@ You must provide at least one of the following two parameters. If both are provi
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| patentId | string | Conditionally | Patent ID(s). Multiple values separated by commas. Maximum 100 entries. |
-| patentNumber | string | Conditionally | Publication/announcement number(s). Multiple values separated by commas. Maximum 100 entries. |
+| patentId | string | Conditionally | Single patent ID only. Do NOT pass comma-separated multiple IDs. |
+| patentNumber | string | Conditionally | Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. |
 
 **Rules**:
 1. At least one of `patentId` or `patentNumber` must be provided.
 2. If both are present, `patentId` is used preferentially.
-3. Multiple values are separated by commas (English commas).
-4. Each parameter supports up to 100 entries per request.
+3. Only one patent may be passed per request. If the user has multiple patents, obtain explicit consent and make a separate call for each.
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Response Fields
 
@@ -47,7 +48,7 @@ You must provide at least one of the following two parameters. If both are provi
 
 - **API 端点**：`POST /zhihuiya/patentForwardCitation`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_cited_references.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-patent-forward-citation-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -79,12 +80,6 @@ Look up the forward citations for patent US10000000B2.
 ```
 Parameters: `{"patentNumber": "US10000000B2"}`
 
-**2. Query forward citations for multiple patents**
-```
-Find all citations for patents US10000000B2, US9876543B1, and EP3456789A1.
-```
-Parameters: `{"patentNumber": "US10000000B2,US9876543B1,EP3456789A1"}`
-
 **3. Query forward citations by patent ID**
 ```
 Retrieve the cited references for patent ID 12345678.
@@ -103,7 +98,7 @@ Parameters: `{"patentId": "12345678", "patentNumber": "US10000000B2"}` (patentId
 2. **Summarize counts**: Always state the total number of cited patents and cited non-patent literature items.
 3. **No fabrication**: Only display data returned by the API. Do not infer or fabricate citation details.
 4. **Error handling**: When a query fails, explain the reason based on the error response and suggest the user verify their patent ID or publication number.
-5. **Batch results**: When querying multiple patents, organize results by patent so each patent's citations are clearly grouped.
+5. **Single patent results**: Results contain a single patent's citation data.
 6. **Empty results**: If a patent has no citations, explicitly inform the user rather than showing an empty table.
 ## User Expression & Scenario Quick Reference
 
@@ -130,6 +125,7 @@ Parameters: `{"patentId": "12345678", "patentNumber": "US10000000B2"}` (patentId
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利引证文献结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

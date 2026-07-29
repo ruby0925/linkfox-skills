@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_stock_movement (v2.sbs.get_stock_movement)
+Shopee Store — get_stock_movement
+
 官方: https://open.shopee.com/documents/v2/v2.sbs.get_stock_movement?module=124&type=1
+
+入参说明见 references/apis/get-stock-movement.md。
 """
 
 from __future__ import annotations

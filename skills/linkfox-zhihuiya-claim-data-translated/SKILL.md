@@ -5,7 +5,7 @@ description: 从智慧芽专利数据库获取翻译后的专利权利要求。�
 
 # Zhihuiya Patent Claims (Translated)
 
-This skill guides you on how to query translated patent claims from the Zhihuiya (PatSnap) patent database, enabling users to retrieve claim texts in Chinese, English, or Japanese for one or more patents.
+This skill guides you on how to query translated patent claims from the Zhihuiya (PatSnap) patent database, enabling users to retrieve claim texts in Chinese, English, or Japanese for a single patent per request.
 
 ## Core Concepts
 
@@ -36,7 +36,7 @@ Default language is **en** (English). Use English when the user does not specify
 
 - **API 端点**：`POST /zhihuiya/claimDataTranslated`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_claim_translated.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-claim-data-translated-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -66,13 +66,15 @@ Default language is **en** (English). Use English when the user does not specify
 
 You must provide **at least one** of the following:
 
-- **patentId** -- The internal patent ID. When both `patentId` and `patentNumber` are provided, `patentId` takes precedence. Multiple values separated by commas, up to 100 patents per request.
-- **patentNumber** -- The publication or announcement number. Multiple values separated by commas, up to 100 patents per request.
+- **patentId** -- The internal patent ID. When both `patentId` and `patentNumber` are provided, `patentId` takes precedence. Single patent ID only. Do NOT pass comma-separated multiple IDs.
+- **patentNumber** -- The publication or announcement number. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers.
 
 ### Optional Parameters
 
 - **lang** -- Target translation language: `en` (English, default), `cn` (Chinese), or `jp` (Japanese).
 - **replaceByRelated** -- Whether to substitute claims from a family patent when the original claims are unavailable: `1` = yes, `0` = no (default).
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Usage Examples
 
@@ -80,12 +82,6 @@ You must provide **at least one** of the following:
 ```
 patentNumber: "CN112345678A"
 lang: "en"
-```
-
-**2. Get Chinese claims for multiple patents by publication number**
-```
-patentNumber: "US20210012345A1,EP3456789B1"
-lang: "cn"
 ```
 
 **3. Get Japanese claims with family patent fallback**
@@ -103,15 +99,15 @@ lang: "en"
 
 ## Display Rules
 
-1. **Present claims clearly**: Show the translated claim text with proper formatting. If multiple patents are returned, separate each patent's claims with its publication number as a heading.
+1. **Present claims clearly**: Show the translated claim text with proper formatting. Results contain a single patent's data per call.
 2. **Family substitution notice**: When `pnRelated` is present in the response, clearly inform the user that the claims were sourced from a related family patent and show the substitute publication number.
 3. **Language notice**: State the language of the returned claims so the user knows which translation they are viewing.
-4. **Large results**: When multiple patents are returned, summarize the count and show a few representative entries, reminding the user of the total.
+4. **Large results**: When the response is large, summarize the count and show a few representative entries, reminding the user of the total.
 5. **Error handling**: When a query fails, explain the reason based on the error response and suggest checking the patent ID or publication number.
 ## Important Limitations
 
 - **At least one identifier required**: Either `patentId` or `patentNumber` must be provided; otherwise the query will fail.
-- **Batch limit**: A maximum of 100 patents per request.
+- **Single patent per request**: Only one patent ID or publication number may be passed per call (no comma-separated batches).
 - **Language support**: Only Chinese (`cn`), English (`en`), and Japanese (`jp`) are supported.
 - **Family substitution**: Substitute claims are only returned when `replaceByRelated` is set to `1` and the original claims are unavailable.
 
@@ -124,7 +120,6 @@ lang: "en"
 | "Show me the claims for patent XX" | Single patent claim lookup |
 | "Translate claims to Chinese/Japanese" | Claim translation |
 | "What does patent XX claim?" | Claim content retrieval |
-| "Get claims for these patents: XX, YY" | Batch patent claim lookup |
 | "Claims unavailable, try family patent" | Family patent substitution |
 | "Patent rights scope of XX" | Claim text retrieval |
 
@@ -140,6 +135,8 @@ lang: "en"
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利权利要求翻译结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+>
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

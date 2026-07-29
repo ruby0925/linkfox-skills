@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_bound_whs_info (v2.sbs.get_bound_whs_info)
+Shopee Store — get_bound_whs_info
+
 官方: https://open.shopee.com/documents/v2/v2.sbs.get_bound_whs_info?module=124&type=1
+
+入参说明见 references/apis/get-bound-whs-info.md。
 """
 
 from __future__ import annotations

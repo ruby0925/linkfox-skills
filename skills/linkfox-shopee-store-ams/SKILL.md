@@ -5,7 +5,7 @@ description: Shopee（虾皮）联盟营销 AMS Affiliate Marketing Solutions（
 
 # Shopee 联盟营销 AMS
 
-Shopee Open Platform **AMS（Affiliate Marketing Solutions）模块**（36 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/ams/...`）。
+Shopee Open Platform **AMS（Affiliate Marketing Solutions）模块**（36 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/ams/...`）。
 
 ## 调用方式
 
@@ -51,7 +51,7 @@ AMS 模块索引：[v2.ams.get_open_campaign_added_product](https://open.shopee.
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **Open Campaign**：开放推广，所有达人可推广 → `get_open_campaign_added_product`、`batch_add_products_to_open_campaign`
 - **Targeted Campaign**：定向推广，指定达人 → `create_new_targeted_campaign`、`edit_affiliate_list_of_targeted_campaign`
 - **效果**：`get_shop_performance`、`get_product_performance`、`get_affiliate_performance`
@@ -68,6 +68,51 @@ AMS 模块索引：[v2.ams.get_open_campaign_added_product](https://open.shopee.
 | 通用入口 | `ams_api.py`（JSON 含 `api` 字段） |
 
 完整列表见 `references/api.md`。共享：`_shopee_ams_common.py`、`_ams_endpoints.py`、`_ams_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_all_products_to_open_campaign` | [references/apis/add-all-products-to-open-campaign.md](./references/apis/add-all-products-to-open-campaign.md) |
+| `batch_add_products_to_open_campaign` | [references/apis/batch-add-products-to-open-campaign.md](./references/apis/batch-add-products-to-open-campaign.md) |
+| `batch_edit_products_open_campaign_setting` | [references/apis/batch-edit-products-open-campaign-setting.md](./references/apis/batch-edit-products-open-campaign-setting.md) |
+| `batch_get_products_suggested_rate` | [references/apis/batch-get-products-suggested-rate.md](./references/apis/batch-get-products-suggested-rate.md) |
+| `batch_remove_products_open_campaign_setting` | [references/apis/batch-remove-products-open-campaign-setting.md](./references/apis/batch-remove-products-open-campaign-setting.md) |
+| `create_new_targeted_campaign` | [references/apis/create-new-targeted-campaign.md](./references/apis/create-new-targeted-campaign.md) |
+| `edit_affiliate_list_of_targeted_campaign` | [references/apis/edit-affiliate-list-of-targeted-campaign.md](./references/apis/edit-affiliate-list-of-targeted-campaign.md) |
+| `edit_all_products_open_campaign_setting` | [references/apis/edit-all-products-open-campaign-setting.md](./references/apis/edit-all-products-open-campaign-setting.md) |
+| `edit_product_list_of_targeted_campaign` | [references/apis/edit-product-list-of-targeted-campaign.md](./references/apis/edit-product-list-of-targeted-campaign.md) |
+| `get_affiliate_performance` | [references/apis/get-affiliate-performance.md](./references/apis/get-affiliate-performance.md) |
+| `get_auto_add_new_product_toggle_status` | [references/apis/get-auto-add-new-product-toggle-status.md](./references/apis/get-auto-add-new-product-toggle-status.md) |
+| `get_campaign_key_metrics_performance` | [references/apis/get-campaign-key-metrics-performance.md](./references/apis/get-campaign-key-metrics-performance.md) |
+| `get_content_performance` | [references/apis/get-content-performance.md](./references/apis/get-content-performance.md) |
+| `get_conversion_report` | [references/apis/get-conversion-report.md](./references/apis/get-conversion-report.md) |
+| `get_managed_affiliate_list` | [references/apis/get-managed-affiliate-list.md](./references/apis/get-managed-affiliate-list.md) |
+| `get_open_campaign_added_product` | [references/apis/get-open-campaign-added-product.md](./references/apis/get-open-campaign-added-product.md) |
+| `get_open_campaign_batch_task_result` | [references/apis/get-open-campaign-batch-task-result.md](./references/apis/get-open-campaign-batch-task-result.md) |
+| `get_open_campaign_not_added_product` | [references/apis/get-open-campaign-not-added-product.md](./references/apis/get-open-campaign-not-added-product.md) |
+| `get_open_campaign_performance` | [references/apis/get-open-campaign-performance.md](./references/apis/get-open-campaign-performance.md) |
+| `get_optimization_suggestion_product` | [references/apis/get-optimization-suggestion-product.md](./references/apis/get-optimization-suggestion-product.md) |
+| `get_performance_data_update_time` | [references/apis/get-performance-data-update-time.md](./references/apis/get-performance-data-update-time.md) |
+| `get_product_performance` | [references/apis/get-product-performance.md](./references/apis/get-product-performance.md) |
+| `get_recommended_affiliate_list` | [references/apis/get-recommended-affiliate-list.md](./references/apis/get-recommended-affiliate-list.md) |
+| `get_shop_performance` | [references/apis/get-shop-performance.md](./references/apis/get-shop-performance.md) |
+| `get_shop_suggested_rate` | [references/apis/get-shop-suggested-rate.md](./references/apis/get-shop-suggested-rate.md) |
+| `get_targeted_campaign_addable_product_list` | [references/apis/get-targeted-campaign-addable-product-list.md](./references/apis/get-targeted-campaign-addable-product-list.md) |
+| `get_targeted_campaign_list` | [references/apis/get-targeted-campaign-list.md](./references/apis/get-targeted-campaign-list.md) |
+| `get_targeted_campaign_performance` | [references/apis/get-targeted-campaign-performance.md](./references/apis/get-targeted-campaign-performance.md) |
+| `get_targeted_campaign_settings` | [references/apis/get-targeted-campaign-settings.md](./references/apis/get-targeted-campaign-settings.md) |
+| `get_validation_list` | [references/apis/get-validation-list.md](./references/apis/get-validation-list.md) |
+| `get_validation_report` | [references/apis/get-validation-report.md](./references/apis/get-validation-report.md) |
+| `query_affiliate_list` | [references/apis/query-affiliate-list.md](./references/apis/query-affiliate-list.md) |
+| `remove_all_products_open_campaign_setting` | [references/apis/remove-all-products-open-campaign-setting.md](./references/apis/remove-all-products-open-campaign-setting.md) |
+| `terminate_targeted_campaign` | [references/apis/terminate-targeted-campaign.md](./references/apis/terminate-targeted-campaign.md) |
+| `update_auto_add_new_product_setting` | [references/apis/update-auto-add-new-product-setting.md](./references/apis/update-auto-add-new-product-setting.md) |
+| `update_basic_info_of_targeted_campaign` | [references/apis/update-basic-info-of-targeted-campaign.md](./references/apis/update-basic-info-of-targeted-campaign.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

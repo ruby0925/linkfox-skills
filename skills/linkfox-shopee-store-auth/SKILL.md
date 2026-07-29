@@ -20,7 +20,7 @@ Shopee Open Platform 的 OAuth 授权、已授权店铺列表、访问令牌读�
 |------|------|
 | `authorize_url.py` | 生成授权 URL（可选 `shopName` / `region`） |
 | `authorized_stores.py` | 列出已授权店铺 |
-| `store_tokens.py` | 查 token（供下游使用） |
+| `store_tokens.py` | 查授权/令牌**状态**（非下游 token 来源） |
 
 入参、响应字段、错误码见 `references/api.md`。
 
@@ -68,25 +68,27 @@ Shopee Open Platform 的 OAuth 授权、已授权店铺列表、访问令牌读�
 ### 2. 列已授权店铺
 调 `authorized_stores.py`，展示 `shopName / shopId / merchantId / region`。
 
-### 3. 给下游准备 accessToken（高频）
+### 3. 给下游准备店铺选店信息（高频）
 
 用户只说自然语言（"我的虾皮店"、"67890 那家店"），**不要让用户报冗长 token**。
 
 | 用户上下文 | Agent 动作 |
 |---|---|
-| 只授权 1 家店铺 | 直接取该店铺 `shopId`，不问 |
+| 只授权 1 家店铺 | 直接取该店铺 `shopId`（或 `merchantId`），不问 |
 | 授权 ≥ 2 家 + 只说店名 | 按 `shopName` 向用户澄清 |
 | 同时给出 shopName 或 shopId | 直接定位 |
 | 显式给出 shopId / merchantId | 直接用 |
 
-**静默原则**：定位成功时不播报完整 accessToken；脚本已做掩码，不要在摘要里还原。
+**静默原则**：定位成功时只确认店铺标识，不向用户索要 token。
 
-流程：先 `authorized_stores.py` 选店 → 再 `store_tokens.py`（传 `shopId` 或 `merchantId`）→ 将 `accessToken` 交给 `/shopee/developerProxy`。
+**推荐流程**：`authorized_stores.py` 选店 → 下游 skill 直接 `POST /shopee/developerProxy` 传入 `shopId`（或 `merchantId`），由服务端解析 token。
+
+`store_tokens.py` **仅用于**确认授权/令牌状态（`status`、`expireIn`、`message` 等），**不要**为 proxy 调用先取 `accessToken`。
 
 ## 调用原则
 
 - 授权前建议确认 `shopName` 与 `region`
-- 不输出完整 accessToken / refreshToken；脚本已做掩码，不要在摘要里还原
+- 不假设 `storeTokens` 响应含 raw `accessToken`；展示状态与过期元数据即可
 - 授权失败按错误码解释原因；不擅自重试
 - 令牌过期须重新走授权流程（无 `refreshToken` 公开接口）
 

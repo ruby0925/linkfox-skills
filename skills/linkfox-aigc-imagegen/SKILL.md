@@ -122,10 +122,6 @@ description: AI生图工具，根据提示词和参考图生成图片。支持�
 
 参见 `references/api.md`。
 
-## 积分消耗规则
-
-不消耗积分。
-
 ## 执行指令
 
 **重要**：收到本文档末尾的 `ARGUMENTS:` 字段后，必须立即调用 `python scripts/aigc_imagegen.py '<JSON>'` 执行，**禁止等待用户确认或额外输入**。

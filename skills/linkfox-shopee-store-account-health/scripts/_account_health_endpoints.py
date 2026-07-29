@@ -25,6 +25,7 @@ ACCOUNT_HEALTH_ENDPOINTS: dict[str, AccountHealthEndpoint] = {
         "path": "api/v2/account_health/get_metric_source_detail",
         "method": "GET",
         "response_key": "getMetricSourceDetail",
+        "required": ["metric_id"],
         "notes": 'Metric source detail by metric_id',
     },
     "get_penalty_point_history": {
@@ -37,6 +38,7 @@ ACCOUNT_HEALTH_ENDPOINTS: dict[str, AccountHealthEndpoint] = {
         "path": "api/v2/account_health/get_punishment_history",
         "method": "GET",
         "response_key": "getPunishmentHistory",
+        "required": ["punishment_status"],
         "notes": 'Punishment history; pagination filters',
     },
     "get_listings_with_issues": {

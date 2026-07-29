@@ -1,5 +1,6 @@
 # linkfox-shopee-store-bundle-deal — 参数与字段参考
 
+> 单接口入参/响应说明已拆到 **`apis/`**（按 API 一份）；本文件保留模块总览与 Feedback。
 Shopee **Bundle Deal 模块**全部 10 个 API，经 **`POST /shopee/developerProxy`** 转发。
 
 授权见 **`linkfox-shopee-store-auth`**。官方索引：[v2.bundle_deal.add_bundle_deal](https://open.shopee.com/documents/v2/v2.bundle_deal.add_bundle_deal?module=110&type=1)
@@ -16,16 +17,16 @@ Shopee **Bundle Deal 模块**全部 10 个 API，经 **`POST /shopee/developerPr
 
 | # | API | Method | path | 脚本 | 官方文档 |
 |---|-----|--------|------|------|----------|
-| 1 | add_bundle_deal | POST | `api/v2/bundle_deal/add_bundle_deal` | `add_bundle_deal.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.add_bundle_deal?module=110&type=1) |
-| 2 | add_bundle_deal_item | POST | `api/v2/bundle_deal/add_bundle_deal_item` | `add_bundle_deal_item.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.add_bundle_deal_item?module=110&type=1) |
-| 3 | delete_bundle_deal | POST | `api/v2/bundle_deal/delete_bundle_deal` | `delete_bundle_deal.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.delete_bundle_deal?module=110&type=1) |
-| 4 | delete_bundle_deal_item | POST | `api/v2/bundle_deal/delete_bundle_deal_item` | `delete_bundle_deal_item.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.delete_bundle_deal_item?module=110&type=1) |
-| 5 | end_bundle_deal | POST | `api/v2/bundle_deal/end_bundle_deal` | `end_bundle_deal.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.end_bundle_deal?module=110&type=1) |
-| 6 | get_bundle_deal | GET | `api/v2/bundle_deal/get_bundle_deal` | `get_bundle_deal.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.get_bundle_deal?module=110&type=1) |
-| 7 | get_bundle_deal_item | GET | `api/v2/bundle_deal/get_bundle_deal_item` | `get_bundle_deal_item.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.get_bundle_deal_item?module=110&type=1) |
-| 8 | get_bundle_deal_list | GET | `api/v2/bundle_deal/get_bundle_deal_list` | `get_bundle_deal_list.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.get_bundle_deal_list?module=110&type=1) |
-| 9 | update_bundle_deal | POST | `api/v2/bundle_deal/update_bundle_deal` | `update_bundle_deal.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.update_bundle_deal?module=110&type=1) |
-| 10 | update_bundle_deal_item | POST | `api/v2/bundle_deal/update_bundle_deal_item` | `update_bundle_deal_item.py` | [doc](https://open.shopee.com/documents/v2/v2.bundle_deal.update_bundle_deal_item?module=110&type=1) |
+| 1 | add_bundle_deal | POST | `api/v2/bundle_deal/add_bundle_deal` | `add_bundle_deal.py` | [apis/add-bundle-deal.md](./apis/add-bundle-deal.md) |
+| 2 | add_bundle_deal_item | POST | `api/v2/bundle_deal/add_bundle_deal_item` | `add_bundle_deal_item.py` | [apis/add-bundle-deal-item.md](./apis/add-bundle-deal-item.md) |
+| 3 | delete_bundle_deal | POST | `api/v2/bundle_deal/delete_bundle_deal` | `delete_bundle_deal.py` | [apis/delete-bundle-deal.md](./apis/delete-bundle-deal.md) |
+| 4 | delete_bundle_deal_item | POST | `api/v2/bundle_deal/delete_bundle_deal_item` | `delete_bundle_deal_item.py` | [apis/delete-bundle-deal-item.md](./apis/delete-bundle-deal-item.md) |
+| 5 | end_bundle_deal | POST | `api/v2/bundle_deal/end_bundle_deal` | `end_bundle_deal.py` | [apis/end-bundle-deal.md](./apis/end-bundle-deal.md) |
+| 6 | get_bundle_deal | GET | `api/v2/bundle_deal/get_bundle_deal` | `get_bundle_deal.py` | [apis/get-bundle-deal.md](./apis/get-bundle-deal.md) |
+| 7 | get_bundle_deal_item | GET | `api/v2/bundle_deal/get_bundle_deal_item` | `get_bundle_deal_item.py` | [apis/get-bundle-deal-item.md](./apis/get-bundle-deal-item.md) |
+| 8 | get_bundle_deal_list | GET | `api/v2/bundle_deal/get_bundle_deal_list` | `get_bundle_deal_list.py` | [apis/get-bundle-deal-list.md](./apis/get-bundle-deal-list.md) |
+| 9 | update_bundle_deal | POST | `api/v2/bundle_deal/update_bundle_deal` | `update_bundle_deal.py` | [apis/update-bundle-deal.md](./apis/update-bundle-deal.md) |
+| 10 | update_bundle_deal_item | POST | `api/v2/bundle_deal/update_bundle_deal_item` | `update_bundle_deal_item.py` | [apis/update-bundle-deal-item.md](./apis/update-bundle-deal-item.md) |
 通用入口：`bundle_deal_api.py`（JSON 含 `"api": "<上表 API 名>"`）。
 
 ---
@@ -34,13 +35,13 @@ Shopee **Bundle Deal 模块**全部 10 个 API，经 **`POST /shopee/developerPr
 
 | API | 要点 |
 |-----|------|
-| `add_bundle_deal` | 创建套装优惠；POST `body` |
-| `add_bundle_deal_item` | 添加参与商品 |
-| `get_bundle_deal_list` | 套装活动列表 |
-| `get_bundle_deal` | 活动详情 |
-| `get_bundle_deal_item` | 活动内商品 |
+| `add_bundle_deal` | 创建套装优惠；POST `body` — [apis/add-bundle-deal.md](./apis/add-bundle-deal.md) |
+| `add_bundle_deal_item` | 添加参与商品 — [apis/add-bundle-deal-item.md](./apis/add-bundle-deal-item.md) |
+| `get_bundle_deal_list` | 套装活动列表 — [apis/get-bundle-deal-list.md](./apis/get-bundle-deal-list.md) |
+| `get_bundle_deal` | 活动详情 — [apis/get-bundle-deal.md](./apis/get-bundle-deal.md) |
+| `get_bundle_deal_item` | 活动内商品 — [apis/get-bundle-deal-item.md](./apis/get-bundle-deal-item.md) |
 | `update_bundle_deal` / `update_bundle_deal_item` | 更新活动/商品 |
-| `end_bundle_deal` | 提前结束 |
+| `end_bundle_deal` | 提前结束 — [apis/end-bundle-deal.md](./apis/end-bundle-deal.md) |
 | `delete_bundle_deal` / `delete_bundle_deal_item` | 删除活动/商品 |
 
 ---
@@ -48,8 +49,8 @@ Shopee **Bundle Deal 模块**全部 10 个 API，经 **`POST /shopee/developerPr
 ## curl 示例
 
 ```bash
-curl -X POST ${LINKFOX_TOOL_GATEWAY}/shopee/developerProxy \
-  -H "Authorization: ${LINKFOX_AGENT_API_KEY}" \
+curl -X POST https://tool-gateway.linkfox.com/shopee/developerProxy \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "path": "api/v2/bundle_deal/get_bundle_deal_list",

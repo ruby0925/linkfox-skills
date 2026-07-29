@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — delete_item_list (v2.livestream.delete_item_list)
+Shopee Store — delete_item_list
+
 官方: https://open.shopee.com/documents/v2/v2.livestream.delete_item_list?module=125&type=1
+
+入参说明见 references/apis/delete-item-list.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _livestream_api_runner import run_livestream_api
-from _shopee_livestream_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: delete_item_list.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_livestream_api("delete_item_list", params, "delete_item_list.py"), inline)
+    print(json.dumps(run_livestream_api("delete_item_list", params, "delete_item_list.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

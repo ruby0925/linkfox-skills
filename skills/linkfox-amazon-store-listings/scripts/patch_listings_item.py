@@ -128,7 +128,7 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_patch(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     query_string: str,
     body_obj: Dict[str, Any],
 ) -> dict:
@@ -136,7 +136,7 @@ def developer_proxy_patch(
         "region": region,
         "path": path,
         "method": "PATCH",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
         "queryString": query_string,
         "body": json.dumps(body_obj, ensure_ascii=False),
         "contentType": "application/json",
@@ -243,13 +243,7 @@ def main() -> None:
     body_obj: Dict[str, Any] = {"productType": product_type, "patches": patches}
 
     path = _path_patch(seller_id, sku)
-    tokens = get_store_tokens(seller_id, region)
-    if "error" in tokens or "accessToken" not in tokens:
-        print(json.dumps(tokens, indent=2, ensure_ascii=False))
-        sys.exit(1)
-
-    access_token = tokens["accessToken"]
-    proxy = developer_proxy_patch(region, path, access_token, query_string, body_obj)
+    proxy = developer_proxy_patch(region, path, seller_id, query_string, body_obj)
 
     out: Dict[str, Any] = {
         "developerProxy": proxy,

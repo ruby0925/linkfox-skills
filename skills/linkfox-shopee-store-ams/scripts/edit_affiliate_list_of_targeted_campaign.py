@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — edit_affiliate_list_of_targeted_campaign (v2.ams.edit_affiliate_list_of_targeted_campaign)
+Shopee Store — edit_affiliate_list_of_targeted_campaign
+
 官方: https://open.shopee.com/documents/v2/v2.ams.edit_affiliate_list_of_targeted_campaign?module=127&type=1
+
+入参说明见 references/apis/edit-affiliate-list-of-targeted-campaign.md。
 """
 
 from __future__ import annotations
-from _shopee_ams_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: edit_affiliate_list_of_targeted_campaign.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ams_api("edit_affiliate_list_of_targeted_campaign", params, "edit_affiliate_list_of_targeted_campaign.py"), inline)
+    print(json.dumps(run_ams_api("edit_affiliate_list_of_targeted_campaign", params, "edit_affiliate_list_of_targeted_campaign.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

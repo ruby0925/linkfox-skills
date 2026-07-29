@@ -42,7 +42,7 @@ description: 亚马逊店铺报告自动化获取技能，支持库存报告、�
 
 ### 依赖已满足后的协作方式
 
-- 本 skill 会在内部调用依赖 skill 提供的 `/spApi/storeTokens` 取 `accessToken`，然后走 `/spApi/developerProxy` 执行报告生命周期。
+- 本 skill 依赖 auth 选店（`sellerId`+`region`），直接经 `/spApi/developerProxy` 执行报告生命周期（服务端解析 token）。
 - 授权、授权的前置选店铺、令牌刷新等操作——**交由 `linkfox-amazon-store-auth`**；本 skill 不重复做这些事。
 
 ---
@@ -141,9 +141,9 @@ description: 亚马逊店铺报告自动化获取技能，支持库存报告、�
 
 **Steps**：
 1. **依赖检查**（Scenario 0）
-2. **前置选店铺 + 取令牌**：委托 `linkfox-amazon-store-auth`
-   - 调 `/spApi/authorizedStores` 让用户选店铺
-   - 调 `/spApi/storeTokens` 获取令牌（本 skill 的脚本会自动完成此步，无需手动调）
+2. **前置选店铺**：委托 `linkfox-amazon-store-auth`
+   - 调 `/spApi/authorizedStores` 让用户选店铺，确定 `sellerId` + `region`
+   - **不要**先调 `/spApi/storeTokens` 取 raw token；脚本直接经 `developerProxy` 传选择器
 3. **识别报告类型**：按用户诉求匹配 `reportType`
    - 库存：`GET_MERCHANT_LISTINGS_ALL_DATA`、`GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA`
    - 订单：`GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_GENERAL`
@@ -159,7 +159,7 @@ description: 亚马逊店铺报告自动化获取技能，支持库存报告、�
      "marketplaceIds": ["ATVPDKIKX0DER"]
    }'
    ```
-5. 脚本会自动：取令牌 → 请求报告 → 轮询 → 下载 → 解压 → 预览 → 输出 JSON；**完成后**在 stderr 与 JSON 中给出 **本地绝对路径**（`downloadPath`）、**本机 file URI**（`localFileUri`），并默认启动短时本机 HTTP 服务，生成 **`extractedFileHttpUrl`**（用于在**同一台机器**的浏览器里下载**已解压**文件）。向用户展示时至少给出 **`extractedFileHttpUrl`**、**`downloadPath`** 与 **`fileName`**；脚本在 `serveSeconds` 计时结束后会关闭服务，链接随即失效。若需 Amazon 源地址（多为压缩包），仅调试时设 `includeAmazonSourceUrl: true`。
+5. 脚本会自动：以 `sellerId`+`region` 调 `developerProxy`（服务端解析 token）→ 请求报告 → 轮询 → 下载 → 解压 → 预览 → 输出 JSON；**完成后**在 stderr 与 JSON 中给出 **本地绝对路径**（`downloadPath`）、**本机 file URI**（`localFileUri`），并默认启动短时本机 HTTP 服务，生成 **`extractedFileHttpUrl`**（用于在**同一台机器**的浏览器里下载**已解压**文件）。向用户展示时至少给出 **`extractedFileHttpUrl`**、**`downloadPath`** 与 **`fileName`**；脚本在 `serveSeconds` 计时结束后会关闭服务，链接随即失效。若需 Amazon 源地址（多为压缩包），仅调试时设 `includeAmazonSourceUrl: true`。
 
 ### Scenario 2: Manual Report Flow (Advanced)
 
@@ -222,7 +222,7 @@ python scripts/get_report.py '{
 2. **只呈现数据**：展示报告获取进度、下载路径、前几行预览；不做业务解读。
 3. **尊重用户选择的报告类型**：用户指定了报告类型就只拉那一种，不得擅自换其他类型。
 4. **错误清晰**：报告失败（`FATAL` / 403 等）时，解释原因并把决定权交还用户。
-5. **安全**：日志中 accessToken 掩码展示。
+5. **安全**：不输出/不传递 raw token；业务只依赖 `sellerId`+`region`。
 6. **完成后展示地址与本机下载链接**：脚本成功结束后，必须把 **`extractedFileHttpUrl`**（已解压文件的本机 HTTP 下载，限时）、**`downloadPath`**（本地绝对路径）、**`fileName`**（文件名）及 **`localFileUri`** 告知用户；并说明「仅在运行脚本的同一台电脑、在服务保持时间内可用」。不要默认把 Amazon 源 URL 当作用户下载入口；仅在用户明确要求或排障需要时使用 `includeAmazonSourceUrl`。
 
 ## CRITICAL: Report Failure Handling Rules
@@ -243,7 +243,7 @@ python scripts/get_report.py '{
 ## Important Limitations
 
 - **依赖 `linkfox-amazon-store-auth`**：未安装则必须先安装，见 Prerequisites。
-- **Token expiration**：`accessToken` 1 小时过期，脚本内部自动取最新令牌。
+- **Token expiration**：服务端令牌约 1 小时过期；`developerProxy` 可按 `sellerId`+`region` 自动解析/续签。过期时也可经 auth skill 的 `refreshToken` 后重试。
 - **Rate limits**：Reports API 0.0222 req/s，默认 30s 轮询是安全间隔。
 - **Report 时效**：部分财务报告可能需要 10–30 分钟，按需调大 `maxAttempts`。
 - **Path 白名单**：后端 `sp-api.developer-proxy.allowed-path-prefixes` 必须允许 `reports/2021-06-30/reports`。

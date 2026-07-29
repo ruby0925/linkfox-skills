@@ -5,7 +5,7 @@ description: Shopee（虾皮）加购优惠 Add-On Deal（与 linkfox-shopee-sto
 
 # Shopee 加购优惠 Add-On Deal
 
-Shopee Open Platform **Add-On Deal 模块**（14 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/add_on_deal/...`）。
+Shopee Open Platform **Add-On Deal 模块**（14 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/add_on_deal/...`）。
 
 ## 调用方式
 
@@ -65,6 +65,29 @@ Add-On Deal 模块索引：[v2.add_on_deal.add_add_on_deal](https://open.shopee.
 | `update_add_on_deal_sub_item.py` | update_add_on_deal_sub_item | POST |
 | `end_add_on_deal.py` | end_add_on_deal | POST |
 | `add_on_deal_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_add_on_deal` | [references/apis/add-add-on-deal.md](./references/apis/add-add-on-deal.md) |
+| `add_add_on_deal_main_item` | [references/apis/add-add-on-deal-main-item.md](./references/apis/add-add-on-deal-main-item.md) |
+| `add_add_on_deal_sub_item` | [references/apis/add-add-on-deal-sub-item.md](./references/apis/add-add-on-deal-sub-item.md) |
+| `delete_add_on_deal` | [references/apis/delete-add-on-deal.md](./references/apis/delete-add-on-deal.md) |
+| `delete_add_on_deal_main_item` | [references/apis/delete-add-on-deal-main-item.md](./references/apis/delete-add-on-deal-main-item.md) |
+| `delete_add_on_deal_sub_item` | [references/apis/delete-add-on-deal-sub-item.md](./references/apis/delete-add-on-deal-sub-item.md) |
+| `end_add_on_deal` | [references/apis/end-add-on-deal.md](./references/apis/end-add-on-deal.md) |
+| `get_add_on_deal` | [references/apis/get-add-on-deal.md](./references/apis/get-add-on-deal.md) |
+| `get_add_on_deal_list` | [references/apis/get-add-on-deal-list.md](./references/apis/get-add-on-deal-list.md) |
+| `get_add_on_deal_main_item` | [references/apis/get-add-on-deal-main-item.md](./references/apis/get-add-on-deal-main-item.md) |
+| `get_add_on_deal_sub_item` | [references/apis/get-add-on-deal-sub-item.md](./references/apis/get-add-on-deal-sub-item.md) |
+| `update_add_on_deal` | [references/apis/update-add-on-deal.md](./references/apis/update-add-on-deal.md) |
+| `update_add_on_deal_main_item` | [references/apis/update-add-on-deal-main-item.md](./references/apis/update-add-on-deal-main-item.md) |
+| `update_add_on_deal_sub_item` | [references/apis/update-add-on-deal-sub-item.md](./references/apis/update-add-on-deal-sub-item.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

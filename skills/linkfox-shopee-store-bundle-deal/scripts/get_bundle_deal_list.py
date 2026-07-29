@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_bundle_deal_list (v2.bundle_deal.get_bundle_deal_list)
+Shopee Store — get_bundle_deal_list
+
 官方: https://open.shopee.com/documents/v2/v2.bundle_deal.get_bundle_deal_list?module=110&type=1
+
+入参说明见 references/apis/get-bundle-deal-list.md。
 """
 
 from __future__ import annotations
-from _shopee_bundle_deal_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_bundle_deal_list.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_bundle_deal_api("get_bundle_deal_list", params, "get_bundle_deal_list.py"), inline)
+    print(json.dumps(run_bundle_deal_api("get_bundle_deal_list", params, "get_bundle_deal_list.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

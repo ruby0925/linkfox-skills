@@ -5,7 +5,7 @@ description: Shopee（虾皮）媒体上传 Media 模块（与 linkfox-shopee-st
 
 # Shopee 媒体 Media
 
-Shopee Open Platform **Media 模块**（6 个 API，**`api/v2/media/...`**，module=130）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发。
+Shopee Open Platform **Media 模块**（6 个 API，**`api/v2/media/...`**，module=130）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发。
 
 ## 调用方式
 
@@ -68,6 +68,21 @@ Media 模块索引：[v2.media.upload_image](https://open.shopee.com/documents/v
 | `get_video_upload_result.py` | get_video_upload_result | GET |
 | `cancel_video_upload.py` | cancel_video_upload | POST |
 | `media_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `cancel_video_upload` | [references/apis/cancel-video-upload.md](./references/apis/cancel-video-upload.md) |
+| `complete_video_upload` | [references/apis/complete-video-upload.md](./references/apis/complete-video-upload.md) |
+| `get_video_upload_result` | [references/apis/get-video-upload-result.md](./references/apis/get-video-upload-result.md) |
+| `init_video_upload` | [references/apis/init-video-upload.md](./references/apis/init-video-upload.md) |
+| `upload_image` | [references/apis/upload-image.md](./references/apis/upload-image.md) |
+| `upload_video_part` | [references/apis/upload-video-part.md](./references/apis/upload-video-part.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

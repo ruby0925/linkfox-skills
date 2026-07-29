@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — set_item_installment_status (v2.payment.set_item_installment_status)
+Shopee Store — set_item_installment_status
+
 官方: https://open.shopee.com/documents/v2/v2.payment.set_item_installment_status?module=97&type=1
+
+入参说明见 references/apis/set-item-installment-status.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _payment_api_runner import run_payment_api
-from _shopee_payment_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: set_item_installment_status.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_payment_api("set_item_installment_status", params, "set_item_installment_status.py"), inline)
+    print(json.dumps(run_payment_api("set_item_installment_status", params, "set_item_installment_status.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

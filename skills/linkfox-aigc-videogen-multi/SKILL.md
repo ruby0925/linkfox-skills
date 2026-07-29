@@ -106,10 +106,6 @@ description: 多参考图生视频工具，根据多张参考图和提示词生�
 - 图片生成 → `linkfox-aigc-imagegen`
 - 文本生成 → `linkfox-aigc-textgen`
 
-## 积分消耗规则
-
-不消耗积分。
-
 ## 反馈
 
 参见 `references/api.md`。

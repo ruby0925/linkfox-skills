@@ -5,7 +5,7 @@ description: Shopee（虾皮）账户健康 Account Health（与 linkfox-shopee-
 
 # Shopee 账户健康 Account Health
 
-Shopee Open Platform **Account Health 模块**（6 个 API，均为 GET）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/account_health/...`）。
+Shopee Open Platform **Account Health 模块**（6 个 API，均为 GET）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/account_health/...`）。
 
 ## 调用方式
 
@@ -58,16 +58,39 @@ Account Health 模块索引：[v2.account_health.get_shop_performance](https://o
 | `get_late_orders.py` | get_late_orders | GET |
 | `account_health_api.py` | 通用入口 | — |
 
+共享：`_shopee_account_health_common.py`、`_account_health_endpoints.py`、`_account_health_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `get_shop_performance` | [references/apis/get-shop-performance.md](./references/apis/get-shop-performance.md) |
+| `get_metric_source_detail` | [references/apis/get-metric-source-detail.md](./references/apis/get-metric-source-detail.md) |
+| `get_penalty_point_history` | [references/apis/get-penalty-point-history.md](./references/apis/get-penalty-point-history.md) |
+| `get_punishment_history` | [references/apis/get-punishment-history.md](./references/apis/get-punishment-history.md) |
+| `get_listings_with_issues` | [references/apis/get-listings-with-issues.md](./references/apis/get-listings-with-issues.md) |
+| `get_late_orders` | [references/apis/get-late-orders.md](./references/apis/get-late-orders.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
+
 ## Usage Scenarios
 
 ### 1. 查看店铺健康概况
-1. `get_shop_performance.py` 获取绩效指标
-2. `get_metric_source_detail.py` 下钻具体指标
-3. `get_late_orders.py` / `get_listings_with_issues.py` 定位问题
+1. auth skill 定位 `shopId`
+2. 按 [get-shop-performance.md](./references/apis/get-shop-performance.md) 调用 `get_shop_performance.py`
+3. 对失败指标按 [get-metric-source-detail.md](./references/apis/get-metric-source-detail.md) 传 `metric_id` 下钻
+4. 用 `get_late_orders.py` / `get_listings_with_issues.py` 定位问题订单或 listing
 
-### 2. 查处罚与扣分记录
-1. `get_penalty_point_history.py` 扣分历史
-2. `get_punishment_history.py` 处罚历史
+### 2. 查逾期订单（`get_late_orders`）
+1. auth skill 定位 `shopId`
+2. 按 [get-late-orders.md](./references/apis/get-late-orders.md) 传参调用 `get_late_orders.py`
+3. 按 `late_by_days` 优先处理更紧急的订单
+
+### 3. 查处罚与扣分记录
+1. 按 [get-penalty-point-history.md](./references/apis/get-penalty-point-history.md) 查扣分
+2. 按 [get-punishment-history.md](./references/apis/get-punishment-history.md) 查处罚（必填 `punishment_status`：`1` 进行中 / `2` 已结束）
 
 ## Not Applicable
 

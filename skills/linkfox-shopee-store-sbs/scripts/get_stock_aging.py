@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_stock_aging (v2.sbs.get_stock_aging)
+Shopee Store — get_stock_aging
+
 官方: https://open.shopee.com/documents/v2/v2.sbs.get_stock_aging?module=124&type=1
+
+入参说明见 references/apis/get-stock-aging.md。
 """
 
 from __future__ import annotations

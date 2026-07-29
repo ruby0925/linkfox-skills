@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺秒杀 Shop Flash Sale（与 linkfox-shopee
 
 # Shopee 店铺秒杀 Shop Flash Sale
 
-Shopee Open Platform **Shop Flash Sale 模块**（11 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/shop_flash_sale/...`）。
+Shopee Open Platform **Shop Flash Sale 模块**（11 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/shop_flash_sale/...`）。
 
 ## 调用方式
 
@@ -62,6 +62,26 @@ Shop Flash Sale 模块索引：[v2.shop_flash_sale.get_time_slot_id](https://ope
 | `delete_shop_flash_sale.py` | delete_shop_flash_sale | POST |
 | `delete_shop_flash_sale_items.py` | delete_shop_flash_sale_items | POST |
 | `shop_flash_sale_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_shop_flash_sale_items` | [references/apis/add-shop-flash-sale-items.md](./references/apis/add-shop-flash-sale-items.md) |
+| `create_shop_flash_sale` | [references/apis/create-shop-flash-sale.md](./references/apis/create-shop-flash-sale.md) |
+| `delete_shop_flash_sale` | [references/apis/delete-shop-flash-sale.md](./references/apis/delete-shop-flash-sale.md) |
+| `delete_shop_flash_sale_items` | [references/apis/delete-shop-flash-sale-items.md](./references/apis/delete-shop-flash-sale-items.md) |
+| `get_item_criteria` | [references/apis/get-item-criteria.md](./references/apis/get-item-criteria.md) |
+| `get_shop_flash_sale` | [references/apis/get-shop-flash-sale.md](./references/apis/get-shop-flash-sale.md) |
+| `get_shop_flash_sale_items` | [references/apis/get-shop-flash-sale-items.md](./references/apis/get-shop-flash-sale-items.md) |
+| `get_shop_flash_sale_list` | [references/apis/get-shop-flash-sale-list.md](./references/apis/get-shop-flash-sale-list.md) |
+| `get_time_slot_id` | [references/apis/get-time-slot-id.md](./references/apis/get-time-slot-id.md) |
+| `update_shop_flash_sale` | [references/apis/update-shop-flash-sale.md](./references/apis/update-shop-flash-sale.md) |
+| `update_shop_flash_sale_items` | [references/apis/update-shop-flash-sale-items.md](./references/apis/update-shop-flash-sale-items.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

@@ -175,7 +175,7 @@ POST Body（JSON）：
 | returnRateAnnual | number | 退货率（全年数据） |
 | acos | number | （ACOS）广告销售成本比 |
 | profitMarginGt50PctSkuRatio | number | 利润率大于50%的商品比例 |
-| breakEvenRatio | number | 盈亏平衡比率 |
+| breakEvenRatio | number | 盈亏平衡自然占比 |
 | cpc | object | CPC数据：`{ high（最高价）, medium（中间价）, low（最低价） }` |
 | categorieList | array | 商品品类列表 |
 | referenceAsinImageUrl | string | 细分市场参考图片地址 |

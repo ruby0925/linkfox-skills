@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — delete_shop_category (v2.shop_category.delete_shop_category)
+Shopee Store — delete_shop_category
+
 官方: https://open.shopee.com/documents/v2/v2.shop_category.delete_shop_category?module=101&type=1
+
+入参说明见 references/apis/delete-shop-category.md。
 """
 
 from __future__ import annotations

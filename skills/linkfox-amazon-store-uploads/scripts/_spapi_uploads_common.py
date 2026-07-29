@@ -109,7 +109,7 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_post(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     *,
     query_string: Optional[str] = None,
     timeout: int = 120,
@@ -118,7 +118,7 @@ def developer_proxy_post(
         "region": region,
         "path": path,
         "method": "POST",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
         "contentType": "application/json",
     }
     if query_string:

@@ -58,6 +58,21 @@ Public 模块索引：[v2.public.get_shops_by_partner](https://open.shopee.com/d
 | `get_shopee_ip_ranges.py` | get_shopee_ip_ranges | GET |
 | `public_api.py` | 通用入口 | — |
 
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `get_access_token` | [references/apis/get-access-token.md](./references/apis/get-access-token.md) |
+| `get_merchants_by_partner` | [references/apis/get-merchants-by-partner.md](./references/apis/get-merchants-by-partner.md) |
+| `get_shopee_ip_ranges` | [references/apis/get-shopee-ip-ranges.md](./references/apis/get-shopee-ip-ranges.md) |
+| `get_shops_by_partner` | [references/apis/get-shops-by-partner.md](./references/apis/get-shops-by-partner.md) |
+| `get_token_by_resend_code` | [references/apis/get-token-by-resend-code.md](./references/apis/get-token-by-resend-code.md) |
+| `refresh_access_token` | [references/apis/refresh-access-token.md](./references/apis/refresh-access-token.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
+
 ## Usage Scenarios
 
 ### 1. 查 Partner 下已授权店铺

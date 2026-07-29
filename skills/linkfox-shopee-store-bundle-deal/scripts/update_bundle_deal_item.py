@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — update_bundle_deal_item (v2.bundle_deal.update_bundle_deal_item)
+Shopee Store — update_bundle_deal_item
+
 官方: https://open.shopee.com/documents/v2/v2.bundle_deal.update_bundle_deal_item?module=110&type=1
+
+入参说明见 references/apis/update-bundle-deal-item.md。
 """
 
 from __future__ import annotations
-from _shopee_bundle_deal_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: update_bundle_deal_item.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_bundle_deal_api("update_bundle_deal_item", params, "update_bundle_deal_item.py"), inline)
+    print(json.dumps(run_bundle_deal_api("update_bundle_deal_item", params, "update_bundle_deal_item.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

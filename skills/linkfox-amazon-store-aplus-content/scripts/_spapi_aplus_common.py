@@ -103,7 +103,7 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_get(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     query_string: Optional[str] = None,
     timeout: int = 120,
 ) -> dict:
@@ -111,7 +111,7 @@ def developer_proxy_get(
         "region": region,
         "path": path,
         "method": "GET",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
     }
     if query_string:
         params["queryString"] = query_string
@@ -121,7 +121,7 @@ def developer_proxy_get(
 def developer_proxy_post(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     *,
     query_string: Optional[str] = None,
     body_obj: Optional[dict[str, Any]] = None,
@@ -131,7 +131,7 @@ def developer_proxy_post(
         "region": region,
         "path": path,
         "method": "POST",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
         "contentType": "application/json",
     }
     if query_string:

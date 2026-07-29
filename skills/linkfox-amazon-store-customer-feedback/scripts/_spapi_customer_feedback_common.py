@@ -109,7 +109,7 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
 def developer_proxy_get(
     region: str,
     path: str,
-    access_token: str,
+    seller_id: str,
     query_string: Optional[str] = None,
     timeout: int = 120,
 ) -> dict:
@@ -117,7 +117,7 @@ def developer_proxy_get(
         "region": region,
         "path": path,
         "method": "GET",
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
     }
     if query_string:
         params["queryString"] = query_string
@@ -234,12 +234,7 @@ def run_item_get(
     path = f"{API_PREFIX}/items/{asin}/{path_suffix}"
     qs = query_builder(params)
 
-    tokens = get_store_tokens(seller_id, region)
-    if "error" in tokens or "accessToken" not in tokens:
-        print(json.dumps(tokens, indent=2, ensure_ascii=False))
-        sys.exit(1)
-
-    proxy = developer_proxy_get(region, path, tokens["accessToken"], query_string=qs)
+    proxy = developer_proxy_get(region, path, seller_id, query_string=qs)
     out: dict = {"developerProxy": proxy, "resolvedPath": path, "queryString": qs}
     merge_success_json(out, proxy, result_key)
     emit_result(out, inline=lf_inline_flag())
@@ -267,12 +262,7 @@ def run_browse_node_get(
     path = f"{API_PREFIX}/browseNodes/{bn}/{path_suffix}"
     qs = query_builder(params)
 
-    tokens = get_store_tokens(seller_id, region)
-    if "error" in tokens or "accessToken" not in tokens:
-        print(json.dumps(tokens, indent=2, ensure_ascii=False))
-        sys.exit(1)
-
-    proxy = developer_proxy_get(region, path, tokens["accessToken"], query_string=qs)
+    proxy = developer_proxy_get(region, path, seller_id, query_string=qs)
     out: dict = {"developerProxy": proxy, "resolvedPath": path, "queryString": qs}
     merge_success_json(out, proxy, result_key)
     emit_result(out, inline=lf_inline_flag())

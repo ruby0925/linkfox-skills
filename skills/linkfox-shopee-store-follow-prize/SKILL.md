@@ -5,7 +5,7 @@ description: Shopee（虾皮）关注有礼 Follow Prize（与 linkfox-shopee-st
 
 # Shopee 关注有礼 Follow Prize
 
-Shopee Open Platform **Follow Prize 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/follow_prize/...`）。
+Shopee Open Platform **Follow Prize 模块**（6 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/follow_prize/...`）。
 
 ## 调用方式
 
@@ -57,6 +57,21 @@ Follow Prize 模块索引：[v2.follow_prize.add_follow_prize](https://open.shop
 | `get_follow_prize_detail.py` | get_follow_prize_detail | GET |
 | `get_follow_prize_list.py` | get_follow_prize_list | GET |
 | `follow_prize_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_follow_prize` | [references/apis/add-follow-prize.md](./references/apis/add-follow-prize.md) |
+| `delete_follow_prize` | [references/apis/delete-follow-prize.md](./references/apis/delete-follow-prize.md) |
+| `end_follow_prize` | [references/apis/end-follow-prize.md](./references/apis/end-follow-prize.md) |
+| `get_follow_prize_detail` | [references/apis/get-follow-prize-detail.md](./references/apis/get-follow-prize-detail.md) |
+| `get_follow_prize_list` | [references/apis/get-follow-prize-list.md](./references/apis/get-follow-prize-list.md) |
+| `update_follow_prize` | [references/apis/update-follow-prize.md](./references/apis/update-follow-prize.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

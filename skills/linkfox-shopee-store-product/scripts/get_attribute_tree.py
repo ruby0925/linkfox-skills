@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_attribute_tree (v2.product.get_attribute_tree)
+Shopee Store — get_attribute_tree
+
 官方: https://open.shopee.com/documents/v2/v2.product.get_attribute_tree?module=89&type=1
+
+入参说明见 references/apis/get-attribute-tree.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _product_api_runner import run_product_api
-from _shopee_product_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_attribute_tree.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_product_api("get_attribute_tree", params, "get_attribute_tree.py"), inline)
+    print(json.dumps(run_product_api("get_attribute_tree", params, "get_attribute_tree.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

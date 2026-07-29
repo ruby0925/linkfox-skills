@@ -107,10 +107,6 @@ description: AI生视频工具（首尾帧/单图模式），根据原图和提�
 - 图片生成 → `linkfox-aigc-imagegen`
 - 文本生成 → `linkfox-aigc-textgen`
 
-## 积分消耗规则
-
-不消耗积分。
-
 ## 反馈
 
 参见 `references/api.md`。

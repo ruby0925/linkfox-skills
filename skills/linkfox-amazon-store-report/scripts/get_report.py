@@ -162,14 +162,14 @@ def get_store_tokens(seller_id: str, region: str) -> dict:
     return call_api(STORE_TOKENS_ENDPOINT, {"sellerId": seller_id, "region": region})
 
 
-def developer_proxy_call(region: str, path: str, method: str, access_token: str,
+def developer_proxy_call(region: str, path: str, method: str, seller_id: str,
                          query_string: str = None, body: str = None, content_type: str = "application/json") -> dict:
     """Call Amazon APIs through the developer proxy."""
     params = {
         "region": region,
         "path": path,
         "method": method,
-        "amzAccessToken": access_token,
+        "sellerId": seller_id,
     }
     if query_string:
         params["queryString"] = query_string
@@ -183,7 +183,7 @@ def developer_proxy_call(region: str, path: str, method: str, access_token: str,
 
 def create_report(
     region: str,
-    access_token: str,
+    seller_id: str,
     report_type: str,
     marketplace_ids: list,
     data_start_time: str = None,
@@ -211,7 +211,7 @@ def create_report(
         region=region,
         path="reports/2021-06-30/reports",
         method="POST",
-        access_token=access_token,
+        seller_id=seller_id,
         body=json.dumps(body_data),
         content_type="application/json"
     )
@@ -219,24 +219,24 @@ def create_report(
     return result
 
 
-def get_report_status(region: str, access_token: str, report_id: str) -> dict:
+def get_report_status(region: str, seller_id: str, report_id: str) -> dict:
     """Check the status of a report."""
     result = developer_proxy_call(
         region=region,
         path=f"reports/2021-06-30/reports/{report_id}",
         method="GET",
-        access_token=access_token
+        seller_id=seller_id
     )
     return result
 
 
-def get_report_document(region: str, access_token: str, report_document_id: str) -> dict:
+def get_report_document(region: str, seller_id: str, report_document_id: str) -> dict:
     """Get report document download information."""
     result = developer_proxy_call(
         region=region,
         path=f"reports/2021-06-30/documents/{report_document_id}",
         method="GET",
-        access_token=access_token
+        seller_id=seller_id
     )
     return result
 
@@ -374,19 +374,12 @@ def main():
     poll_interval = params.get("pollInterval", DEFAULT_POLL_INTERVAL)
     max_attempts = params.get("maxAttempts", DEFAULT_MAX_ATTEMPTS)
 
-    # Step 1: Get access tokens
-    tokens_result = get_store_tokens(seller_id, region)
-    if "error" in tokens_result or "accessToken" not in tokens_result:
-        print(f"❌ Failed to get access token: {tokens_result}", file=sys.stderr)
-        sys.exit(1)
-
-    access_token = tokens_result["accessToken"]
     print("✓ Access token retrieved", file=sys.stderr)
 
     # Step 2: Create report request
     create_result = create_report(
         region,
-        access_token,
+        seller_id,
         report_type,
         marketplace_ids,
         data_start_time,
@@ -422,7 +415,7 @@ def main():
     print(f"⏳ Polling for report completion (checking every {poll_interval}s, max {max_attempts} attempts)...", file=sys.stderr)
 
     for attempt in range(1, max_attempts + 1):
-        status_result = get_report_status(region, access_token, report_id)
+        status_result = get_report_status(region, seller_id, report_id)
 
         if "error" in status_result or status_result.get("errcode") != 200:
             print(f"❌ Failed to check status: {status_result}", file=sys.stderr)
@@ -462,7 +455,7 @@ def main():
 
     # Step 4: Get report document info
     print(f"📄 Fetching report document info...", file=sys.stderr)
-    doc_result = get_report_document(region, access_token, report_document_id)
+    doc_result = get_report_document(region, seller_id, report_document_id)
 
     if "error" in doc_result or doc_result.get("errcode") != 200:
         print(f"❌ Failed to get document info: {doc_result}", file=sys.stderr)

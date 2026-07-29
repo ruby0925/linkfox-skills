@@ -5,7 +5,7 @@ description: 亚马逊广告（Amazon Ads）报告一站式获取技能，覆盖
 
 # Amazon Ads 报告获取
 
-报告一站式获取：脚本自动完成报告的创建、等待（约 2–10 分钟）、下载和解压，直接返回可读的结构化数据。
+报告一站式获取：脚本经 `developerProxy` 传 `profileId`（服务端解析 token），自动完成报告的创建、等待（约 2–10 分钟）、下载和解压，直接返回可读的结构化数据。
 脚本本身不做"该选哪些列 / 该怎么分组"的业务判断，这些由 agent 先查 `references/report-types/` 下对应的 `.md` 文件，再显式传给脚本。
 
 **依赖 `linkfox-amazon-ads-auth`**（脚本启动自动检查；未安装时 exit 42，stderr 打 `DEPENDENCY_MISSING`）。

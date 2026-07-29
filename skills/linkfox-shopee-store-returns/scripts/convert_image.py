@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — convert_image (v2.returns.convert_image)
+Shopee Store — convert_image
+
 官方: https://open.shopee.com/documents/v2/v2.returns.convert_image?module=102&type=1
+
+入参说明见 references/apis/convert-image.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _returns_api_runner import run_returns_api
-from _shopee_returns_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: convert_image.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_returns_api("convert_image", params, "convert_image.py"), inline)
+    print(json.dumps(run_returns_api("convert_image", params, "convert_image.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

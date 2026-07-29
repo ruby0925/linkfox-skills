@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺退货退款（与 linkfox-shopee-store-aut
 
 # Shopee 店铺 Returns
 
-Shopee Open Platform **Returns 模块**（15 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/returns/...`）。
+Shopee Open Platform **Returns 模块**（15 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/returns/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ Returns 模块索引：[v2.returns.get_return_list](https://open.shopee.com/docu
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **退货 vs 订单**：订单查询见 `linkfox-shopee-store-orders`；本 skill 处理**退货/退款/争议**
 - **典型流程**：`get_return_list` → `get_return_detail` → `confirm` / `offer` / `dispute`
 - **店铺级 API**：通常传 **`shopId`**
@@ -77,6 +77,30 @@ Returns 模块索引：[v2.returns.get_return_list](https://open.shopee.com/docu
 | `returns_api.py` | 通用入口（JSON 含 `api` 字段） | — |
 
 共享：`_shopee_returns_common.py`、`_returns_endpoints.py`、`_returns_api_runner.py`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `accept_offer` | [references/apis/accept-offer.md](./references/apis/accept-offer.md) |
+| `cancel_dispute` | [references/apis/cancel-dispute.md](./references/apis/cancel-dispute.md) |
+| `confirm` | [references/apis/confirm.md](./references/apis/confirm.md) |
+| `convert_image` | [references/apis/convert-image.md](./references/apis/convert-image.md) |
+| `dispute` | [references/apis/dispute.md](./references/apis/dispute.md) |
+| `get_available_solutions` | [references/apis/get-available-solutions.md](./references/apis/get-available-solutions.md) |
+| `get_return_detail` | [references/apis/get-return-detail.md](./references/apis/get-return-detail.md) |
+| `get_return_dispute_reason` | [references/apis/get-return-dispute-reason.md](./references/apis/get-return-dispute-reason.md) |
+| `get_return_list` | [references/apis/get-return-list.md](./references/apis/get-return-list.md) |
+| `get_reverse_tracking_info` | [references/apis/get-reverse-tracking-info.md](./references/apis/get-reverse-tracking-info.md) |
+| `get_shipping_carrier` | [references/apis/get-shipping-carrier.md](./references/apis/get-shipping-carrier.md) |
+| `offer` | [references/apis/offer.md](./references/apis/offer.md) |
+| `query_proof` | [references/apis/query-proof.md](./references/apis/query-proof.md) |
+| `upload_proof` | [references/apis/upload-proof.md](./references/apis/upload-proof.md) |
+| `upload_shipping_proof` | [references/apis/upload-shipping-proof.md](./references/apis/upload-shipping-proof.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

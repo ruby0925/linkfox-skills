@@ -5,7 +5,7 @@ description: Shopee（虾皮）直播 Livestream（与 linkfox-shopee-store-auth
 
 # Shopee 直播 Livestream
 
-Shopee Open Platform **Livestream 模块**（25 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/livestream/...`）。
+Shopee Open Platform **Livestream 模块**（25 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/livestream/...`）。
 
 ## 调用方式
 
@@ -76,6 +76,40 @@ Livestream 模块索引：[v2.livestream.upload_image](https://open.shopee.com/d
 | `ban_user_comment.py` | ban_user_comment | POST |
 | `unban_user_comment.py` | unban_user_comment | POST |
 | `livestream_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_item_list` | [references/apis/add-item-list.md](./references/apis/add-item-list.md) |
+| `apply_item_set` | [references/apis/apply-item-set.md](./references/apis/apply-item-set.md) |
+| `ban_user_comment` | [references/apis/ban-user-comment.md](./references/apis/ban-user-comment.md) |
+| `create_session` | [references/apis/create-session.md](./references/apis/create-session.md) |
+| `delete_item_list` | [references/apis/delete-item-list.md](./references/apis/delete-item-list.md) |
+| `delete_show_item` | [references/apis/delete-show-item.md](./references/apis/delete-show-item.md) |
+| `end_session` | [references/apis/end-session.md](./references/apis/end-session.md) |
+| `get_item_count` | [references/apis/get-item-count.md](./references/apis/get-item-count.md) |
+| `get_item_list` | [references/apis/get-item-list.md](./references/apis/get-item-list.md) |
+| `get_item_set_item_list` | [references/apis/get-item-set-item-list.md](./references/apis/get-item-set-item-list.md) |
+| `get_item_set_list` | [references/apis/get-item-set-list.md](./references/apis/get-item-set-list.md) |
+| `get_latest_comment_list` | [references/apis/get-latest-comment-list.md](./references/apis/get-latest-comment-list.md) |
+| `get_like_item_list` | [references/apis/get-like-item-list.md](./references/apis/get-like-item-list.md) |
+| `get_recent_item_list` | [references/apis/get-recent-item-list.md](./references/apis/get-recent-item-list.md) |
+| `get_session_detail` | [references/apis/get-session-detail.md](./references/apis/get-session-detail.md) |
+| `get_session_item_metric` | [references/apis/get-session-item-metric.md](./references/apis/get-session-item-metric.md) |
+| `get_session_metric` | [references/apis/get-session-metric.md](./references/apis/get-session-metric.md) |
+| `get_show_item` | [references/apis/get-show-item.md](./references/apis/get-show-item.md) |
+| `post_comment` | [references/apis/post-comment.md](./references/apis/post-comment.md) |
+| `start_session` | [references/apis/start-session.md](./references/apis/start-session.md) |
+| `unban_user_comment` | [references/apis/unban-user-comment.md](./references/apis/unban-user-comment.md) |
+| `update_item_list` | [references/apis/update-item-list.md](./references/apis/update-item-list.md) |
+| `update_session` | [references/apis/update-session.md](./references/apis/update-session.md) |
+| `update_show_item` | [references/apis/update-show-item.md](./references/apis/update-show-item.md) |
+| `upload_image` | [references/apis/upload-image.md](./references/apis/upload-image.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

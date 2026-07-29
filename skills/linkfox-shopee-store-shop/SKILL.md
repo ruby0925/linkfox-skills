@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺信息与设置（与 linkfox-shopee-store-
 
 # Shopee 店铺 Shop
 
-Shopee Open Platform **Shop 模块**（9 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/shop/...`）。
+Shopee Open Platform **Shop 模块**（9 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/shop/...`）。
 
 ## 调用方式
 
@@ -50,7 +50,7 @@ Shop 模块索引：[v2.shop.get_shop_info](https://open.shopee.com/documents/v2
 
 ## Core Concepts
 
-- **转发链路**：`storeTokens` → `developerProxy` → 紫鸟 `shopee-proxy` → Shopee API
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
 - **信息 vs 资料**：`get_shop_info` 返回 region/status/授权过期等；`get_profile` 返回店名/logo/描述
 - **写操作**：`update_profile`（店名 30 天仅可改一次）、`set_shop_holiday_mode`（开启后买家无法下单）
 - **仓库**：`get_warehouse_detail` 可选 `warehouse_type`（1=揽收仓，2=退货仓）
@@ -71,7 +71,25 @@ Shop 模块索引：[v2.shop.get_shop_info](https://open.shopee.com/documents/v2
 | `set_shop_holiday_mode.py` | set_shop_holiday_mode | POST |
 | `shop_api.py` | 通用入口（JSON 含 `api` 字段） | — |
 
-共享：`_shopee_shop_common.py`、`_shop_endpoints.py`、`_shop_api_runner.py`。入参详见 `references/api.md`。
+共享：`_shopee_shop_common.py`、`_shop_endpoints.py`、`_shop_api_runner.py`。入参见 `references/apis/`。
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `get_authorised_reseller_brand` | [references/apis/get-authorised-reseller-brand.md](./references/apis/get-authorised-reseller-brand.md) |
+| `get_br_shop_onboarding_info` | [references/apis/get-br-shop-onboarding-info.md](./references/apis/get-br-shop-onboarding-info.md) |
+| `get_profile` | [references/apis/get-profile.md](./references/apis/get-profile.md) |
+| `get_shop_holiday_mode` | [references/apis/get-shop-holiday-mode.md](./references/apis/get-shop-holiday-mode.md) |
+| `get_shop_info` | [references/apis/get-shop-info.md](./references/apis/get-shop-info.md) |
+| `get_shop_notification` | [references/apis/get-shop-notification.md](./references/apis/get-shop-notification.md) |
+| `get_warehouse_detail` | [references/apis/get-warehouse-detail.md](./references/apis/get-warehouse-detail.md) |
+| `set_shop_holiday_mode` | [references/apis/set-shop-holiday-mode.md](./references/apis/set-shop-holiday-mode.md) |
+| `update_profile` | [references/apis/update-profile.md](./references/apis/update-profile.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

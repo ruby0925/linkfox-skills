@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_auto_add_new_product_toggle_status (v2.ams.get_auto_add_new_product_toggle_status)
+Shopee Store — get_auto_add_new_product_toggle_status
+
 官方: https://open.shopee.com/documents/v2/v2.ams.get_auto_add_new_product_toggle_status?module=127&type=1
+
+入参说明见 references/apis/get-auto-add-new-product-toggle-status.md。
 """
 
 from __future__ import annotations
-from _shopee_ams_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_auto_add_new_product_toggle_status.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ams_api("get_auto_add_new_product_toggle_status", params, "get_auto_add_new_product_toggle_status.py"), inline)
+    print(json.dumps(run_ams_api("get_auto_add_new_product_toggle_status", params, "get_auto_add_new_product_toggle_status.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

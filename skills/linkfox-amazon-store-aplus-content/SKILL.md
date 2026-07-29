@@ -5,7 +5,7 @@ description: 亚马逊店铺 A+ Content（增强图文页）管理（与 linkfox
 
 # Amazon 店铺 A+ Content Management
 
-本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-listings`** 等同属 **Amazon Store** 系列：使用 **`POST /spApi/storeTokens`** 取 `accessToken`，再经 **`POST /spApi/developerProxy`** 转发上游 **GET** 或 **POST**。
+本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-listings`** 等同属 **Amazon Store** 系列：依赖 auth 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发上游 **GET** 或 **POST**。
 
 | 操作 | 官方参考 |
 |------|----------|

@@ -5,7 +5,7 @@ description: Shopee（虾皮）FBS 巴西仓储（与 linkfox-shopee-store-auth 
 
 # Shopee FBS 巴西仓储
 
-Shopee Open Platform **FBS 模块**（4 个 API，均为 GET，面向巴西 BR）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/fbs/...`）。
+Shopee Open Platform **FBS 模块**（4 个 API，均为 GET，面向巴西 BR）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/fbs/...`）。
 
 ## 调用方式
 
@@ -55,6 +55,19 @@ FBS 模块索引：[v2.fbs.query_br_shop_enrollment_status](https://open.shopee.
 | `query_br_shop_block_status.py` | query_br_shop_block_status | GET |
 | `query_br_sku_block_status.py` | query_br_sku_block_status | GET |
 | `fbs_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `query_br_shop_block_status` | [references/apis/query-br-shop-block-status.md](./references/apis/query-br-shop-block-status.md) |
+| `query_br_shop_enrollment_status` | [references/apis/query-br-shop-enrollment-status.md](./references/apis/query-br-shop-enrollment-status.md) |
+| `query_br_shop_invoice_error` | [references/apis/query-br-shop-invoice-error.md](./references/apis/query-br-shop-invoice-error.md) |
+| `query_br_sku_block_status` | [references/apis/query-br-sku-block-status.md](./references/apis/query-br-sku-block-status.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

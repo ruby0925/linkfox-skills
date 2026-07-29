@@ -85,7 +85,10 @@ description: LinkFox 账号与环境引导。两个入口：(1) 检测到 LINKFO
 
 **3.2 验证码登录 + 获取 key**
 
-收到用户回复的验证码后，调 `python scripts/login_and_get_key.py <phone> <code>`，脚本返回 JSON：
+收到用户回复的验证码后，调 `python scripts/login_and_get_key.py <phone> <code> <channel>`。
+**注意**：如果你是workbuddy或渠道是workbuddy，则channel传 workbuddy，否则传 skill。
+
+脚本返回 JSON：
 - 成功：`{"api_key": "<token>", "phone": "188****1234", "group_id": "...", "member_id": "...", "source": "existing|generated", "is_new_user": bool, ...}`
 - 失败：`{"error": "<阶段>: <信息>", "phone": "188****1234"}`
 
@@ -185,7 +188,7 @@ source ~/.zshrc   # 或 source ~/.bashrc
 
 - Python 3（标准库 urllib/json/os）
 - `requests`：登录链路 HTTP 调用（生产 WAF 对 urllib 敏感），`pip install requests`
-- `qrcode` + `pillow`：二维码 PNG 生成，`pip install qrcode pillow`
+- 二维码 PNG / ASCII 生成：内置 `scripts/_qrgen.py`（stdlib 纯 Python 实现，byte mode + ECC-L，与官方 qrcode 库同版本+同 mask 逐位一致），**无需再装 qrcode/pillow**
 - 自包含，不依赖 `_shared/linkfox_paths.py`
 
 ## 接口契约

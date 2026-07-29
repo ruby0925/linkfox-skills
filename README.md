@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-118-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-129-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 118 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 129 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -104,10 +104,15 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-echotik-batch-product-detail` | Batch-fetch detailed TikTok Shop product metrics (multi-period sales and GMV, live, video, influencer, and views data) by product ID or URL |
+| `linkfox-echotik-batch-video-detail` | Batch-fetch detailed TikTok video metrics (views with 1d/7d/30d breakdown, likes with increments, comments, shares, favorites, video sales and GMV, duration, resolution, publish date, creator, and ad/AI/selling flags) by video ID or video URL |
 | `linkfox-echotik-get-video-download-url` | Resolve a TikTok video URL into no-watermark and watermarked download links, plus playback URL and cover images |
 | `linkfox-echotik-list-new-product-rank` | Echotik List New Product Rank |
 | `linkfox-echotik-list-product` | Echotik List Product |
+| `linkfox-echotik-list-seller` | List and filter TikTok Shop sellers (stores) by region, category, 30-day GMV, sales trend, listing date, and local/cross-border type, returning store sales, GMV, followers, ratings, reviews, and influencer/video/livestream counts across 16 marketplaces |
+| `linkfox-echotik-list-seller-product` | List the in-store products of a single TikTok Shop seller by sellerId, returning per-product title, price, multi-period (1d/7d/15d/30d/60d/90d/total) sales and GMV, rating, reviews, commission rate, listing date, and sales channel |
+| `linkfox-echotik-list-video` | List and filter TikTok videos by region, creator, product, category, views, duration, publish time, and ad/AI/selling flags, returning views, likes, comments, shares, favorites, video sales, and GMV across 16 marketplaces |
 | `linkfox-echotik-product-video` | Query promotional videos for a TikTok product with engagement and sales metrics |
+| `linkfox-echotik-seller-detail` | Fetch the full profile of a single TikTok Shop seller (store) by sellerId, returning total and multi-period (1d/7d/30d/90d) sales and GMV, followers, rating, reviews, fulfillment rates, product counts, price range, categories, and influencer/video/livestream counts across 16 marketplaces |
 
 ### TikTok (FastMoss)
 
@@ -115,6 +120,16 @@ Get your API key and configure the environment before using any skill.
 | --- | --- |
 | `linkfox-fastmoss-product-rank-top-selling` | Fastmoss Product Rank Top Selling |
 | `linkfox-fastmoss-product-search` | Search TikTok products with keyword, category, sales, and creator filters |
+
+### TikTok (Kalodata)
+
+| Skill | Description |
+| --- | --- |
+| `linkfox-kalodata-tiktok-creator` | Browse TikTok Shop creator leaderboards and fetch detailed creator profile and performance data by creator ID via the Kalodata data source |
+| `linkfox-kalodata-tiktok-livestream` | Browse TikTok Shop livestream rankings by region, currency, language, and date range and fetch detailed livestream data by livestream ID via the Kalodata data source |
+| `linkfox-kalodata-tiktok-product` | Browse TikTok Shop product rankings by region, currency, language, and date range and fetch detailed product data by product ID via the Kalodata data source |
+| `linkfox-kalodata-tiktok-shop` | Browse TikTok Shop store leaderboards and fetch detailed store data by shop ID via the Kalodata data source |
+| `linkfox-kalodata-tiktok-video` | Browse top TikTok Shop video leaderboards and fetch detailed shoppable video metrics by video ID via the Kalodata data source |
 
 ### Ozon (Mpstats)
 
@@ -147,6 +162,7 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-jiimore-get-niche-info` | Jiimore Get Niche Info |
+| `linkfox-jiimore-get-niche-info-by-asin` | Jiimore Get Niche Info By Asin |
 | `linkfox-jiimore-get-niche-info-by-keyword` | Jiimore Get Niche Info By Keyword |
 | `linkfox-jiimore-get-niche-review-from-keyword` | Jiimore Get Niche Review From Keyword |
 | `linkfox-jiimore-page-asins-by-asin` | Jiimore Page Asins By Asin |
@@ -227,20 +243,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-zhihuiya-simple-bibliography` | Get simplified patent metadata (title, date, status) |
 | `linkfox-zhihuiya-utility-patent-image-search` | Zhihuiya Utility Patent Image Search |
 
-### Eureka Patent
-
-| Skill | Description |
-| --- | --- |
-| `linkfox-eureka-abstract-image` | Eureka Abstract Image |
-| `linkfox-eureka-abstract-translated` | Eureka Abstract Translated |
-| `linkfox-eureka-bibliography` | Eureka Bibliography |
-| `linkfox-eureka-claim-data` | Eureka Claim Data |
-| `linkfox-eureka-claim-translated` | Eureka Claim Translated |
-| `linkfox-eureka-description` | Eureka Description |
-| `linkfox-eureka-description-translated` | Eureka Description Translated |
-| `linkfox-eureka-patent-family` | Eureka Patent Family |
-| `linkfox-eureka-patent-image-search` | Eureka Patent Image Search |
-
 ### AI Multimodal
 
 | Skill | Description |
@@ -269,6 +271,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-etsy-store-query` | Etsy Store Query |
 | `linkfox-lanjing-mercado-product-selection` | Query Mercado Libre (Mexico, Brazil, Argentina, Chile, Colombia) product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data via 24 Lanjing tools through the LinkFox gateway |
 | `linkfox-lingxing-erp` | Lingxing Erp |
+| `linkfox-maidalv-product-tro-detection` | Detect product TRO (Temporary Restraining Order) and trademark/patent/copyright infringement risk from a product image, returning risk level, infringement items, TRO plaintiff info, and an AI legal report |
 | `linkfox-onboarding` | Onboarding |
 | `linkfox-product-title-analyze` | Analyze and optimize Amazon product listing titles |
 | `linkfox-seerfar-ozon-category-search` | List an Ozon category's products by categoryId with category aggregates (total sales, total revenue, average price, rating, seasonality) and per-product sales, price, rating, reviews, brand, seller, and fulfillment via Seerfar |

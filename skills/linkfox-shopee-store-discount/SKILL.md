@@ -5,7 +5,7 @@ description: Shopee（虾皮）店铺折扣促销 Discount（与 linkfox-shopee-
 
 # Shopee 店铺 Discount
 
-Shopee Open Platform **Discount 模块**（12 个 API）。**依赖 `linkfox-shopee-store-auth`**：先取 `accessToken`，再经 **`POST /shopee/developerProxy`** 转发（`path` 须 `api/v2/discount/...`）。
+Shopee Open Platform **Discount 模块**（12 个 API）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/discount/...`）。
 
 ## 调用方式
 
@@ -63,6 +63,27 @@ Discount 模块索引：[v2.discount.add_discount](https://open.shopee.com/docum
 | `set_sip_discount.py` | set_sip_discount | POST |
 | `delete_sip_discount.py` | delete_sip_discount | POST |
 | `discount_api.py` | 通用入口 | — |
+
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `add_discount` | [references/apis/add-discount.md](./references/apis/add-discount.md) |
+| `add_discount_item` | [references/apis/add-discount-item.md](./references/apis/add-discount-item.md) |
+| `delete_discount` | [references/apis/delete-discount.md](./references/apis/delete-discount.md) |
+| `delete_discount_item` | [references/apis/delete-discount-item.md](./references/apis/delete-discount-item.md) |
+| `delete_sip_discount` | [references/apis/delete-sip-discount.md](./references/apis/delete-sip-discount.md) |
+| `end_discount` | [references/apis/end-discount.md](./references/apis/end-discount.md) |
+| `get_discount` | [references/apis/get-discount.md](./references/apis/get-discount.md) |
+| `get_discount_list` | [references/apis/get-discount-list.md](./references/apis/get-discount-list.md) |
+| `get_sip_discounts` | [references/apis/get-sip-discounts.md](./references/apis/get-sip-discounts.md) |
+| `set_sip_discount` | [references/apis/set-sip-discount.md](./references/apis/set-sip-discount.md) |
+| `update_discount` | [references/apis/update-discount.md](./references/apis/update-discount.md) |
+| `update_discount_item` | [references/apis/update-discount-item.md](./references/apis/update-discount-item.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
 
 ## Usage Scenarios
 

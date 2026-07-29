@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — end_bundle_deal (v2.bundle_deal.end_bundle_deal)
+Shopee Store — end_bundle_deal
+
 官方: https://open.shopee.com/documents/v2/v2.bundle_deal.end_bundle_deal?module=110&type=1
+
+入参说明见 references/apis/end-bundle-deal.md。
 """
 
 from __future__ import annotations
-from _shopee_bundle_deal_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: end_bundle_deal.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_bundle_deal_api("end_bundle_deal", params, "end_bundle_deal.py"), inline)
+    print(json.dumps(run_bundle_deal_api("end_bundle_deal", params, "end_bundle_deal.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — upload_image (v2.media_space.upload_image)
+Shopee Store — upload_image
+
 官方: https://open.shopee.com/documents/v2/v2.media_space.upload_image?module=91&type=1
+
+入参说明见 references/apis/upload-image.md。
 """
 
 from __future__ import annotations

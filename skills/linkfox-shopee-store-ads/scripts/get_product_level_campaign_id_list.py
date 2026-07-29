@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_product_level_campaign_id_list (v2.ads.get_product_level_campaign_id_list)
+Shopee Store — get_product_level_campaign_id_list
+
 官方: https://open.shopee.com/documents/v2/v2.ads.get_product_level_campaign_id_list?module=117&type=1
+
+入参说明见 references/apis/get-product-level-campaign-id-list.md。
 """
 
 from __future__ import annotations
-from _shopee_ads_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_product_level_campaign_id_list.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ads_api("get_product_level_campaign_id_list", params, "get_product_level_campaign_id_list.py"), inline)
+    print(json.dumps(run_ads_api("get_product_level_campaign_id_list", params, "get_product_level_campaign_id_list.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

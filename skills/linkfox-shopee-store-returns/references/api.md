@@ -1,14 +1,15 @@
 # linkfox-shopee-store-returns — 参数与字段参考
 
+> 单接口入参/响应说明已拆到 **`apis/`**（按 API 一份）；本文件保留模块总览与 Feedback。
 Shopee **Returns 模块**全部 15 个 API，经 **`POST /shopee/developerProxy`** 转发。
 
 授权见 **`linkfox-shopee-store-auth`**。官方索引：[v2.returns.get_return_list](https://open.shopee.com/documents/v2/v2.returns.get_return_list?module=102&type=1)
 
 ## 通用约定
 
-- **Base URL**：`${LINKFOX_TOOL_GATEWAY}`
+- **Base URL**：`https://tool-gateway.linkfox.com`
 - **Method**：POST（网关），上游 Method 见各接口
-- **Auth**：Header `Authorization: <api_key>`（从 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取）（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **Auth**：Header `Authorization: <api_key>`（`LINKFOXAGENT_API_KEY`）
 - **流程**：`POST /shopee/storeTokens` → `POST /shopee/developerProxy`
 - **path**：须 `api/v2/returns/...`
 - **标识**：店铺级 API，通常传 **`shopId`**
@@ -21,21 +22,21 @@ Shopee **Returns 模块**全部 15 个 API，经 **`POST /shopee/developerProxy`
 
 | # | API | Method | path | 脚本 | 官方文档 |
 |---|-----|--------|------|------|----------|
-| 1 | accept_offer | POST | `api/v2/returns/accept_offer` | `accept_offer.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.accept_offer?module=102&type=1) |
-| 2 | cancel_dispute | POST | `api/v2/returns/cancel_dispute` | `cancel_dispute.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.cancel_dispute?module=102&type=1) |
-| 3 | confirm | POST | `api/v2/returns/confirm` | `confirm.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.confirm?module=102&type=1) |
-| 4 | convert_image | POST | `api/v2/returns/convert_image` | `convert_image.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.convert_image?module=102&type=1) |
-| 5 | dispute | POST | `api/v2/returns/dispute` | `dispute.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.dispute?module=102&type=1) |
-| 6 | get_available_solutions | GET | `api/v2/returns/get_available_solutions` | `get_available_solutions.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_available_solutions?module=102&type=1) |
-| 7 | get_return_detail | GET | `api/v2/returns/get_return_detail` | `get_return_detail.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_return_detail?module=102&type=1) |
-| 8 | get_return_dispute_reason | GET | `api/v2/returns/get_return_dispute_reason` | `get_return_dispute_reason.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_return_dispute_reason?module=102&type=1) |
-| 9 | get_return_list | GET | `api/v2/returns/get_return_list` | `get_return_list.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_return_list?module=102&type=1) |
-| 10 | get_reverse_tracking_info | GET | `api/v2/returns/get_reverse_tracking_info` | `get_reverse_tracking_info.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_reverse_tracking_info?module=102&type=1) |
-| 11 | get_shipping_carrier | GET | `api/v2/returns/get_shipping_carrier` | `get_shipping_carrier.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.get_shipping_carrier?module=102&type=1) |
-| 12 | offer | POST | `api/v2/returns/offer` | `offer.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.offer?module=102&type=1) |
-| 13 | query_proof | GET | `api/v2/returns/query_proof` | `query_proof.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.query_proof?module=102&type=1) |
-| 14 | upload_proof | POST | `api/v2/returns/upload_proof` | `upload_proof.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.upload_proof?module=102&type=1) |
-| 15 | upload_shipping_proof | POST | `api/v2/returns/upload_shipping_proof` | `upload_shipping_proof.py` | [doc](https://open.shopee.com/documents/v2/v2.returns.upload_shipping_proof?module=102&type=1) |
+| 1 | accept_offer | POST | `api/v2/returns/accept_offer` | `accept_offer.py` | [apis/accept-offer.md](./apis/accept-offer.md) |
+| 2 | cancel_dispute | POST | `api/v2/returns/cancel_dispute` | `cancel_dispute.py` | [apis/cancel-dispute.md](./apis/cancel-dispute.md) |
+| 3 | confirm | POST | `api/v2/returns/confirm` | `confirm.py` | [apis/confirm.md](./apis/confirm.md) |
+| 4 | convert_image | POST | `api/v2/returns/convert_image` | `convert_image.py` | [apis/convert-image.md](./apis/convert-image.md) |
+| 5 | dispute | POST | `api/v2/returns/dispute` | `dispute.py` | [apis/dispute.md](./apis/dispute.md) |
+| 6 | get_available_solutions | GET | `api/v2/returns/get_available_solutions` | `get_available_solutions.py` | [apis/get-available-solutions.md](./apis/get-available-solutions.md) |
+| 7 | get_return_detail | GET | `api/v2/returns/get_return_detail` | `get_return_detail.py` | [apis/get-return-detail.md](./apis/get-return-detail.md) |
+| 8 | get_return_dispute_reason | GET | `api/v2/returns/get_return_dispute_reason` | `get_return_dispute_reason.py` | [apis/get-return-dispute-reason.md](./apis/get-return-dispute-reason.md) |
+| 9 | get_return_list | GET | `api/v2/returns/get_return_list` | `get_return_list.py` | [apis/get-return-list.md](./apis/get-return-list.md) |
+| 10 | get_reverse_tracking_info | GET | `api/v2/returns/get_reverse_tracking_info` | `get_reverse_tracking_info.py` | [apis/get-reverse-tracking-info.md](./apis/get-reverse-tracking-info.md) |
+| 11 | get_shipping_carrier | GET | `api/v2/returns/get_shipping_carrier` | `get_shipping_carrier.py` | [apis/get-shipping-carrier.md](./apis/get-shipping-carrier.md) |
+| 12 | offer | POST | `api/v2/returns/offer` | `offer.py` | [apis/offer.md](./apis/offer.md) |
+| 13 | query_proof | GET | `api/v2/returns/query_proof` | `query_proof.py` | [apis/query-proof.md](./apis/query-proof.md) |
+| 14 | upload_proof | POST | `api/v2/returns/upload_proof` | `upload_proof.py` | [apis/upload-proof.md](./apis/upload-proof.md) |
+| 15 | upload_shipping_proof | POST | `api/v2/returns/upload_shipping_proof` | `upload_shipping_proof.py` | [apis/upload-shipping-proof.md](./apis/upload-shipping-proof.md) |
 通用入口：`returns_api.py`（JSON 含 `"api": "<上表 API 名>"`）。
 
 ---
@@ -46,16 +47,16 @@ Shopee **Returns 模块**全部 15 个 API，经 **`POST /shopee/developerProxy`
 
 | API | 要点 |
 |-----|------|
-| `get_return_list` | 退货/退款列表；可选 `page_no`、`page_size`、时间筛选 |
-| `get_return_detail` | 必填 `return_sn` |
-| `get_reverse_tracking_info` | 逆向物流轨迹 |
+| `get_return_list` | 退货/退款列表；可选 `page_no`、`page_size`、时间筛选 — [apis/get-return-list.md](./apis/get-return-list.md) |
+| `get_return_detail` | 必填 `return_sn` — [apis/get-return-detail.md](./apis/get-return-detail.md) |
+| `get_reverse_tracking_info` | 逆向物流轨迹 — [apis/get-reverse-tracking-info.md](./apis/get-reverse-tracking-info.md) |
 
 ### 卖家处理
 
 | API | 要点 |
 |-----|------|
-| `confirm` | 卖家确认退货；POST `body` 含 `return_sn` |
-| `get_available_solutions` | 必填 `return_sn`；可用解决方案 |
+| `confirm` | 卖家确认退货；POST `body` 含 `return_sn` — [apis/confirm.md](./apis/confirm.md) |
+| `get_available_solutions` | 必填 `return_sn`；可用解决方案 — [apis/get-available-solutions.md](./apis/get-available-solutions.md) |
 | `offer` / `accept_offer` | 提出/接受解决方案 |
 | `dispute` / `cancel_dispute` | 发起/取消争议 |
 
@@ -64,10 +65,10 @@ Shopee **Returns 模块**全部 15 个 API，经 **`POST /shopee/developerProxy`
 | API | 要点 |
 |-----|------|
 | `upload_proof` / `query_proof` | 上传/查询退货凭证 |
-| `convert_image` | 图片转换 |
-| `get_shipping_carrier` | 退货物流承运商 |
-| `upload_shipping_proof` | 上传退货运单凭证 |
-| `get_return_dispute_reason` | 争议原因列表 |
+| `convert_image` | 图片转换 — [apis/convert-image.md](./apis/convert-image.md) |
+| `get_shipping_carrier` | 退货物流承运商 — [apis/get-shipping-carrier.md](./apis/get-shipping-carrier.md) |
+| `upload_shipping_proof` | 上传退货运单凭证 — [apis/upload-shipping-proof.md](./apis/upload-shipping-proof.md) |
+| `get_return_dispute_reason` | 争议原因列表 — [apis/get-return-dispute-reason.md](./apis/get-return-dispute-reason.md) |
 
 ---
 
@@ -79,7 +80,6 @@ Shopee **Returns 模块**全部 15 个 API，经 **`POST /shopee/developerProxy`
 | 1003 | 代理/网络异常 | 重试 |
 | 1004 | 无授权记录 | auth skill |
 | 1005 | path 未白名单 | 确认 `api/v2/returns/...` |
-| HTTP 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
 
 ---
 

@@ -56,6 +56,19 @@ Push 模块索引：[v2.push.set_app_push_config](https://open.shopee.com/docume
 | `confirm_consumed_lost_push_message.py` | confirm_consumed_lost_push_message | POST |
 | `push_api.py` | 通用入口 | — |
 
+## 接口说明（按 API）
+
+入参与响应细节放在 `references/apis/`，SKILL 只保留索引。
+
+| API | 说明文档 |
+|-----|----------|
+| `confirm_consumed_lost_push_message` | [references/apis/confirm-consumed-lost-push-message.md](./references/apis/confirm-consumed-lost-push-message.md) |
+| `get_app_push_config` | [references/apis/get-app-push-config.md](./references/apis/get-app-push-config.md) |
+| `get_lost_push_message` | [references/apis/get-lost-push-message.md](./references/apis/get-lost-push-message.md) |
+| `set_app_push_config` | [references/apis/set-app-push-config.md](./references/apis/set-app-push-config.md) |
+
+模块总览 / Feedback 见 [references/api.md](./references/api.md)。
+
 ## Usage Scenarios
 
 ### 1. 配置 Push 回调

@@ -79,11 +79,10 @@ Currently only **US** (United States) is supported. Always set `site` to `US`. I
 
 ## Display Rules
 
-1. **Present the report directly**: The API returns a Markdown-formatted report in the `stdout` field - display it as-is to the user
-2. **No subjective advice**: Present the AI-generated analysis without adding your own business recommendations
-3. **Clarify scope**: Remind users the report is based on a point-in-time snapshot and serves as a reference for decision-making
-4. **Error handling**: When a query fails, explain the reason based on the `msg` field and suggest checking the keyword or trying again
-5. **No secondary analysis**: This tool's output cannot be fed into data query tools for further processing - inform users if they attempt this
+- **No subjective advice**: Apply the AI-generated analysis without adding your own business recommendations
+- **Clarify scope**: Remind users the report is based on a point-in-time snapshot and serves as a reference for decision-making
+- **Error handling**: When a query fails, explain the reason based on the `msg` field and suggest checking the keyword or trying again
+- **No secondary analysis**: This tool's output cannot be fed into data query tools for further processing - inform users if they attempt this
 
 ## Important Limitations
 

@@ -271,32 +271,33 @@ def gateway_get(path: str) -> dict:
 def render_qr(qr_content: str, session_dir_path: str) -> dict:
     """把 qr_content 渲染成本地 PNG + ASCII 字符串。
 
+    用同目录下的 `_qrgen.py` 做纯 Python 实现（byte mode + ECC-L + 手写 PNG），
+    stdlib 已经够用，**不再依赖 qrcode / pillow**——避免 onboarding 场景在没
+    这两个包的机器上直接崩掉。
+
     Returns:
         {"png_path": str, "ascii_qr": str}
-        qrcode/pillow 缺失时返回 {"png_path": None, "ascii_qr": None, "error": str}
+        编码失败（如 qr_content 为空 / 超出 v40 容量）时返回带 error 字段的 dict。
     """
+    if not isinstance(qr_content, str) or not qr_content:
+        return {"png_path": None, "ascii_qr": None, "error": "qr_content 为空"}
     try:
-        import qrcode
-    except ImportError:
-        err = "缺少 qrcode 依赖，请运行: pip install qrcode pillow"
+        from _qrgen import render as _render_qr  # 同目录模块
+    except ImportError as e:
+        err = f"加载内置 _qrgen.py 失败: {e}"
         print(f"{_stderr_tag()} render_qr: {err}", file=sys.stderr)
         return {"png_path": None, "ascii_qr": None, "error": err}
 
     os.makedirs(session_dir_path, exist_ok=True)
     ts_us = int(time.time() * 1_000_000)
     png_path = os.path.join(session_dir_path, f"qr-{ts_us}.png")
-
-    qr = qrcode.QRCode(border=1)
-    qr.add_data(qr_content)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    img.save(png_path)
-
-    buf = io.StringIO()
-    qr.print_ascii(out=buf, invert=True)
-    ascii_qr = buf.getvalue()
-
-    return {"png_path": png_path, "ascii_qr": ascii_qr}
+    try:
+        r = _render_qr(qr_content, png_path=png_path, ascii_invert=True)
+    except Exception as e:
+        err = f"生成二维码失败: {e}"
+        print(f"{_stderr_tag()} render_qr: {err}", file=sys.stderr)
+        return {"png_path": None, "ascii_qr": None, "error": err}
+    return {"png_path": r.get("png_path"), "ascii_qr": r.get("ascii", "")}
 
 
 def decode_jwt_uid() -> dict:

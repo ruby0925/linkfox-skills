@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_warehouse_detail (v2.shop.get_warehouse_detail)
+Shopee Store — get_warehouse_detail
+
 官方: https://open.shopee.com/documents/v2/v2.shop.get_warehouse_detail?module=92&type=1
+
+入参说明见 references/apis/get-warehouse-detail.md。
 """
 
 from __future__ import annotations

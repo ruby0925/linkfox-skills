@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_targeted_campaign_settings (v2.ams.get_targeted_campaign_settings)
+Shopee Store — get_targeted_campaign_settings
+
 官方: https://open.shopee.com/documents/v2/v2.ams.get_targeted_campaign_settings?module=127&type=1
+
+入参说明见 references/apis/get-targeted-campaign-settings.md。
 """
 
 from __future__ import annotations
-from _shopee_ams_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_targeted_campaign_settings.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ams_api("get_targeted_campaign_settings", params, "get_targeted_campaign_settings.py"), inline)
+    print(json.dumps(run_ams_api("get_targeted_campaign_settings", params, "get_targeted_campaign_settings.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

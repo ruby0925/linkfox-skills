@@ -11,7 +11,7 @@ This skill guides you on how to query patent family information via the Zhihuiya
 
 - **API 端点**：`POST /zhihuiya/patentFamily`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_patent_family.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-patent-family-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -51,14 +51,15 @@ You must supply at least one of the two lookup parameters. If both are provided,
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| patentId | string | Conditionally | Patent ID(s). Separate multiple values with commas. Maximum 100 entries. |
-| patentNumber | string | Conditionally | Publication / announcement number(s). Separate multiple values with commas. Maximum 100 entries. |
+| patentId | string | Conditionally | Single patent ID only. Do NOT pass comma-separated multiple IDs. |
+| patentNumber | string | Conditionally | Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. |
 
 **Rules**:
 1. At least one of `patentId` or `patentNumber` must be provided.
 2. If both are provided, the API uses `patentId` and ignores `patentNumber`.
-3. Multiple values are comma-separated (e.g., `"US10000001B2,EP3000001A1"`).
-4. The upper limit is 100 patents per request.
+3. Only one patent may be passed per request. If the user has multiple patents, obtain explicit consent and make a separate call for each.
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Response Fields
 
@@ -88,14 +89,6 @@ Call with:
 {"patentNumber": "US10000001B2"}
 ```
 
-**2. Look up families for multiple patents at once**
-> "Show the INPADOC family for these patents: EP3000001A1, CN112345678A, JP2020123456A"
-
-Call with:
-```json
-{"patentNumber": "EP3000001A1,CN112345678A,JP2020123456A"}
-```
-
 **3. Look up by patent ID**
 > "Get the patent family for patent ID 5af83e12-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
@@ -119,12 +112,12 @@ Then compare `simpleFamily` and `inpadocFamily` arrays in the response.
 2. **Summarize counts**: Always state how many family members were found under each family type so users can quickly gauge geographic spread.
 3. **Highlight jurisdictions**: When listing family members, call out the countries/regions covered to help users understand the patent's geographic protection scope.
 4. **Error handling**: When the API returns an error or empty results, explain the likely cause (invalid patent number format, patent not found in database, etc.) and suggest corrections.
-5. **Batch result organization**: When querying multiple patents, organize results per patent so users can easily find each one.
+5. **Single-patent results**: Each call returns a single patent's family data; present it clearly.
 6. **No subjective legal advice**: Present factual family data only. Do not provide legal opinions on patent scope, validity, or infringement.
 ## Important Limitations
 
 - **Lookup only**: This tool retrieves family information for known patents. It cannot perform keyword-based patent searches or full-text queries.
-- **Batch limit**: A maximum of 100 patent IDs or publication numbers per request.
+- **Single patent per request**: Only one patent ID or publication number may be passed per call (no comma-separated batches).
 - **Data source**: Family data comes from the Zhihuiya (PatSnap) database and may have a slight delay relative to the very latest patent office publications.
 - **Family member detail**: The family member arrays contain summary objects. For full bibliographic data on a specific family member, a separate lookup may be required.
 
@@ -140,7 +133,6 @@ Then compare `simpleFamily` and `inpadocFamily` arrays in the response.
 | "INPADOC family members" | Broad family lookup |
 | "Related patents / sibling patents" | Family exploration |
 | "Compare simple vs extended family" | Multi-definition comparison |
-| "Batch check families for these patents" | Bulk family lookup |
 
 **Not applicable** -- Needs beyond patent family lookup:
 - Full-text patent search by keywords or classification codes
@@ -153,6 +145,8 @@ Then compare `simpleFamily` and `inpadocFamily` arrays in the response.
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利同族结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+
+> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

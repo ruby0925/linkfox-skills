@@ -5,7 +5,7 @@ description: 亚马逊店铺买家反馈洞察（与 linkfox-amazon-store-auth �
 
 # Amazon 店铺 Customer Feedback
 
-本 skill 与 **`linkfox-amazon-store-auth`** 等同属 **Amazon Store** 系列：先 **`POST /spApi/storeTokens`**，再 **`POST /spApi/developerProxy`** 转发 **GET**。
+本 skill 与 **`linkfox-amazon-store-auth`** 等同属 **Amazon Store** 系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发 **GET**。
 
 > 说明：接口属于 **Customer Feedback（买家评论/退货洞察）**，不是 Orders 订单 API。订单见 **`linkfox-amazon-store-orders`**。
 

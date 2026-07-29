@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_top_picks_list (v2.top_picks.get_top_picks_list)
+Shopee Store — get_top_picks_list
+
 官方: https://open.shopee.com/documents/v2/v2.top_picks.get_top_picks_list?module=100&type=1
+
+入参说明见 references/apis/get-top-picks-list.md。
 """
 
 from __future__ import annotations

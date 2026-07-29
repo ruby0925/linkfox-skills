@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_br_shop_onboarding_info (v2.shop.get_br_shop_onboarding_info)
+Shopee Store — get_br_shop_onboarding_info
+
 官方: https://open.shopee.com/documents/v2/v2.shop.get_br_shop_onboarding_info?module=92&type=1
+
+入参说明见 references/apis/get-br-shop-onboarding-info.md。
 """
 
 from __future__ import annotations

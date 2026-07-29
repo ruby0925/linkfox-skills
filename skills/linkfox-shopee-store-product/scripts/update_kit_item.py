@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — update_kit_item (v2.product.update_kit_item)
+Shopee Store — update_kit_item
+
 官方: https://open.shopee.com/documents/v2/v2.product.update_kit_item?module=89&type=1
+
+入参说明见 references/apis/update-kit-item.md。
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ import json
 import sys
 
 from _product_api_runner import run_product_api
-from _shopee_product_common import emit_result, lf_inline_flag
 
 
 def main() -> None:
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: update_kit_item.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_product_api("update_kit_item", params, "update_kit_item.py"), inline)
+    print(json.dumps(run_product_api("update_kit_item", params, "update_kit_item.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_profile (v2.shop.get_profile)
+Shopee Store — get_profile
+
 官方: https://open.shopee.com/documents/v2/v2.shop.get_profile?module=92&type=1
+
+入参说明见 references/apis/get-profile.md。
 """
 
 from __future__ import annotations

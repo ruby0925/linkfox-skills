@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Shopee Store — get_product_performance (v2.ams.get_product_performance)
+Shopee Store — get_product_performance
+
 官方: https://open.shopee.com/documents/v2/v2.ams.get_product_performance?module=127&type=1
+
+入参说明见 references/apis/get-product-performance.md。
 """
 
 from __future__ import annotations
-from _shopee_ams_common import emit_result, lf_inline_flag
 
 import json
 import sys
@@ -18,8 +20,7 @@ def main() -> None:
         print("Usage: get_product_performance.py '<JSON>'", file=sys.stderr)
         sys.exit(1)
     params = json.loads(sys.argv[1])
-    inline = lf_inline_flag()
-    emit_result(run_ams_api("get_product_performance", params, "get_product_performance.py"), inline)
+    print(json.dumps(run_ams_api("get_product_performance", params, "get_product_performance.py"), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

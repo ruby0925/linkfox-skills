@@ -5,7 +5,7 @@ description: 亚马逊店铺 Listing 与刊登相关定义/限制（与 linkfox-
 
 # Amazon 店铺 Listings 与相关 API
 
-本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`** 同属 **Amazon Store** 系列：使用 **`POST /spApi/storeTokens`** 取 `accessToken`，再经 **`POST /spApi/developerProxy`** 转发上游 **GET**、**PATCH**、**PUT** 或 **DELETE**。
+本 skill 与 **`linkfox-amazon-store-auth`**、**`linkfox-amazon-store-report`** 同属 **Amazon Store** 系列：依赖 **`linkfox-amazon-store-auth`** 选店（`sellerId`+`region`）；直接 **`POST /spApi/developerProxy`** 传入 `sellerId`+`region`，由服务端解析 token（勿传 `amzAccessToken`，除非兼容旧调用）。转发上游 **GET**、**PATCH**、**PUT** 或 **DELETE**。
 
 | 操作 | 官方参考 |
 |------|----------|
