@@ -9,6 +9,9 @@ STATUS_FIELDS = (
     "expireIn",
     "expiresIn",
     "authRecordId",
+    "appType",
+    "shopId",
+    "merchantId",
     "message",
     "accessTokenExpireIn",
     "refreshTokenExpireIn",
@@ -34,8 +37,8 @@ def print_status_note(result: dict) -> None:
         if key in result and result[key] is not None:
             print(f"  {key}: {result[key]}", file=sys.stderr)
     print(
-        "Note: Response is status/metadata only. "
-        "Use account selectors (sellerId+region, profileId, shopId, openId, etc.) "
-        "with developerProxy; do not fetch raw tokens for proxy calls.",
+        "Note: Response is status/metadata only (no raw tokens). "
+        "Match shopId/merchantId + appType; call developerProxy with path + shopId "
+        "only (no accessToken / no appType on proxy).",
         file=sys.stderr,
     )

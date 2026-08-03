@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
 Shopee Authorized Stores List - LinkFox Skill
-Calls /shopee/authorizedStores to list all authorized stores
+Calls /shopee/authorizedStores to list all authorized stores (ERP and/or AD).
 
 Usage:
   python authorized_stores.py
+
+Each store row may include appType=erp|ad; the same shopId can appear twice.
 """
 
 import json
@@ -64,13 +66,20 @@ def main():
     if "stores" in result:
         stores = result.get("stores", [])
         total = result.get("total", 0)
-        print(f"\n✓ Found {total} authorized store(s):", file=sys.stderr)
+        print(f"\n✓ Found {total} authorized store record(s):", file=sys.stderr)
         for s in stores:
+            app_type = s.get("appType") or "erp"
             print(
                 f"  - shopId={s.get('shopId')}  {s.get('shopName', 'N/A')}  "
-                f"merchantId={s.get('merchantId', '')}  region={s.get('region', '')}",
+                f"merchantId={s.get('merchantId', '')}  region={s.get('region', '')}  "
+                f"appType={app_type}",
                 file=sys.stderr,
             )
+        print(
+            "Note: Match shopId/merchantId AND appType before calling business APIs. "
+            "ERP authorization does not grant Ads; Ads does not grant ERP.",
+            file=sys.stderr,
+        )
 
 
 if __name__ == "__main__":

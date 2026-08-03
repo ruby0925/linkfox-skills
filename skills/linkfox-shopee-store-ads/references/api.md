@@ -12,10 +12,11 @@ Shopee **Ads 模块**全部 23 个 API，经 **`POST /shopee/developerProxy`** �
 - **Base URL**：`https://tool-gateway.linkfox.com`
 - **Method**：POST（网关），上游 Method 见各接口
 - **Auth**：Header `Authorization: <api_key>`（`LINKFOXAGENT_API_KEY`）
-- **流程**：`POST /shopee/storeTokens` → `POST /shopee/developerProxy`
-- **path**：须 `api/v2/ads/...`
-- **标识**：店铺级广告 API，通常传 **`shopId`**
-- **权限**：Ads API 需 Shopee 额外开通广告权限；并非所有站点可用
+- **流程**：auth 确认目标店 **`appType=ad`** → 直接 `POST /shopee/developerProxy`（**不要**先取 accessToken）
+- **path**：须 `api/v2/ads/...`（服务端自动用 AD partner/token）
+- **标识**：店铺级广告 API，通常传 **`shopId`**（或 `merchantId`）
+- **禁止**：在 developerProxy 传 `accessToken` 或 `appType`
+- **权限**：需 LinkFox 侧 `appType=ad` 授权 + Shopee 侧开通广告能力；ERP 授权不能代替
 - **官方文档 URL 规则**：`https://open.shopee.com/documents/v2/v2.ads.{api}?module=117&type=1`
 - **复杂 POST**（如 `create_manual_product_ads`）：推荐传完整 `body`；日期格式常为 DD-MM-YYYY
 
@@ -98,9 +99,9 @@ Shopee **Ads 模块**全部 23 个 API，经 **`POST /shopee/developerProxy`** �
 | errcode | 含义 | 建议 |
 |---------|------|------|
 | 1002 | 参数/未登录 | 检查 shopId 与 API Key |
-| 1003 | 代理/网络异常 | 重试 |
-| 1004 | 无授权记录 | auth skill |
-| 1005 | path 未白名单 | 确认 `api/v2/ads/...` |
+| 1003 | 代理/网络异常 | 稍后重试 |
+| 1004 | 无 **AD** 授权记录 | 即使店铺有 ERP，也须 auth 发起 `appType=ad` |
+| 1005 | Token 失效或 path 未白名单 | 重新 AD 授权；确认 `api/v2/ads/...` |
 
 ---
 
@@ -110,12 +111,12 @@ Shopee **Ads 模块**全部 23 个 API，经 **`POST /shopee/developerProxy`** �
 export KEY=$LINKFOXAGENT_API_KEY
 BASE=https://tool-gateway.linkfox.com
 
+# 业务转发：只传 path + shopId（服务端注入 AD token）
 curl -X POST $BASE/shopee/developerProxy -H "Authorization: $KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "path": "api/v2/ads/get_total_balance",
     "method": "GET",
-    "accessToken": "xxx",
     "shopId": "67890"
   }'
 ```

@@ -7,7 +7,7 @@
 | 官方文档 | [get_all_cpc_ads_daily_performance](https://open.shopee.com/documents/v2/v2.ads.get_all_cpc_ads_daily_performance?module=117&type=1) |
 | 用途 | All CPC ads daily performance |
 
-经 **`POST /shopee/developerProxy`** 转发；依赖 **`linkfox-shopee-store-auth`** 选店（通常传 `shopId` 或 `merchantId`）。
+经 **`POST /shopee/developerProxy`** 转发；依赖 **`linkfox-shopee-store-auth`** 确认目标店已有 **`appType=ad`** 授权（ERP 不能代替），再传 `shopId` 或 `merchantId`（勿传 accessToken / appType）。
 
 ---
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 Shopee Store Tokens Query - LinkFox Skill
-Calls /shopee/storeTokens to get tokens for a specific store authorization
+Calls /shopee/storeTokens to get authorization status for a store + appType
 
 Usage:
-  python store_tokens.py '{"shopId": "67890"}'
+  python store_tokens.py '{"shopId": "67890", "appType": "erp"}'
+  python store_tokens.py '{"shopId": "67890", "appType": "ad"}'
   python store_tokens.py '{"merchantId": "12345"}'
 """
 
@@ -63,7 +64,7 @@ def call_api(params: dict) -> dict:
 def main():
     if len(sys.argv) < 2:
         print("Usage: store_tokens.py '<JSON parameters>'", file=sys.stderr)
-        print("Required: shopId OR merchantId", file=sys.stderr)
+        print("Required: shopId OR merchantId; optional appType=erp|ad (default erp)", file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -76,6 +77,18 @@ def main():
         print("Error: 'shopId' or 'merchantId' is required (choose one)", file=sys.stderr)
         sys.exit(1)
 
+    raw_app = params.get("appType")
+    if raw_app is None or (isinstance(raw_app, str) and not str(raw_app).strip()):
+        params["appType"] = "erp"
+    else:
+        app_type = str(raw_app).strip().lower()
+        if app_type not in ("erp", "ad"):
+            print(
+                f"Error: 'appType' must be 'erp' or 'ad', got {raw_app!r}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        params["appType"] = app_type
 
     result = call_api(params)
     result = strip_raw_tokens(result)

@@ -1,11 +1,11 @@
 ---
 name: linkfox-shopee-store-ads
-description: Shopee（虾皮）店铺站内广告 Ads（与 linkfox-shopee-store-auth 同系列），经 /shopee/developerProxy 转发 Shopee Open API Ads 模块 23 个接口：get_total_balance、create_manual_product_ads、get_product_campaign_daily_performance、GMS 广告等。当用户提到 Shopee 广告、Ads、广告余额、CPC、商品推广、手动广告、campaign、广告效果、ROI、get_total_balance 时触发。即使未明确提及"广告"，只要涉及已授权 Shopee 店铺的广告账户、推广或效果查询，也应触发。
+description: Shopee（虾皮）店铺站内广告 Ads（与 linkfox-shopee-store-auth 同系列），经 /shopee/developerProxy 转发 Shopee Open API Ads 模块 23 个接口：get_total_balance、create_manual_product_ads、get_product_campaign_daily_performance、GMS 广告等。调用前须确认目标店已有 appType=ad 授权（ERP 授权不能代替）。当用户提到 Shopee 广告、Ads、广告余额、CPC、商品推广、手动广告、campaign、广告效果、ROI、get_total_balance、广告授权 时触发。即使未明确提及"广告"，只要涉及已授权 Shopee 店铺的广告账户、推广或效果查询，也应触发。
 ---
 
 # Shopee 店铺 Ads
 
-Shopee Open Platform **Ads 模块**（23 个 API，不含即将下线的 auto product ads）。**依赖 `linkfox-shopee-store-auth`** 选店；经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`），由服务端解析 token 转发（`path` 须 `api/v2/ads/...`）。
+Shopee Open Platform **Ads 模块**（23 个 API，不含即将下线的 auto product ads）。**依赖 `linkfox-shopee-store-auth`**；须目标店存在 **`appType=ad`** 授权。经 **`POST /shopee/developerProxy`** 传入 `shopId`（或 `merchantId`）+ `api/v2/ads/...` 路径，服务端自动走 AD 应用 Token（**勿**传 `accessToken` / `appType`）。
 
 ## 调用方式
 
@@ -43,15 +43,20 @@ Ads 模块索引：[v2.ads.get_total_balance](https://open.shopee.com/documents/
 
 ## Prerequisites（必须先读）
 
-1. 运行 `python scripts/check_auth_dependency.py`；exit code **42** → 先安装 **`linkfox-shopee-store-auth`** 并授权店铺。
-2. **不要**在本 skill 内实现授权/令牌逻辑。
-3. Ads API 需 Shopee **额外广告权限**；并非所有站点/店铺可用。
+1. 运行 `python scripts/check_auth_dependency.py`；exit code **42** → 先安装 **`linkfox-shopee-store-auth`**。
+2. **不要**在本 skill 内实现授权/令牌逻辑；授权一律走 auth skill。
+3. 调用业务 API **之前**，用 auth 的 `authorized_stores.py` 确认目标店存在 **`appType=ad`**：
+   - 仅有 `appType=erp`（或历史空值）→ **不能**当广告已授权；引导 `authorize_url.py` 且传 **`appType=ad`**
+   - 两项都缺 → 若用户只要广告，只开 AD 授权即可（不必先开 ERP）
+4. Ads API 还需 Shopee 侧开通广告能力；并非所有站点/店铺可用。
+5. **禁止**向 `developerProxy` 传 `accessToken` 或 `appType`；path 用 `api/v2/ads/**` 即可由服务端路由到 AD。
 
 ---
 
 ## Core Concepts
 
-- **转发链路**：`developerProxy`（`shopId`/`merchantId` 选店，服务端注入 token）→ 紫鸟 `shopee-proxy` → Shopee API
+- **AD 与 ERP 分离**：广告 Token 与 ERP Token 独立；店铺在列表中存在 ≠ 广告已授权
+- **转发链路**：`developerProxy`（`shopId`/`merchantId` + `api/v2/ads/...`，服务端注入 **AD** token）→ 紫鸟 `shopee-proxy/ad/...` → Shopee API
 - **余额**：`get_total_balance` 查广告账户余额
 - **手动商品广告**：`create_manual_product_ads` → `edit_manual_product_ads` / `edit_manual_product_ad_keywords`
 - **效果报表**：`get_all_cpc_ads_*_performance`、`get_product_campaign_*_performance`
@@ -105,6 +110,12 @@ Ads 模块索引：[v2.ads.get_total_balance](https://open.shopee.com/documents/
 
 ## Usage Scenarios
 
+### 0. 确认 AD 授权（每次任务开头）
+
+1. auth：`authorized_stores.py` → 找目标 `shopId` 且 **`appType=ad`**
+2. 缺失 → auth：`authorize_url.py` 传 `appType=ad`，提示用户完成**广告**授权（URL 1 小时有效）
+3. 完成后再进入下列业务场景；收到 **1004** 时优先怀疑缺 AD 授权，不要用 ERP 记录硬调
+
 ### 1. 查余额与推荐
 1. `get_total_balance.py`
 2. `get_recommended_item_list.py` / `get_recommended_keyword_list.py`
@@ -116,10 +127,12 @@ Ads 模块索引：[v2.ads.get_total_balance](https://open.shopee.com/documents/
 
 ## 调用原则
 
-- 先看 **`developerProxy.httpStatus`**，再读 `*Response` 字段
+- 先确认 **`appType=ad`**，再调脚本
+- 先看 **`developerProxy.httpStatus`** / 网关 `errcode`，再读 `*Response` 字段
 - GET：业务参数放 JSON 顶层
 - POST：复杂接口传 `body`；create/edit 建议传唯一 `reference_id` 防重复
 - 每个脚本 docstring 含 **官方文档 URL**（`module=117`）
+- 不要先 `storeTokens` 取 raw token，也不要在 proxy 里塞 `accessToken`
 
 ## Not Applicable
 
