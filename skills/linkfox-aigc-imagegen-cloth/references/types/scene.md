@@ -20,7 +20,7 @@
 | `point` | `{selling_points}` | 核心营销卖点（中文一段详细描述），必填 |
 | `imageDesc` | `{image_desc}` | 最佳场景 / 画面内容（用户自定义场景）；为空时由模板自由构思多样场景 |
 
-- **本模板只消费 `{selling_points}` 与 `{image_desc}` 两个占位符**。`language` / `salesRegion` / `platform` / `brandGeneJson` 等不写进本链路 prompt——模特人种 / 年龄 / 性别、场景 Vibe 均由模板内置工作流自动推导（未指定默认欧美模特）。
+- **本模板只消费 `{selling_points}` 与 `{image_desc}` 两个占位符**。`language` / `salesRegion` / `platform` / `brandGeneJson` 等不写进本链路 prompt——模特人种 / 年龄 / 性别、场景 Vibe 均由模板内置工作流自动推导（未指定默认目标受众商业模特）。
 - 默认比例 1:1，比例走入参（`useRatio=true`）。
 
 ## 步骤 2 差异：③textgen 改写
@@ -49,13 +49,13 @@ python scripts/build_textgen_params.py \
 - [ ] 服装完整呈现且占画面 60% 以上，搭配单品（外套 / 罩衫 / 围巾 / 包袋等）未遮挡主体服装关键设计
 - [ ] 人货物理逻辑一致（成人穿成人装 / 儿童穿童装），性别匹配
 - [ ] 画面为 Ins 时尚博主风格大片：姿势富表现力（站姿 / 动态优先，避免坐姿）、机位多样、氛围感到位
-- [ ] 无 iPhone / 品牌 logo、无黑边、未遮挡衣服主体；除非 `imageDesc` 指定，否则未使用黑人模特
+- [ ] 无 iPhone / 品牌 logo、无黑边、未遮挡衣服主体；
 - [ ] 步骤 3 `provider` 已按入参透传、`outputNum=1`、`aspectRatio=ratio` 已原样透传给 imagegen
 
 ## 已知局限
 
 - 强依赖 `linkfox-aigc-textgen`（`GEM_3_FLASH`）对**目标人群 / 年龄（童装 vs 成人）/ 性别**与服装款式的判定；判定错误会直接传导到模特画像与场景构图。
-- 模板只消费 `{selling_points}` 与 `{image_desc}`：`salesRegion` / `language` / `brandGeneJson` 等不接入本链路，市场化人种 / 品牌调性强控需改由 `imageDesc` 文字描述传入，否则默认欧美模特。
+- 模板只消费 `{selling_points}` 与 `{image_desc}`：`salesRegion` / `language` / `brandGeneJson` 等不接入本链路，市场化人种 / 品牌调性强控需改由 `imageDesc` 文字描述传入，否则默认目标受众商业模特。
 - 不做敏感词改写：若卖点 / 自定义场景含违禁内容，本链路不拦截，由上游或人工把关。
 - 多张参考图时由模型自行判断主体服饰角色，复杂组合下可能误判主图。
 - 本类型只做从服饰图"生成"种草大片，不做对已有模特图的换姿势 / 换动作裂变（模特裂变为独立能力，提示词由业务方上游构造，不读字典）。

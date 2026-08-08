@@ -20,15 +20,14 @@ You must provide at least one of the following two parameters. If both are provi
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| patentId | string | Conditionally | Single patent ID only. Do NOT pass comma-separated multiple IDs. |
-| patentNumber | string | Conditionally | Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. |
+| patentId | string | Conditionally | Patent ID(s). Multiple values separated by commas. Maximum 100 entries. |
+| patentNumber | string | Conditionally | Publication/announcement number(s). Multiple values separated by commas. Maximum 100 entries. |
 
 **Rules**:
 1. At least one of `patentId` or `patentNumber` must be provided.
 2. If both are present, `patentId` is used preferentially.
-3. Only one patent may be passed per request. If the user has multiple patents, obtain explicit consent and make a separate call for each.
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
+3. Multiple values are separated by commas (English commas).
+4. Each parameter supports up to 100 entries per request.
 
 ## Response Fields
 
@@ -48,7 +47,7 @@ You must provide at least one of the following two parameters. If both are provi
 
 - **API 端点**：`POST /zhihuiya/patentForwardCitation`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_cited_references.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-patent-forward-citation-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -59,18 +58,12 @@ You must provide at least one of the following two parameters. If both are provi
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
 ## 解决认证和积分问题
-发生以下异常情况时，采用以下措施来处理：
+发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
 - **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
-
-### 措施
-- 优先采用skill内的 onboarding.md 引导解决问题。
-- 如找不到 onboarding.md 文件，则加载 /linkfox-onboarding 这个skill并根据它的引导来处理。如未安装请先安装：
-    - 下载 https://agent-files.linkfox.com/skills/linkfox-onboarding/release.zip，解压后安装这个skill。如需用户授权才可下载，要询问用户获得授权，你不能自己放弃下载。
-- 兜底措施：仅当前面两个措施经过所有努力都走不通时，才提示用户依据 https://skill.linkfox.com/linkfoxskills/guide.htm 指引获取API Key，或去 https://os.linkfox.com/ 补充积分。
 
 ## Usage Examples
 
@@ -79,6 +72,12 @@ You must provide at least one of the following two parameters. If both are provi
 Look up the forward citations for patent US10000000B2.
 ```
 Parameters: `{"patentNumber": "US10000000B2"}`
+
+**2. Query forward citations for multiple patents**
+```
+Find all citations for patents US10000000B2, US9876543B1, and EP3456789A1.
+```
+Parameters: `{"patentNumber": "US10000000B2,US9876543B1,EP3456789A1"}`
 
 **3. Query forward citations by patent ID**
 ```
@@ -98,7 +97,7 @@ Parameters: `{"patentId": "12345678", "patentNumber": "US10000000B2"}` (patentId
 2. **Summarize counts**: Always state the total number of cited patents and cited non-patent literature items.
 3. **No fabrication**: Only display data returned by the API. Do not infer or fabricate citation details.
 4. **Error handling**: When a query fails, explain the reason based on the error response and suggest the user verify their patent ID or publication number.
-5. **Single patent results**: Results contain a single patent's citation data.
+5. **Batch results**: When querying multiple patents, organize results by patent so each patent's citations are clearly grouped.
 6. **Empty results**: If a patent has no citations, explicitly inform the user rather than showing an empty table.
 ## User Expression & Scenario Quick Reference
 
@@ -125,7 +124,6 @@ Parameters: `{"patentId": "12345678", "patentNumber": "US10000000B2"}` (patentId
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利引证文献结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

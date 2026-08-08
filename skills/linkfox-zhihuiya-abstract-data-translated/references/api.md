@@ -12,14 +12,12 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| patentId | string | patentId 和 patentNumber 至少填一个 | 智慧芽内部专利ID，仅支持单个，不可用英文逗号分隔多个。最大长度 60,000 字符 |
-| patentNumber | string | patentId 和 patentNumber 至少填一个 | 公开(公告)号，仅支持单个，不可用英文逗号分隔多个。最大长度 60,000 字符 |
+| patentId | string | patentId 和 patentNumber 至少填一个 | 智慧芽内部专利ID，多个用英文逗号隔开。最大长度 60,000 字符 |
+| patentNumber | string | patentId 和 patentNumber 至少填一个 | 公开(公告)号，多个用英文逗号隔开。最大长度 60,000 字符 |
 | replaceByRelated | integer | 否 | 摘要无法获取时是否用同族专利摘要替代：`1` 是，`0` 否。默认 `0` |
 | lang | string | 否 | 翻译目标语言。可选值：`en`（英文，默认）、`cn`（中文）、`jp`（日语）。最大长度 1,000 字符 |
 
 - `patentId` 和 `patentNumber` 至少需要提供一个。如果两个都存在，会优先使用 `patentId`
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次仅传 1 个专利。
 
 ## 响应结构
 
@@ -63,6 +61,15 @@ curl -X POST https://tool-gateway.linkfox.com/zhihuiya/abstractDataTranslated \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"patentNumber": "US20200012345A1", "lang": "en", "replaceByRelated": 0}'
+```
+
+### 批量查询示例
+
+```bash
+curl -X POST https://tool-gateway.linkfox.com/zhihuiya/abstractDataTranslated \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"patentNumber": "CN112345678A,US20200067890A1", "lang": "cn", "replaceByRelated": 1}'
 ```
 
 ---

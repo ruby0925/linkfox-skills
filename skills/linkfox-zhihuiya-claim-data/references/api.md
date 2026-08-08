@@ -12,13 +12,11 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| patentId | string | 否* | 智慧芽内部专利ID，仅支持单个，不可用英文逗号分隔多个，最大长度60000字符 |
-| patentNumber | string | 否* | 公开公告号，仅支持单个，不可用英文逗号分隔多个，最大长度60000字符 |
+| patentId | string | 否* | 智慧芽内部专利ID，多个用英文逗号隔开，上限100条，最大长度60000字符 |
+| patentNumber | string | 否* | 公开公告号，多个用英文逗号隔开，上限100条，最大长度60000字符 |
 | replaceByRelated | string | 否 | 当前专利权利要求无法获取时是否用同族专利的权利要求替代：`1` 是，`0` 否，最大长度1000字符 |
 
 \* `patentId` 和 `patentNumber` 两个参数必须至少提供一个。如果两个都存在，会优先使用 `patentId`。
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次仅传 1 个专利。
 
 
 ## 响应结构
@@ -49,6 +47,14 @@ curl -X POST https://tool-gateway.linkfox.com/zhihuiya/claimData \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"patentNumber": "CN115000000A"}'
+```
+
+```bash
+# 查询多条专利的权利要求，并启用同族专利替代
+curl -X POST https://tool-gateway.linkfox.com/zhihuiya/claimData \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"patentNumber": "CN115000000A,US20230001234A1", "replaceByRelated": "1"}'
 ```
 
 ```bash

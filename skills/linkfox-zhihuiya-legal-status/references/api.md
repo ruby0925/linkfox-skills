@@ -12,10 +12,8 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| patentId | string | 条件必填 | 专利ID。`patentId` 和 `patentNumber` 两个参数必须至少提供一个，如果两个都存在，会优先使用 `patentId`。仅支持单个，不可用英文逗号分隔多个。最大长度：60000字符。 |
-| patentNumber | string | 条件必填 | 公开(公告)号。`patentId` 和 `patentNumber` 两个参数必须至少提供一个，如果两个都存在，会优先使用 `patentId`。仅支持单个，不可用英文逗号分隔多个。最大长度：60000字符。 |
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次仅传 1 个专利。
+| patentId | string | 条件必填 | 专利ID。`patentId` 和 `patentNumber` 两个参数必须至少提供一个，如果两个都存在，会优先使用 `patentId`。多个用英文逗号隔开，上限100条。最大长度：60000字符。 |
+| patentNumber | string | 条件必填 | 公开(公告)号。`patentId` 和 `patentNumber` 两个参数必须至少提供一个，如果两个都存在，会优先使用 `patentId`。多个用英文逗号隔开，上限100条。最大长度：60000字符。 |
 
 
 ## 响应结构
@@ -62,6 +60,22 @@ curl -X POST https://tool-gateway.linkfox.com/zhihuiya/legalStatus \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"patentNumber": "CN115000000A"}'
+```
+
+```bash
+# 通过专利ID查询（多个）
+curl -X POST https://tool-gateway.linkfox.com/zhihuiya/legalStatus \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"patentId": "abc123,def456"}'
+```
+
+```bash
+# 查询多个公开号
+curl -X POST https://tool-gateway.linkfox.com/zhihuiya/legalStatus \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"patentNumber": "US11000000B2,EP3000000A1,CN115000001A"}'
 ```
 
 ---

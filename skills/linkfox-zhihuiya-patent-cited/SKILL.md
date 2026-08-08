@@ -24,12 +24,10 @@ You must provide at least one of the following identifiers. If both are supplied
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| patentId | Zhihuiya internal patent ID. Single patent ID only. Do NOT pass comma-separated multiple IDs. | abc123def456 |
-| patentNumber | Publication / announcement number. Single publication/announcement number only. Do NOT pass comma-separated multiple numbers. | US10123456B2 |
+| patentId | Zhihuiya internal patent ID. Multiple IDs separated by commas (max 100). | abc123def456 |
+| patentNumber | Publication / announcement number. Multiple numbers separated by commas (max 100). | US10123456B2, CN112345678A |
 
 **Important**: At least one of `patentId` or `patentNumber` is required. When the user provides a publication number (e.g., "US10123456B2"), use `patentNumber`. When they provide internal IDs, use `patentId`.
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次调用仅可传入 1 个专利（`patentId` 与 `patentNumber` 均不可逗号分隔多个）。
 
 ## Usage Examples
 
@@ -41,6 +39,14 @@ Query: "How many citations does patent US10123456B2 have?"
 }
 ```
 
+**2. Multiple patents citation comparison**
+Query: "Compare citations for CN112345678A and CN113456789B"
+```json
+{
+  "patentNumber": "CN112345678A,CN113456789B"
+}
+```
+
 **3. Lookup by patent ID**
 Query: "Get citation data for patent ID abc123def456"
 ```json
@@ -49,10 +55,18 @@ Query: "Get citation data for patent ID abc123def456"
 }
 ```
 
+**4. Batch query with multiple IDs**
+Query: "Citation info for these patent IDs: id001, id002, id003"
+```json
+{
+  "patentId": "id001,id002,id003"
+}
+```
+
 ## Display Rules
 
 1. **Present data in tables**: Show citation results in clear, structured tables. Include the publication number, 3-year citations, 5-year citations, and family citation counts.
-2. **Highlight key metrics**: Each call returns a single patent's data; highlight its citation counts across the 3-year, 5-year, and family metrics.
+2. **Highlight key metrics**: When comparing multiple patents, highlight the one with the highest citation counts.
 3. **Explain family types**: If the user is unfamiliar with patent families, briefly explain the difference between Simple, INPADOC, and PatSnap family definitions.
 4. **Citing patent details**: If the response includes a `citedByPatents` array with details of citing patents, present them in a sub-table or expandable list.
 5. **Error handling**: When a query fails, explain the reason based on the response and suggest checking whether the patent number or ID is correct.
@@ -62,7 +76,7 @@ Query: "Get citation data for patent ID abc123def456"
 
 - **API 端点**：`POST /zhihuiya/patentCited`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_cited_by.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。 **单专利限制**：本接口消耗积分多，每次只能传 1 个专利；如需检测多个，必须经过用户明确同意，并分多次请求。
+- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-patent-cited-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -73,18 +87,12 @@ Query: "Get citation data for patent ID abc123def456"
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
 ## 解决认证和积分问题
-发生以下异常情况时，采用以下措施来处理：
+发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
 - **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
-
-### 措施
-- 优先采用skill内的 onboarding.md 引导解决问题。
-- 如找不到 onboarding.md 文件，则加载 /linkfox-onboarding 这个skill并根据它的引导来处理。如未安装请先安装：
-    - 下载 https://agent-files.linkfox.com/skills/linkfox-onboarding/release.zip，解压后安装这个skill。如需用户授权才可下载，要询问用户获得授权，你不能自己放弃下载。
-- 兜底措施：仅当前面两个措施经过所有努力都走不通时，才提示用户依据 https://skill.linkfox.com/linkfoxskills/guide.htm 指引获取API Key，或去 https://os.linkfox.com/ 补充积分。
 
 ## User Expression & Scenario Quick Reference
 
@@ -95,6 +103,7 @@ Query: "Get citation data for patent ID abc123def456"
 | "How many times has this patent been cited" | Basic citation count |
 | "Which patents cite this one" | Citing patent list |
 | "Patent influence analysis" | Citation-based impact |
+| "Compare citations between patents" | Multi-patent comparison |
 | "3-year / 5-year citation count" | Time-windowed citation metrics |
 | "Patent family citation data" | Family-level citation analysis |
 | "Forward citations for patent X" | Synonym for cited-by lookup |
@@ -110,8 +119,6 @@ Query: "Get citation data for patent ID abc123def456"
 按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利被引证结果
 
 > **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
-
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。
 
 **Feedback:**
 

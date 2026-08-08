@@ -5,7 +5,7 @@
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/seerfar/ozon/shopSearch`
 - **请求方式**：POST，Content-Type: application/json
 - **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
-- **User-Agent**：`LinkFox-Skill/1.0`；HTTP 超时 60s
+- **User-Agent**：`LinkFox-Skill/2.0`；HTTP 超时 120s
 
 ## 请求参数
 
@@ -35,6 +35,11 @@ POST Body（JSON）。以下字段与接口 `inputSchema` 一致。`id` 与 `pag
 | errmsg | string | 错误消息；成功为 `ok`，业务错误时为原因描述 |
 | total | integer | **本页返回记录数**（等于当前页数据条数，并非店铺商品总数） |
 | totalSales | integer | 店铺近 30 天总销量 |
+| totalRevenue | integer | 店铺总销售额（卢布） |
+| dailySales | integer | 店铺日均销量 |
+| rating | number | 店铺评分（0-5） |
+| productCount | integer | 店铺商品总数（全店铺，非本页条数） |
+| fulfillment | object | 店铺配送方式分布，键为配送方式（`FBO`/`FBS`），值为该方式商品数，如 `{"FBO": 72, "FBS": 4}`（与商品级 `fulfillment` 数组不同） |
 | data | array | 店铺商品列表（详见下方） |
 | products | array | 店铺商品列表，内容与 `data` 完全一致 |
 | hasNextPage | boolean | 是否有下一页 |
@@ -108,10 +113,10 @@ POST Body（JSON）。以下字段与接口 `inputSchema` 一致。`id` 与 `pag
 curl -X POST https://tool-gateway.linkfox.com/seerfar/ozon/shopSearch \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: LinkFox-Skill/1.0" \
+  -H "User-Agent: LinkFox-Skill/2.0" \
   -d '{
     "id": 1362816,
-    "page": {"page": 1, "pageSize": 5, "orders": [{"field": "sales", "direction": "DESC"}]}
+    "page": {"page": 1, "pageSize": 20, "orders": [{"field": "sales", "direction": "DESC"}]}
   }'
 ```
 
@@ -123,28 +128,33 @@ curl -X POST https://tool-gateway.linkfox.com/seerfar/ozon/shopSearch \
   "msg": "ok",
   "errcode": 200,
   "errmsg": "ok",
-  "total": 5,
-  "totalSales": 11782,
+  "total": 20,
+  "totalSales": 8528,
+  "totalRevenue": 15113703,
+  "dailySales": 284,
+  "rating": 4.9,
+  "productCount": 76,
+  "fulfillment": {"FBO": 72, "FBS": 4},
   "hasNextPage": true,
   "type": "productWorkbenches",
-  "costTime": 4706,
+  "costTime": 2985,
   "costToken": 16000,
   "data": [
     {
-      "productId": 1310550649,
-      "sku": 1310550649,
+      "productId": 1591817986,
+      "sku": 1591817986,
       "rating": 4.9,
       "reviewRating": 4.9,
-      "weight": 5650.0,
-      "sales": 1098,
-      "monthlySalesUnits": 1098,
-      "upTime": 1700928000000,
-      "price": 2591.0,
+      "weight": 2950.0,
+      "sales": 869,
+      "monthlySalesUnits": 869,
+      "upTime": 1717084800000,
+      "price": 1556.0,
       "currency": "₽",
-      "imageUrl": "https://ir.ozone.ru/s3/multimedia-1-h/wc300/11110286861.jpg",
+      "imageUrl": "https://ir.ozone.ru/s3/multimedia-1-y/wc300/11054085154.jpg",
       "fulfillment": ["FBO"],
       "sellerType": 0,
-      "returnCancellationRate": 15.6,
+      "returnCancellationRate": 17.5,
       "sourceType": "ozon",
       "sourceTool": "Seerfar-Ozon-查店铺"
     }

@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-130-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-131-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 130 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 131 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -258,6 +258,7 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-1688-procurement` | Run authorized 1688 procurement workflows including OAuth checks, SKU and address lookup, order preview, guarded order creation, payment links, order status, logistics, cancellation, and receipt confirmation |
+| `linkfox-1688-product-detail` | Retrieve 1688 product, SKU, pricing, logistics, and supplier details by offer ID |
 | `linkfox-1688-search-by-image` | Find similar 1688 supplier products using image-based visual search |
 | `linkfox-ai-mode-google-search` | Ai Mode Google Search |
 | `linkfox-aigc-imagegen` | Aigc Imagegen |

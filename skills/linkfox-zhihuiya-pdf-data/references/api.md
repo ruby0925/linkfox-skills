@@ -12,11 +12,10 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| patentId | string | 条件必填 | 专利ID（专利ID和公开号两个参数必须要有一个，如果两个都存在，会优先使用专利ID），仅支持单个，不可用英文逗号分隔多个 |
-| patentNumber | string | 条件必填 | 公开公告号（专利ID和公开号两个参数必须要有一个，如果两个都存在，会优先使用专利ID），仅支持单个，不可用英文逗号分隔多个 |
+| patentId | string | 条件必填 | 专利ID（专利ID和公开号两个参数必须要有一个，如果两个都存在，会优先使用专利ID），多个用英文逗号隔开，上限100条 |
+| patentNumber | string | 条件必填 | 公开公告号（专利ID和公开号两个参数必须要有一个，如果两个都存在，会优先使用专利ID），多个用英文逗号隔开，上限100条 |
 | replaceByRelated | string | 否 | 当前专利PDF无法获取时是否用同族专利的PDF替代：`1` 是，`0` 否 |
 
-> **单专利限制**：本接口消耗积分多，如需检测多个，必须经过用户明确同意，并分多次请求。每次仅传 1 个专利。
 
 ## 响应结构
 
@@ -70,6 +69,15 @@ curl -X POST https://tool-gateway.linkfox.com/zhihuiya/pdfData \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"patentId": "12345678", "replaceByRelated": "1"}'
+```
+
+### 批量查询多个公开号
+
+```bash
+curl -X POST https://tool-gateway.linkfox.com/zhihuiya/pdfData \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"patentNumber": "CN115000000A,CN115000001A,CN115000002A"}'
 ```
 
 ---
