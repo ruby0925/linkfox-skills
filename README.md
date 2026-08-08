@@ -346,7 +346,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-temu-tax-eu` | Temu Tax Eu |
 | `linkfox-tsearch-search` | Tsearch Search |
 | `linkfox-wallysmarter-product-detail` | Walmart product detail with historical pricing and sales trends via WallySmarter |
-| `linkfox-xiyou-dongcha` | Xiyou Insights Amazon ASIN and keyword analytics via LinkFox gateway (traffic scores, reverse ASIN lookup, rank trends, ABA weekly data) |
 
 
 ## Requirements
