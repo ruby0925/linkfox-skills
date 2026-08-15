@@ -118,7 +118,7 @@ def call_gateway(endpoint: str, payload: dict) -> dict:
         method="POST",
     )
     try:
-        with urlopen(req, timeout=60) as resp:
+        with urlopen(req, timeout=150) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except HTTPError as e:
         body = e.read().decode("utf-8") if e.fp else ""

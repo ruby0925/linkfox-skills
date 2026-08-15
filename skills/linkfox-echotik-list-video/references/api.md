@@ -6,7 +6,7 @@
 - **请求方式**：POST，Content-Type: application/json
 - **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
-- **超时**：120s
+- **超时**：150s
 
 ## 请求参数
 

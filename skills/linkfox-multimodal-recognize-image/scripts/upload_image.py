@@ -66,7 +66,7 @@ def get_presigned_url(content_type: str, file_extension: str) -> str:
     )
 
     try:
-        with urlopen(req, timeout=30) as response:
+        with urlopen(req, timeout=150) as response:
             result = json.loads(response.read().decode("utf-8"))
     except HTTPError as e:
         body = e.read().decode("utf-8") if e.fp else ""

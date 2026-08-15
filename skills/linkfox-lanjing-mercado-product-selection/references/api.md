@@ -8,7 +8,7 @@
 - **请求地址**：`POST ${LINKFOX_TOOL_GATEWAY}/lingdong/call`
 - **Content-Type**：`application/json`
 - **User-Agent**：`LinkFox-Skill/2.0`
-- **超时**：120s
+- **超时**：150s
 - **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
 
 脚本还会透传 `SESSION_ID`、`MODE_ID`、`APP_NAME` 同名环境变量（缺省空串）。不要把蓝鲸上游 `secret-key`、`X-API-Key` 或后端内部环境变量交给 Skill；上游凭证由后端托管。
@@ -118,7 +118,7 @@
 
 ## 脚本用法
 
-入口脚本以官方模板为唯一权威：整体复制模板 + 替换占位符，已内置网关、鉴权、120s 超时、24h 本地缓存、`--inline` 与自动落盘。请求体作为**单个 JSON 参数**传入（即完整的 `{"toolName":...,"arguments":{...}}`）：
+入口脚本以官方模板为唯一权威：整体复制模板 + 替换占位符，已内置网关、鉴权、150s 超时、24h 本地缓存、`--inline` 与自动落盘。请求体作为**单个 JSON 参数**传入（即完整的 `{"toolName":...,"arguments":{...}}`）：
 
 ```bash
 # 免费工具：按名称搜墨西哥类目

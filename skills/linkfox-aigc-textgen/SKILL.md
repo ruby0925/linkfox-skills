@@ -49,7 +49,7 @@ description: AI生文工具，使用大语言模型根据提示词生成文本�
   - `python scripts/aigc_textgen.py --stdin --content-only` — 只输出 content 文本（同样已是单行）
   - `python scripts/aigc_textgen.py '<JSON 参数>' [--inline]` — 简单场景直传（**prompt 含换行符时禁用**）
 
-> **轮询策略**：单次 HTTP 超时 120 秒；轮询间隔从 10 秒起递减至 5 秒；总轮询时长最长 600 秒。完整参数/响应/错误码见 `references/api.md`。
+> **轮询策略**：单次 HTTP 超时 150 秒；轮询间隔从 10 秒起递减至 5 秒；总轮询时长最长 600 秒。完整参数/响应/错误码见 `references/api.md`。
 
 > **换行符压平默认开启（无需任何 flag）**：所有输出模式下，content 的换行都会自动替换为单字符 `⏎`（U+23CE），整段 content 变成单行；`--content-only` 只是改变"输出 content 文本 vs 完整 JSON"，不影响该压平行为。
 

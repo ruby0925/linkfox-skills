@@ -5,7 +5,7 @@
 | 广告产品 | 脚本子目录 | 查询参考 |
 |---------|-----------|---------|
 | **Sponsored Products (SP)** — v3 | `scripts/sp/` | [api/sp.md](./api/sp.md) |
-| **Sponsored Brands (SB)** — v4 | `scripts/sb/` | [api/sb.md](./api/sb.md) |
+| **Sponsored Brands (SB)** — V3 Legacy + V4 | `scripts/sb/v3/`、`scripts/sb/v4/` | [api/sb.md](./api/sb.md) |
 | **Sponsored Display (SD)** — v3 | `scripts/sd/` | [api/sd.md](./api/sd.md) |
 
 > Sponsored Television (ST) / Amazon DSP 暂未覆盖。
@@ -23,7 +23,7 @@
 |------|------|------|------|------|
 | `profileId` | number | ✅ | — | 从 ads-auth 获取 |
 | `region` | string | ✅ | — | `NA` / `EU` / `FE` |
-| `fetchAll` | boolean | 否 | `true` | 自动翻页（SP / SB 跟 `nextToken`，SD 用 `startIndex + count`） |
+| `fetchAll` | boolean | 否 | `true` | 自动翻页；SP/SB V4/Target 用 `nextToken`，SB V3 GET 与 SD 用 `startIndex + count` |
 | `maxResults` | integer | 否 | `100` | 单页 1-100；超限上游可能静默 clamp；对应 SD 端 `count` |
 | `skipDepCheck` | boolean | 否 | `false` | 跳过依赖检查 |
 | `includeExtendedDataFields` | boolean | 否 | — | 返回扩展字段（部分实体）；SD 通过路径切换为 `/sd/<entity>/extended` 实现 |
@@ -34,6 +34,8 @@
 ```json
 {
   "success": true,
+  "apiVersion": "V3 | V4",
+  "amazonResourceVersion": "V4 | V3_SHARED_TARGETING | V3.2_SHARED_TARGETING | SHARED",
   "<entityKey>": [ /* 实体数组 */ ],
   "total": 157,
   "pagesFetched": 2,
@@ -42,6 +44,8 @@
 ```
 
 客户端过滤时（SP productAds 的 asinFilter/skuFilter）额外带 `serverTotalBeforeClientFilter` + `clientSideFilters`。
+
+SB 输出中的两个版本字段含义不同：`apiVersion` 表示调用入口和 Campaign 结构意图；`amazonResourceVersion` 表示实际 Amazon 资源传输版本。V4 Keyword/Target 入口使用 Amazon 共享 V3/V3.2 targeting 路径，不代表自动回落。
 
 失败：
 ```json

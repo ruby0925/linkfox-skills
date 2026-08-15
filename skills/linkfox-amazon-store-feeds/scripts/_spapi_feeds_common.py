@@ -77,7 +77,7 @@ def get_api_key() -> str:
     return key
 
 
-def call_api(endpoint: str, params: dict, timeout: int = 120) -> dict:
+def call_api(endpoint: str, params: dict, timeout: int = 150) -> dict:
     api_key = get_api_key()
     data = json.dumps(params).encode("utf-8")
     req = Request(
@@ -113,7 +113,7 @@ def developer_proxy_call(
     query_string: Optional[str] = None,
     body: Optional[str] = None,
     content_type: str = "application/json",
-    timeout: int = 120,
+    timeout: int = 150,
 ) -> dict:
     params: dict[str, Any] = {
         "region": region,

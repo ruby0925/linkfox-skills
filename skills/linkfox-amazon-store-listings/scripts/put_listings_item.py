@@ -111,7 +111,7 @@ def call_api(endpoint: str, params: dict) -> dict:
         method="POST",
     )
     try:
-        with urlopen(req, timeout=120) as response:
+        with urlopen(req, timeout=150) as response:
             return json.loads(response.read().decode("utf-8"))
     except HTTPError as e:
         body = e.read().decode("utf-8") if e.fp else ""

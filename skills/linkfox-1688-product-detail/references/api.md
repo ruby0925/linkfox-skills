@@ -7,7 +7,7 @@
 - **认证方式**：Header `Authorization: <api_key>`；api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **上下文透传 Header**：`SESSION_ID`、`MODE_ID`、`APP_NAME`，均读取同名环境变量，未配置时传空字符串
-- **超时**：120s
+- **超时**：150s
 
 ## 请求参数
 

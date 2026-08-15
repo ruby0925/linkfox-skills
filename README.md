@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-131-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-136-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 131 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 136 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -58,6 +58,7 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-aba-intelligent-query` | Aba Intelligent Query |
+| `linkfox-amazon-ads` | Amazon Ads |
 | `linkfox-amazon-ads-auth` | Amazon Ads OAuth authorization, profile discovery, and access-token management |
 | `linkfox-amazon-ads-manager` | Manage Amazon Ads SP/SB/SD entities: list, create, and update campaigns, ad groups, keywords, targets, product ads, and budget rules |
 | `linkfox-amazon-ads-report` | One-stop Amazon Ads SP/SB reporting: request, poll, download, and auto-extract |
@@ -66,6 +67,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-opportunity-search-by-metrics` | Amazon Opportunity Search By Metrics |
 | `linkfox-amazon-policy-feed` | Query Amazon latest policy and regulation feed with AI Chinese summaries, and read full article bodies by record ID |
 | `linkfox-amazon-product-detail` | Get detailed Amazon product info by ASIN (price, BSR, bullets, etc.) |
+| `linkfox-amazon-product-selection` | Amazon Product Selection |
 | `linkfox-amazon-reviews-list` | Amazon Reviews List |
 | `linkfox-amazon-search` | Search Amazon products by keyword with real-time ranking data |
 | `linkfox-amazon-search-by-image` | Find similar Amazon products using image-based search |
@@ -73,8 +75,11 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-store-auth` | Amazon Store Auth |
 | `linkfox-amazon-store-catalog` | Amazon Store Catalog |
 | `linkfox-amazon-store-customer-feedback` | Amazon Store Customer Feedback |
+| `linkfox-amazon-store-external-fulfillment` | Amazon Store External Fulfillment |
+| `linkfox-amazon-store-fba` | Amazon Store Fba |
 | `linkfox-amazon-store-feeds` | Amazon Store Feeds |
 | `linkfox-amazon-store-listings` | Amazon Store Listings |
+| `linkfox-amazon-store-operations` | Amazon Store Operations |
 | `linkfox-amazon-store-orders` | Amazon Store Orders |
 | `linkfox-amazon-store-pricing` | Amazon Store Pricing |
 | `linkfox-amazon-store-report` | Amazon Store Report |
@@ -111,6 +116,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-echotik-list-seller` | List and filter TikTok Shop sellers (stores) by region, category, 30-day GMV, sales trend, listing date, and local/cross-border type, returning store sales, GMV, followers, ratings, reviews, and influencer/video/livestream counts across 16 marketplaces |
 | `linkfox-echotik-list-seller-product` | List the in-store products of a single TikTok Shop seller by sellerId, returning per-product title, price, multi-period (1d/7d/15d/30d/60d/90d/total) sales and GMV, rating, reviews, commission rate, listing date, and sales channel |
 | `linkfox-echotik-list-video` | List and filter TikTok videos by region, creator, product, category, views, duration, publish time, and ad/AI/selling flags, returning views, likes, comments, shares, favorites, video sales, and GMV across 16 marketplaces |
+| `linkfox-echotik-list-video-rank` | Query dated TikTok video rankings by date, region, rank type, and ranking metric, returning views, likes, comments, shares, favorites, video sales, and GMV across 16 marketplaces |
 | `linkfox-echotik-product-video` | Query promotional videos for a TikTok product with engagement and sales metrics |
 | `linkfox-echotik-seller-detail` | Fetch the full profile of a single TikTok Shop seller (store) by sellerId, returning total and multi-period (1d/7d/30d/90d) sales and GMV, followers, rating, reviews, fulfillment rates, product counts, price range, categories, and influencer/video/livestream counts across 16 marketplaces |
 
@@ -146,6 +152,7 @@ Get your API key and configure the environment before using any skill.
 
 | Skill | Description |
 | --- | --- |
+| `linkfox-google-patent-search` | Search Google Patents by keyword, inventor, assignee, country, date, and status; returns publication numbers, titles, dates, CPC classifications, and PDF links |
 | `linkfox-google-trend-get-trend-by-keys` | Google Trend Get Trend By Keys |
 | `linkfox-google-trend-get-trend-by-time` | Google Trend Get Trend By Time |
 
@@ -204,6 +211,9 @@ Get your API key and configure the environment before using any skill.
 | --- | --- |
 | `linkfox-sorftime-amazon-product-detail` | Sorftime Amazon Product Detail |
 | `linkfox-sorftime-amazon-product-query` | Sorftime Amazon Product Query |
+| `linkfox-sorftime-walmart-category-market` | Retrieve the Walmart US category tree, match natural-language category names, and analyze category markets with Best Seller Top 80 data via Sorftime |
+| `linkfox-sorftime-walmart-keyword-research` | Research Walmart keywords, product-keyword relationships, related terms, and saved keyword folders via Sorftime |
+| `linkfox-sorftime-walmart-product-analysis` | Find Walmart products by natural-language name and query product details, trends, and variant sales via Sorftime |
 
 ### Shopee (YouYing)
 
@@ -260,6 +270,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-1688-procurement` | Run authorized 1688 procurement workflows including OAuth checks, SKU and address lookup, order preview, guarded order creation, payment links, order status, logistics, cancellation, and receipt confirmation |
 | `linkfox-1688-product-detail` | Retrieve 1688 product, SKU, pricing, logistics, and supplier details by offer ID |
 | `linkfox-1688-search-by-image` | Find similar 1688 supplier products using image-based visual search |
+| `linkfox-1688-sourcing` | 1688 Sourcing |
 | `linkfox-ai-mode-google-search` | Ai Mode Google Search |
 | `linkfox-aigc-imagegen` | Aigc Imagegen |
 | `linkfox-aigc-imagegen-brand-gene-extract` | Aigc Imagegen Brand Gene Extract |
@@ -268,13 +279,14 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-aigc-textgen` | Aigc Textgen |
 | `linkfox-aigc-videogen` | Aigc Videogen |
 | `linkfox-aigc-videogen-multi` | Aigc Videogen Multi |
+| `linkfox-ecommerce-compliance-detection` | Ecommerce Compliance Detection |
 | `linkfox-etsy-category-search` | Etsy Category Search |
+| `linkfox-etsy-product-detail` | Retrieve one public Etsy listing with pricing, images, variants, inventory, shipping, shop, ratings, and review data |
 | `linkfox-etsy-product-query` | Etsy Product Query |
 | `linkfox-etsy-store-query` | Etsy Store Query |
 | `linkfox-lanjing-mercado-product-selection` | Query Mercado Libre (Mexico, Brazil, Argentina, Chile, Colombia) product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data via 24 Lanjing tools through the LinkFox gateway |
 | `linkfox-lingxing-erp` | Lingxing Erp |
 | `linkfox-maidalv-product-tro-detection` | Detect product TRO (Temporary Restraining Order) and trademark/patent/copyright infringement risk from a product image, returning risk level, infringement items, TRO plaintiff info, and an AI legal report |
-| `linkfox-onboarding` | Onboarding |
 | `linkfox-product-title-analyze` | Analyze and optimize Amazon product listing titles |
 | `linkfox-seerfar-ozon-category-search` | List an Ozon category's products by categoryId with category aggregates (total sales, total revenue, average price, rating, seasonality) and per-product sales, price, rating, reviews, brand, seller, and fulfillment via Seerfar |
 | `linkfox-seerfar-ozon-keyword-back-search` | Reverse-lookup Ozon (and Wildberries) search keywords by a product SKU list (organic and ad terms), filtered by search volume, growth, competition, natural/ad rank, exposure, and conversion metrics via Seerfar |
@@ -283,6 +295,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-seerfar-ozon-product-detail-search` | Fetch full detail of a single Ozon product by SKU (title, price, rating, reviews, QA, windowed total + daily-average + daily-trend sales, revenue, stock, category rank history, brand, seller, fulfillment, weight, listing age) via Seerfar |
 | `linkfox-seerfar-ozon-product-report-search` | Screen and filter Ozon products by sales, revenue, growth, conversion, price, rating, reviews, brand, seller, fulfillment, and listing-age metrics via Seerfar - the Ozon product report / selection screener returning per-product SKU, price (RUB), sales, revenue, conversion, rating, reviews, brand, seller, fulfillment, and listing age |
 | `linkfox-seerfar-ozon-shop-search` | List an Ozon shop's product catalog by seller ID with 30-day sales, price, rating, weight, fulfillment, seller type, return rate, and shop total sales via Seerfar |
+| `linkfox-shopee-product-detail` | Retrieve one public Shopee listing across eight marketplaces with available pricing, sales, stock, variants, media, categories, shop, and rating data |
 | `linkfox-shopee-store-account-health` | Shopee Store Account Health |
 | `linkfox-shopee-store-add-on-deal` | Shopee Store Add On Deal |
 | `linkfox-shopee-store-ads` | Shopee Store Ads |
@@ -344,6 +357,8 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-temu-returns-refunds-us` | Temu Returns Refunds Us |
 | `linkfox-temu-store-query` | Temu Store Query |
 | `linkfox-temu-tax-eu` | Temu Tax Eu |
+| `linkfox-tiktok-selection-and-shoppable-video` | Tiktok Selection And Shoppable Video |
+| `linkfox-tiktok-shop-product-detail` | Retrieve one public TikTok Shop product with pricing, sales, SKU inventory, media, seller, reviews, shipping, and promotion data |
 | `linkfox-tsearch-search` | Tsearch Search |
 | `linkfox-wallysmarter-product-detail` | Walmart product detail with historical pricing and sales trends via WallySmarter |
 

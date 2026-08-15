@@ -6,7 +6,7 @@
 - **请求方式**：POST，Content-Type: `application/json; charset=utf-8`
 - **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置，按 SKILL.md 的 **## 解决认证和积分问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
-- **超时**：120s
+- **超时**：150s
 - **缓存**：本采购 Skill 不做 24h 响应缓存；授权、价格、库存、订单状态和物流以实时返回为准，高风险写操作不得缓存或自动重放。
 
 Windows 推荐使用 `--payload-env` 或 `--payload-file`，避免 shell 转义破坏 JSON。

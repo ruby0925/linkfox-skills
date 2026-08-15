@@ -17,7 +17,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 SLUG = "linkfox-1688-procurement"
-TIMEOUT_SECONDS = 120
+TIMEOUT_SECONDS = 150
 SMALL_THRESHOLD = 8000
 
 ENDPOINTS = {

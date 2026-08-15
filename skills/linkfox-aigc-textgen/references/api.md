@@ -13,7 +13,7 @@
 - **基础地址**：`${LINKFOX_TOOL_GATEWAY}`，从环境变量读取，未配置时报错退出。
 - **请求方式**：POST，Content-Type: application/json
 - **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）。
-- **HTTP 超时**：单次请求超时 120 秒；客户端轮询总时长建议 600 秒。
+- **HTTP 超时**：单次请求超时 150 秒；客户端轮询总时长建议 600 秒。
 
 ---
 
