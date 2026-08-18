@@ -31,7 +31,7 @@ if __name__ == "__main__":
         __doc__,
         path=f"sb/ads/creatives/{creative_type}",
         method="POST",
-        content_type="application/vnd.sbadcreativeresource.v4+json",
+        content_type="application/json",
         api_version="V4",
         resource_version="V4",
         params=params,

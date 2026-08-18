@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/keywords"
-CONTENT_TYPE = "application/vnd.spKeyword.v3+json"
+CONTENT_TYPE = "application/json"
 METHOD = "POST"
 
 

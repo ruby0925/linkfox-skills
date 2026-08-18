@@ -140,7 +140,7 @@ python sd/list_creatives.py '{"profileId":1111111111,"region":"NA",
 |------|-------|-------|-------|
 | 路径前缀 | `sp/` | `sb/v4/` | `sd/`（+ `/extended` 子路径） |
 | HTTP 方法 | POST list | POST list | GET |
-| Content-Type | `application/vnd.sp<entity>.v3+json` | `application/vnd.sb<entity>resource.v4+json` | `application/json` |
+| Content-Type | `application/json` | `application/json` | `application/json` |
 | 实体数量 | 6 个 list | 3 个 list | 6 个 list（含 creatives；不含 keywords） |
 | 分页 | `nextToken` | `nextToken` + `totalCount` | `startIndex` + `count`（偏移分页） |
 | `stateFilter` 实参 | 大写 ENUM | 大写 ENUM | 接口端要求小写串，脚本会自动转换 |

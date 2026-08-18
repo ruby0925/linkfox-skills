@@ -31,7 +31,7 @@ if __name__ == "__main__":
         __doc__,
         path=f"sb/v4/ads/{ad_type}",
         method="POST",
-        content_type="application/vnd.sbadresource.v4+json",
+        content_type="application/json",
         api_version="V4",
         resource_version="V4",
         params=params,

@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/targets"
-CONTENT_TYPE = "application/vnd.spTargetingClause.v3+json"
+CONTENT_TYPE = "application/json"
 METHOD = "POST"
 
 

@@ -11,7 +11,7 @@ if __name__ == "__main__":
         __doc__,
         path="sb/v4/ads",
         method="PUT",
-        content_type="application/vnd.sbadresource.v4+json",
+        content_type="application/json",
         api_version="V4",
         resource_version="V4",
     )

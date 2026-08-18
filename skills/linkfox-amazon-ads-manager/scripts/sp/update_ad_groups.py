@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/adGroups"
-CONTENT_TYPE = "application/vnd.spAdGroup.v3+json"
+CONTENT_TYPE = "application/json"
 METHOD = "PUT"
 
 

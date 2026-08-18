@@ -15,7 +15,7 @@ if __name__ == "__main__":
     run_post_token_list(
         __doc__,
         path="sb/targets/list",
-        content_type="application/vnd.sblisttargets.v3.2+json",
+        content_type="application/json",
         response_key="targets",
         api_version="V4",
         resource_version="V3.2_SHARED_TARGETING",

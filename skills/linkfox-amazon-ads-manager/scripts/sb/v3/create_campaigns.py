@@ -15,7 +15,7 @@ if __name__ == "__main__":
         __doc__,
         path="sb/campaigns",
         method="POST",
-        content_type="application/vnd.sbcampaign.v3+json",
+        content_type="application/json",
         api_version="V3",
         resource_version="V3",
     )

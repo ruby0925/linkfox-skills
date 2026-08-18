@@ -14,7 +14,7 @@ if __name__ == "__main__":
     run_post_token_list(
         __doc__,
         path="sb/ads/creatives/list",
-        content_type="application/vnd.sbadcreativeresource.v4+json",
+        content_type="application/json",
         response_key="creatives",
         api_version="V4",
         resource_version="V4",

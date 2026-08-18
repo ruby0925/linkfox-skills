@@ -55,7 +55,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/productAds/list"
-ENTITY_CONTENT_TYPE = "application/vnd.spproductad.v3+json"
+ENTITY_CONTENT_TYPE = "application/json"
 RESPONSE_KEY = "productAds"
 
 FILTER_KEYS = [

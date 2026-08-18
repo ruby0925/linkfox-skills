@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/productAds"
-CONTENT_TYPE = "application/vnd.spProductAd.v3+json"
+CONTENT_TYPE = "application/json"
 METHOD = "PUT"
 
 

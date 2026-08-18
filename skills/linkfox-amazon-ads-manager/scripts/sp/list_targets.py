@@ -42,7 +42,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/targets/list"
-ENTITY_CONTENT_TYPE = "application/vnd.sptargetingclause.v3+json"
+ENTITY_CONTENT_TYPE = "application/json"
 # Amazon Ads v3 返回字段为 targetingClauses
 RESPONSE_KEY = "targetingClauses"
 
