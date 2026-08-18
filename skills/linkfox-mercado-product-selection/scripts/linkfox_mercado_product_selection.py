@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Lanjing Mercado Libre Product Selection - LinkFox Skill
+Mercado Libre Product Selection - LinkFox Skill
 调用 /lingdong/call 接口。
 
 Usage:
-  python linkfox_lanjing_mercado_product_selection.py '<JSON parameters>'           # 自动：小结果全量；大结果写文件+摘要
-  python linkfox_lanjing_mercado_product_selection.py '<JSON parameters>' --inline  # 强制全量打印到 stdout
+  python linkfox_mercado_product_selection.py '<JSON parameters>'           # 自动：小结果全量；大结果写文件+摘要
+  python linkfox_mercado_product_selection.py '<JSON parameters>' --inline  # 强制全量打印到 stdout
 
 输出策略（脚本默认行为）：
-  - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-lanjing-mercado-product-selection-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
+  - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-mercado-product-selection-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
   - 响应体 ≤ 8 KB：落盘后把完整 JSON 打印到 stdout
   - 响应体 > 8 KB：落盘后 stdout 只输出摘要（顶层字段、常见计数如 `total`/`costToken`、最大列表字段的长度 + 前 3 条样本）
   - 加 `--inline` 强制全量打印到 stdout（同样落盘）
@@ -25,7 +25,7 @@ from urllib.error import HTTPError, URLError
 
 
 API_PATH = "/lingdong/call"
-SLUG = "linkfox-lanjing-mercado-product-selection"
+SLUG = "linkfox-mercado-product-selection"
 
 # 响应小于等于该字节数时，直接全量输出，不落文件
 SMALL_THRESHOLD = 8000
@@ -315,7 +315,7 @@ def main():
 
     if not argv:
         print(
-            "Usage: linkfox_lanjing_mercado_product_selection.py '<JSON parameters>' [--inline]",
+            "Usage: linkfox_mercado_product_selection.py '<JSON parameters>' [--inline]",
             file=sys.stderr,
         )
         sys.exit(1)

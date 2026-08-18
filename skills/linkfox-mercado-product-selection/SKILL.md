@@ -1,24 +1,24 @@
 ---
-name: linkfox-lanjing-mercado-product-selection
-description: Mercado Libre（美客多）选品数据查询与分析，通过 LinkFox 网关统一调用蓝鲸 24 个商品、官链、关键词、类目、趋势、店铺、评论、汇率与套餐用量工具，覆盖墨西哥、巴西、阿根廷、智利、哥伦比亚站点。当用户提到 Mercado Libre、美客多、蓝鲸选品、Lanjing、美客多选品、商品搜索、类目趋势、关键词热搜、流量词反查、店铺查询、评论查询、汇率、套餐用量时触发此技能。
+name: linkfox-mercado-product-selection
+description: Mercado Libre（美客多）选品数据查询与分析，通过 LinkFox 网关统一调用 24 个商品、官链、关键词、类目、趋势、店铺、评论、汇率与套餐用量工具，覆盖墨西哥、巴西、阿根廷、智利、哥伦比亚站点。当用户提到 Mercado Libre、美客多、美客多选品、商品搜索、类目趋势、关键词热搜、流量词反查、店铺查询、评论查询、汇率、套餐用量时触发此技能。
 ---
 
-# Lanjing Mercado Libre Product Selection
+# Mercado Libre Product Selection
 
 This skill queries Mercado Libre product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data through the LinkFox gateway. The gateway exposes one unified route, `POST /lingdong/call`, and the skill selects one of 24 supported `toolName` values with matching `arguments`.
 
 ## Core Concepts
 
-- Call only `${LINKFOX_TOOL_GATEWAY}/lingdong/call`. Do not call the upstream Lanjing XP-MCP server directly, and do not ask the user for upstream `secret-key` / `X-API-Key` — upstream credentials are owned by the backend.
+- Call only `${LINKFOX_TOOL_GATEWAY}/lingdong/call`. Do not call the upstream XP-MCP server directly, and do not ask the user for upstream `secret-key` / `X-API-Key` — upstream credentials are owned by the backend.
 - The request body is always `{"toolName":"...","arguments":{...}}`. The script takes this whole object as a single JSON argument.
-- Field names inside `arguments` must match `references/lanjing-mercado-tool-reference.md` exactly, including camelCase names such as `siteId`, `itemId`, `productId`, `categoryId`, `runDate`, `runMonth`, `pageNo`, `pageSize`.
+- Field names inside `arguments` must match `references/mercado-tool-reference.md` exactly, including camelCase names such as `siteId`, `itemId`, `productId`, `categoryId`, `runDate`, `runMonth`, `pageNo`, `pageSize`.
 - Read `data` first when presenting results. Read `contentText` when `data` is text or ambiguous. Show `rawResponse` only when the user asks for raw diagnostics.
 - Paid tools currently cost `16000` tokens per call; free tools cost `0`. Trust the backend `costToken` field.
 
 ## Reference Files
 
 - `references/api.md`: LinkFox gateway contract, request/response structure, error codes, curl example, and Feedback API.
-- `references/lanjing-mercado-tool-reference.md`: detailed Chinese reference for the 24 Mercado Libre tools — parameters, site IDs, pagination, sorting, and billing status.
+- `references/mercado-tool-reference.md`: detailed Chinese reference for the 24 Mercado Libre tools — parameters, site IDs, pagination, sorting, and billing status.
 
 ## Tool Selection
 
@@ -47,11 +47,11 @@ Free tools: `categorySearch`, `categorySmallSearch`, `reviewSearch`, `rateInfo`,
 ## 调用方式
 
 - **API 端点**：`POST /lingdong/call`（完整参数/响应/错误码见 `references/api.md`）
-- **Python 脚本**：`python scripts/linkfox_lanjing_mercado_product_selection.py '<JSON 参数>' [--inline]`
+- **Python 脚本**：`python scripts/linkfox_mercado_product_selection.py '<JSON 参数>' [--inline]`
 - **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
-- **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-lanjing-mercado-product-selection-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
+- **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-mercado-product-selection-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
 - 响应体 ≤ 8 KB：落盘后把完整 JSON 打印到 stdout
 - 响应体 > 8 KB：落盘后 stdout 只输出摘要（顶层字段、常见计数如 `total`/`costToken`、最大列表字段的长度 + 前 3 条样本）
 - 加 `--inline` 强制全量打印到 stdout（同样落盘）
@@ -72,16 +72,16 @@ The single JSON argument is the full payload `{"toolName":...,"arguments":{...}}
 
 ```bash
 # Free: search Mexico categories by name
-python scripts/linkfox_lanjing_mercado_product_selection.py '{"toolName":"categorySearch","arguments":{"siteId":"MLM","searchText":"Auriculares"}}'
+python scripts/linkfox_mercado_product_selection.py '{"toolName":"categorySearch","arguments":{"siteId":"MLM","searchText":"Auriculares"}}'
 
 # Paid: product detail for a real MLM item
-python scripts/linkfox_lanjing_mercado_product_selection.py '{"toolName":"itemInfo","arguments":{"siteId":"MLM","itemId":"MLM4979447466"}}'
+python scripts/linkfox_mercado_product_selection.py '{"toolName":"itemInfo","arguments":{"siteId":"MLM","itemId":"MLM4979447466"}}'
 
 # Free: my plan usage (no arguments)
-python scripts/linkfox_lanjing_mercado_product_selection.py '{"toolName":"myUsage","arguments":{}}'
+python scripts/linkfox_mercado_product_selection.py '{"toolName":"myUsage","arguments":{}}'
 
 # Paid: monthly hot keywords for Brazil, 2026-06
-python scripts/linkfox_lanjing_mercado_product_selection.py '{"toolName":"keywordMonthSearch","arguments":{"siteId":"MLB","runMonth":"202606"}}'
+python scripts/linkfox_mercado_product_selection.py '{"toolName":"keywordMonthSearch","arguments":{"siteId":"MLB","runMonth":"202606"}}'
 ```
 
 On PowerShell, wrap the JSON in single quotes the same way; if quoting is troublesome, write the payload to a file and pass it via `--inline` after loading, or use `ConvertTo-Json` to build the argument.
@@ -97,7 +97,7 @@ On PowerShell, wrap the JSON in single quotes the same way; if quoting is troubl
 ## Important Limitations
 
 - The LinkFox route is a unified backend gateway; the skill does not publish separate HTTP endpoints for each `toolName`.
-- Required-field validation happens in the backend and is also documented in `references/lanjing-mercado-tool-reference.md`.
+- Required-field validation happens in the backend and is also documented in `references/mercado-tool-reference.md`.
 - Paid tools charge per backend invocation, even if the upstream business result is empty.
 - Response shapes vary by tool. Most tools return business results as **text** in `data`; use real responses and `references/api.md` as the source of truth instead of forcing a single table schema.
 

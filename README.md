@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-136-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-141-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 136 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 141 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -78,6 +78,8 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-store-external-fulfillment` | Amazon Store External Fulfillment |
 | `linkfox-amazon-store-fba` | Amazon Store Fba |
 | `linkfox-amazon-store-feeds` | Amazon Store Feeds |
+| `linkfox-amazon-store-fulfillment-inbound` | Manage Amazon FBA inbound plans, packing, placement, transportation, shipments, delivery windows, labels, and bills of lading with Fulfillment Inbound v2024-03-20 and retained v0 operations |
+| `linkfox-amazon-store-fulfillment-outbound` | Manage Amazon Multi-Channel Fulfillment quotes, previews, orders, tracking, sandbox status simulations, and related invoice-header discovery with Fulfillment Outbound v2026-07-04 |
 | `linkfox-amazon-store-listings` | Amazon Store Listings |
 | `linkfox-amazon-store-operations` | Amazon Store Operations |
 | `linkfox-amazon-store-orders` | Amazon Store Orders |
@@ -284,9 +286,9 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-etsy-product-detail` | Retrieve one public Etsy listing with pricing, images, variants, inventory, shipping, shop, ratings, and review data |
 | `linkfox-etsy-product-query` | Etsy Product Query |
 | `linkfox-etsy-store-query` | Etsy Store Query |
-| `linkfox-lanjing-mercado-product-selection` | Query Mercado Libre (Mexico, Brazil, Argentina, Chile, Colombia) product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data via 24 Lanjing tools through the LinkFox gateway |
 | `linkfox-lingxing-erp` | Lingxing Erp |
 | `linkfox-maidalv-product-tro-detection` | Detect product TRO (Temporary Restraining Order) and trademark/patent/copyright infringement risk from a product image, returning risk level, infringement items, TRO plaintiff info, and an AI legal report |
+| `linkfox-mercado-product-selection` | Query Mercado Libre (Mexico, Brazil, Argentina, Chile, Colombia) product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data via 24 tools through the LinkFox gateway |
 | `linkfox-product-title-analyze` | Analyze and optimize Amazon product listing titles |
 | `linkfox-seerfar-ozon-category-search` | List an Ozon category's products by categoryId with category aggregates (total sales, total revenue, average price, rating, seasonality) and per-product sales, price, rating, reviews, brand, seller, and fulfillment via Seerfar |
 | `linkfox-seerfar-ozon-keyword-back-search` | Reverse-lookup Ozon (and Wildberries) search keywords by a product SKU list (organic and ad terms), filtered by search volume, growth, competition, natural/ad rank, exposure, and conversion metrics via Seerfar |

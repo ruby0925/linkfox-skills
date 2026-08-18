@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/campaigns"
-CONTENT_TYPE = "application/json"
+CONTENT_TYPE = "application/vnd.spCampaign.v3+json"
 METHOD = "PUT"
 
 

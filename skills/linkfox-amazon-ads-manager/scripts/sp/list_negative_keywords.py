@@ -42,7 +42,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/negativeKeywords/list"
-ENTITY_CONTENT_TYPE = "application/json"
+ENTITY_CONTENT_TYPE = "application/vnd.spnegativekeyword.v3+json"
 RESPONSE_KEY = "negativeKeywords"
 
 FILTER_KEYS = [

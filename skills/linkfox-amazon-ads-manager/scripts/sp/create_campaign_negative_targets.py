@@ -32,7 +32,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/campaignNegativeTargets"
-CONTENT_TYPE = "application/json"
+CONTENT_TYPE = "application/vnd.spCampaignNegativeTargetingClause.v3+json"
 METHOD = "POST"
 
 

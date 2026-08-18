@@ -1,4 +1,4 @@
-# Lanjing Mercado XP-MCP Tool Reference
+# Mercado XP-MCP Tool Reference
 
 > 美客多（Mercado Libre）平台 MCP (Model Context Protocol) 服务接口文档  
 > 版本：1.0.0  
@@ -516,7 +516,7 @@
 
 ### B. 认证说明
 
-本 Skill 不直连蓝鲸 XP-MCP。上游认证由 LinkFox Java 后端统一托管，Agent / Skill 侧只调用 LinkFox 生产网关 `POST https://tool-gateway.linkfox.com/lingdong/call`，不要向用户索要或传递蓝鲸上游凭证。
+本 Skill 不直连 XP-MCP。上游认证由 LinkFox Java 后端统一托管，Agent / Skill 侧只调用 LinkFox 生产网关 `POST https://tool-gateway.linkfox.com/lingdong/call`，不要向用户索要或传递上游凭证。
 
 ### C. 分页说明
 
@@ -538,8 +538,3 @@
 | -32001 | 已过期 |
 | -32002 | 配额超出 |
 | -32003 | 认证失败 |
-
----
-
-**文档生成时间**：2026-06-29  
-**技术支持**：蓝鲸选品团队
