@@ -1,15 +1,15 @@
 ---
 name: linkfox-echotik-list-video-rank
-description: 查询TikTok视频排行榜，按日期、区域、排行类型与视频排名指标获取热门视频榜单，返回播放量、点赞、评论、分享、收藏、视频销量与GMV等指标，覆盖16个TikTok Shop站点。当用户提到TikTok视频排行、TikTok热门视频榜单、TikTok视频排名、TikTok带货视频排行、TikTok视频销量排行、TikTok视频GMV排行、EchoTik视频排行、TikTok video ranking, TikTok top videos chart, TikTok video leaderboard, TikTok viral video ranking时触发此技能。即使用户未明确提及"EchoTik"或"视频排行"，只要其需求涉及按日期获取TikTok视频榜单或视频排名，也应触发此技能。
+description: 查询TikTok视频排行榜，按日榜、周榜或月榜以及区域与视频排名指标获取热门视频榜单，返回播放量、点赞、评论、分享、收藏、视频销量与GMV等指标，覆盖16个TikTok Shop站点。当用户提到TikTok视频排行、TikTok热门视频榜单、TikTok视频排名、TikTok日榜、TikTok周榜、TikTok月榜、TikTok带货视频排行、TikTok视频销量排行、TikTok视频GMV排行、EchoTik视频排行、TikTok video ranking, TikTok top videos chart, TikTok video leaderboard, TikTok viral video ranking时触发此技能。即使用户未明确提及"EchoTik"或"视频排行"，只要其需求涉及按日期获取TikTok视频榜单或视频排名，也应触发此技能。
 ---
 
 # EchoTik - TikTok Video Ranking
 
-This skill queries TikTok Shop **video ranking** data via the EchoTik data source, helping cross-border sellers and marketers discover top-performing videos on a given day across regional markets. Unlike `linkfox-echotik-list-video` (which lists videos by region with free filters), this tool returns a **dated ranking** of videos sorted by a chosen metric.
+This skill queries TikTok Shop **video ranking** data via the EchoTik data source, helping cross-border sellers and marketers discover top-performing videos in daily, weekly, or monthly rankings. Unlike `linkfox-echotik-list-video` (which lists videos by region with free filters), this tool returns a **dated ranking** of videos sorted by a chosen metric.
 
 ## Core Concepts
 
-EchoTik is a TikTok Shop analytics platform. This tool returns ranked video lists — daily snapshots of the top videos in a market, ordered by a selected ranking metric. It is the video counterpart of the new-product ranking: instead of scouting new products, you scout the day's best-performing videos.
+EchoTik is a TikTok Shop analytics platform. This tool returns ranked video lists for a selected day, week, or month, ordered by a selected ranking metric.
 
 **Required input**: `date`, `rankType`, `region`, and `videoRankField` are all mandatory. There are no defaults for required fields.
 
@@ -17,14 +17,14 @@ EchoTik is a TikTok Shop analytics platform. This tool returns ranked video list
 
 ## Data Fields
 
-The response `data[*]` video object has 25 fields. Metric names begin with `total` but represent the **ranking period's** cumulative value (daily, for `rankType:1`). Key fields:
+The response `data[*]` video object has 25 documented fields. Metric names begin with `total` but represent the **ranking period's** cumulative value. Key fields:
 
 | Field | Description |
 |-------|-------------|
 | videoId / officialUrl / coverUrl | Video ID / TikTok URL / cover image URL |
 | videoDesc / duration / createDate | Description / duration (seconds) / publish date |
 | userId / uniqueId / nickName / avatar | Creator ID / TikTok account ID / nickname / avatar |
-| category / region | Video category / marketplace code |
+| category / region | Creator category / marketplace code |
 | totalViewsCnt / totalDiggCnt / totalCommentsCnt | Period views / likes / comments |
 | totalSharesCnt / totalFavoritesCnt | Period shares / favorites |
 | totalVideoSaleCnt / totalVideoSaleGmvAmt | Period video sales (units, estimated) / sales GMV (estimated) |
@@ -42,14 +42,18 @@ The response `data[*]` video object has 25 fields. Metric names begin with `tota
 | rankType | integer | Yes | - | Ranking type (see values below) |
 | region | string | Yes | - | Marketplace code. See supported list below |
 | videoRankField | integer | Yes | - | Ranking metric (see values below) |
+| productCategoryId | string | No | - | Level-1 product category ID for filtering sales-video rankings |
+| createdByAi | string | No | - | AI-video filter: `true` or `false` |
 | pageNum | integer | No | 1 | Page number, starts at 1 |
-| pageSize | integer | No | 50 | Items per page |
+| pageSize | integer | No | 50 | Page size — must be a multiple of 10, max 100 |
 
 ### rankType values
 
 | Value | Meaning |
 |-------|---------|
-| 1 | Daily ranking (verified) |
+| 1 | Daily ranking (day) |
+| 2 | Weekly ranking (week) |
+| 3 | Monthly ranking (month) |
 
 ### videoRankField values
 
@@ -57,9 +61,8 @@ The response `data[*]` video object has 25 fields. Metric names begin with `tota
 |-------|---------|----------|
 | 1 | Rank by views (播放量) | ✓ 200 |
 | 2 | Rank by video sales (视频销量) | ✓ 200 |
-| 3+ | Unverified | Returns errcode 10000 (no pre-computed chart) for tested date/region |
 
-> **Metric sparsity**: when ranking by a given `videoRankField`, the other metric fields often return 0 (ranking by sales → views/likes/comments are 0; ranking by views → sales/GMV are 0). The full valid-value sets are defined by the upstream EchoTik service; confirm against `references/api.md` and real responses before combining unfamiliar values.
+> **Metric sparsity**: when ranking by a given `videoRankField`, the other metric fields may return 0 (ranking by sales → views/likes/comments can be 0; ranking by views → sales/GMV can be 0).
 
 ### Supported Marketplaces
 
@@ -103,24 +106,26 @@ When the user doesn't specify a marketplace, ask or default to **US**.
 }
 ```
 
-**2. Top UK videos on a given day**
+**2. Weekly UK video ranking**
 ```json
 {
   "date": "2026-08-10",
-  "rankType": 1,
+  "rankType": 2,
   "region": "GB",
   "videoRankField": 1
 }
 ```
 
-**3. Paginate a large ranking**
+**3. Monthly US sales ranking filtered to AI videos**
 ```json
 {
-  "date": "2026-08-10",
-  "rankType": 1,
+  "date": "2026-08-01",
+  "rankType": 3,
   "region": "US",
-  "videoRankField": 1,
-  "pageNum": 2,
+  "videoRankField": 2,
+  "createdByAi": "true",
+  "productCategoryId": "601450",
+  "pageNum": 1,
   "pageSize": 20
 }
 ```
@@ -136,10 +141,9 @@ When the user doesn't specify a marketplace, ask or default to **US**.
 ## Important Limitations
 
 1. **All four required fields**: `date`, `rankType`, `region`, `videoRankField` are mandatory; no defaults are applied.
-2. **Daily granularity**: `date` is a daily snapshot; pass one specific `YYYY-MM-DD`.
-3. **Ranking data lags 1–2 days**: The current day and yesterday usually have no ranking yet and return `errcode:10000` ("no matching data"). Use a date 2+ days in the past; if a date still returns 10000, step further back.
-4. **Ranking vs. listing**: This is a dated ranking. For region-scoped video listing with free filters (creator / views range / ad / AI flags), use `linkfox-echotik-list-video`.
-5. **No secondary processing**: Results are live queries; secondary SQL/data processing is not available.
+2. **Ranking data lags 1–2 days**: Recent ranking data may be unavailable and return `errcode:10000` ("no matching data"). Use an earlier date if needed.
+3. **Ranking vs. listing**: This is a dated ranking. For region-scoped video listing with free filters (creator / views range / ad / AI flags), use `linkfox-echotik-list-video`.
+4. **No secondary processing**: Results are live queries; secondary SQL/data processing is not available.
 
 ## User Expression & Scenario Quick Reference
 
@@ -147,8 +151,9 @@ When the user doesn't specify a marketplace, ask or default to **US**.
 
 | User Says | Scenario |
 |-----------|----------|
-| "TikTok视频排行" / "TikTok top video chart" | Daily video ranking by views |
-| "今天TikTok最火的视频" | Today's ranking, region scoped |
+| "TikTok视频排行" / "TikTok top video chart" | Video ranking by selected period and metric |
+| "本周TikTok最火的视频" | Weekly ranking (`rankType:2`) |
+| "本月TikTok带货视频榜" | Monthly sales ranking (`rankType:3`) |
 | "TikTok带货视频排行" | Ranked selling videos (inspect sales/GMV columns) |
 | "英国TikTok视频榜单" | region=GB ranking |
 

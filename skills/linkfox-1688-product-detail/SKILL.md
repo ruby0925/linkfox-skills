@@ -1,6 +1,6 @@
 ---
 name: linkfox-1688-product-detail
-description: 1688 商品详情查询。通过 offerId 获取商品标题、属性、SKU/库存、批发价和外币价、起批量、图片/视频、物流包装、供应商服务、混批、发票与证书等采购信息。用户提到 1688 商品详情、1688 链接或商品 ID 查货、SKU 价格库存、跨境采购核价、供应商评估、包装重量、1688 product detail、offerId lookup、sourcing details 时触发。即使未明确说“商详”，只要希望根据 1688 offerId 核对货源、报价、MOQ、SKU、物流或供应商数据，也应触发此技能。
+description: 1688 商品详情查询。通过 offerId 获取商品标题、属性、SKU/库存、1 件零售价、2 件及以上批发阶梯价、外币价、起批量、图片/视频、物流包装、供应商服务、混批、发票与证书等采购信息。用户提到 1688 商品详情、1688 链接或商品 ID 查货、SKU 价格库存、1 件采购价、跨境采购核价、供应商评估、包装重量、1688 product detail、offerId lookup、sourcing details 时触发。即使未明确说“商详”，只要希望根据 1688 offerId 核对货源、报价、MOQ、SKU、物流或供应商数据，也应触发此技能。
 ---
 
 # 1688 Product Detail
@@ -11,8 +11,9 @@ This skill retrieves one structured 1688 product record by offer ID, including p
 
 - **Detail lookup, not discovery**: Query one known 1688 `offerId`; use a search skill when the user has no product ID.
 - **Complete product record**: Preserve the returned title, attributes, media, SKU, sales, logistics, and supplier fields without inventing missing values.
-- **Sourcing data**: Treat SKU prices, stock, MOQ, dropshipping terms, packaging, supplier metrics, invoices, and certificates as live product facts.
-- **Currency semantics**: Base `price`/`offerPrice` values and requested-currency `foreignCurrencyPrice` values are separate fields. Never relabel a base price as the requested currency.
+- **Quantity-based price semantics**: When `retailPrice` is present, use it for quantity 1 and use SKU `price` plus `saleInfo.priceRanges[].price` for quantities of 2 or more. During the rollout, a missing `retailPrice` can mean an old product model or no configured retail price; never infer a 1-piece price from another field for a price-sensitive decision.
+- **Sourcing data**: Treat prices, stock, MOQ, dropshipping terms, packaging, supplier metrics, invoices, and certificates as live product facts.
+- **Currency semantics**: CNY `retailPrice`/`price` values and requested-currency `foreignCurrencyRetailPrice`/`foreignCurrencyPrice` values are separate fields. Never relabel a CNY price as the requested currency.
 
 ## Data Fields
 
@@ -20,8 +21,8 @@ This skill retrieves one structured 1688 product record by offer ID, including p
 |-------|------------|
 | Identity | `offerId`, `subject`, `productUrl`, category IDs, `status` |
 | Media and copy | `productImage`, `mainVideo`, `detailVideo`, `description`, `sellingPoints` |
-| SKU | `skuList[].skuId`, attributes, images, prices, requested-currency prices, stock |
-| Sales | `saleInfo.priceRanges`, `amountOnSale`, MOQ, unit, dropshipping and free-shipping terms |
+| SKU | `skuList[].skuId`, attributes, images, `retailPrice`, SKU `price` (new-model wholesale or legacy-model price), requested-currency prices, stock |
+| Sales | `saleInfo.retailPrice`, `priceRanges` (new-model wholesale or legacy tiers), `amountOnSale`, MOQ, unit, dropshipping and free-shipping terms |
 | Logistics | Shipping origin, dispatch guarantee, package dimensions/weight, per-SKU measurements |
 | Supplier | `companyName`, trade/service scores, repeat-purchase and quality-refund indicators |
 | Procurement | Mix-order settings, service tags, promotions, invoices, certificates, product badges |
@@ -49,6 +50,8 @@ If the user provides a standard URL such as `https://detail.1688.com/offer/10404
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
+**价格时效**：用于采购成本、利润率、报价或下单决策时加 `--no-cache` 获取实时价格；不要用 24h 缓存结果确认成交价，最终成交价以采购 Skill 的订单预览为准。
+
 ## 解决认证和积分问题
 
 发生以下异常情况时，采用 `references/onboarding.md` 引导解决问题：
@@ -70,7 +73,7 @@ python scripts/alibaba1688_product_detail.py '{"offerId":"1040473674152","curren
 **2. Inspect sourcing facts**
 
 ```text
-查询 1688 商品 1040473674152 的 SKU 价格、库存、起批量、包装重量、发货地和供应商服务分。
+查询 1688 商品 1040473674152 的 1 件零售价、2 件及以上批发价、SKU 库存、起批量、包装重量、发货地和供应商服务分。
 ```
 
 **3. Retrieve details from a product URL**
@@ -82,8 +85,8 @@ python scripts/alibaba1688_product_detail.py '{"offerId":"1040473674152","curren
 ## Display Rules
 
 1. Show the product title and offer ID first, followed by the requested product facts.
-2. Present SKU results in a table with attributes, stock, base price, requested-currency price, and dropshipping price when available.
-3. Keep base and foreign-currency prices in separate columns; do not infer an exchange rate or convert missing values.
+2. Present SKU results in a table with attributes, stock, 1-piece retail price, wholesale price for quantities of 2 or more, requested-currency prices, and dropshipping price when available.
+3. Keep CNY and foreign-currency prices in separate columns. Preserve missing `retailPrice` as unknown; do not substitute `price`, `consignPrice`, `offerPrice`, `onePiecePrice`, or `promotionPrice`. If an old-model tier starts at 1, label it as a legacy tier and require real-time order preview before using it as the 1-piece cost.
 4. Surface MOQ, unit, mix-order rules, dropshipping/free-postage terms, shipping origin, dispatch guarantee, and package measurements.
 5. Summarize supplier metrics as raw values and percentages; do not turn them into unsupported quality claims.
 6. Display product and SKU images inline when visual comparison helps.
@@ -93,9 +96,9 @@ python scripts/alibaba1688_product_detail.py '{"offerId":"1040473674152","curren
 ## Important Limitations
 
 1. This tool accepts one `offerId` per call and does not search by keyword or image.
-2. Product, price, inventory, logistics, and supplier data are live and may change; reconfirm before purchasing.
+2. Product, price, inventory, logistics, and supplier data are live and may change; use `--no-cache` for price-sensitive decisions and reconfirm with order preview before purchasing.
 3. Video, certificates, promotions, and some logistics fields may be absent.
-4. `currency` requests upstream foreign-currency fields but does not guarantee every SKU or price tier has them.
+4. `currency` requests upstream foreign-currency fields but does not guarantee every SKU, retail price, or wholesale tier has them. A missing foreign-currency retail price can also mean that conversion failed.
 5. This lookup does not authorize an account, place an order, pay, or alter procurement state; use the procurement workflow for those actions.
 6. Results are not stored in an analysis database, so secondary SQL/data-query processing is unavailable.
 

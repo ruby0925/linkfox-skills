@@ -112,7 +112,9 @@ POST Body（JSON）只需传 1688 业务参数：
 | specId | string | 规格 ID |
 | cargoNumber | string | SKU 货号 |
 | amountOnSale | integer | 可售库存 |
-| price | string | SKU 基础价格 |
+| price | string | SKU 价格（人民币）；新零售价模型中是采购数量大于等于 2 件的批发价，旧商品模型语义结合阶梯和订单预览判断 |
+| retailPrice | string | SKU 零售价（人民币），适用于采购数量 1 件；上游无零售价时缺失 |
+| foreignCurrencyRetailPrice | number | SKU 外币零售价，适用于采购数量 1 件；未请求币种、无零售价或换算失败时缺失 |
 | promotionPrice | string | 营销价 |
 | consignPrice | string | 一件代发价格；上游废弃兼容字段，可能缺失 |
 | jxhyPrice / pfJxhyPrice | string | 精选货源兼容价格字段，可能缺失 |
@@ -120,18 +122,28 @@ POST Body（JSON）只需传 1688 业务参数：
 | attributes | array | SKU 属性；包含名称、值以及可选图片 |
 | fenxiaoPriceInfo | object | `offerPrice`、`onePiecePrice`、`foreignCurrencyPrice`、`foreignCurrencyPromotionPrice` |
 
-`currency` 对应的是 `fenxiaoPriceInfo.foreignCurrencyPrice` 和其他 `foreignCurrency*` 字段。不要把 `price`、`offerPrice` 等基础价格直接标成请求币种。
+`currency` 对应 `foreignCurrencyRetailPrice`、`fenxiaoPriceInfo.foreignCurrencyPrice` 和其他 `foreignCurrency*` 字段。不要把人民币 `retailPrice`、`price`、`offerPrice` 直接标成请求币种。
 
 ### `saleInfo`
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | amountOnSale | integer | 商品总库存 |
+| retailPrice | string | 商品级零售价（人民币），适用于采购数量 1 件；上游无零售价时缺失 |
+| foreignCurrencyRetailPrice | number | 商品级外币零售价，适用于采购数量 1 件；未请求币种、无零售价或换算失败时缺失 |
 | quoteType | integer | `0` 无 SKU 按商品数量；`1` 按 SKU 规格；`2` 有 SKU 按商品数量 |
-| priceRanges | array | 阶梯价：`startQuantity`、`price`、`promotionPrice`、`foreignCurrencyPrice`、`foreignCurrencyPromotionPrice` |
+| priceRanges | array | 批发阶梯价：`startQuantity`、`price`、`promotionPrice`、`foreignCurrencyPrice`、`foreignCurrencyPromotionPrice`；新零售价模型首档大于等于 2，旧商品模型可能仍从 1 件起 |
 | unitInfo | object | 单位字段 `unit` 与上游扩展字段 `transUnit` |
 | fenxiaoSaleInfo | object | `startQuantity`、`offerPrice`、`onePiecePrice`、`onePieceFreePostage` |
 | consignPrice / jxhyPrice | string | 上游废弃兼容字段，可能缺失 |
+
+### 零售价改造后的价格选择
+
+- 新零售价模型、采购数量为 1 件：读取匹配 SKU 的 `skuList[].retailPrice`；无 SKU 商品读取 `saleInfo.retailPrice`。
+- 新零售价模型、采购数量大于等于 2 件：读取匹配 SKU 的 `skuList[].price`，并结合 `saleInfo.priceRanges[]` 选择数量所在的批发阶梯。
+- `minOrderQuantity` 仍可能为 `1`，但新零售价模型的 `priceRanges` 批发首档从 2 件起；不要因为最小起批量为 1 就把批发价当成 1 件价。
+- `retailPrice` 缺失可能表示旧商品模型或未设置零售价。保持零售价缺失，不要自动回退到 `price`、`consignPrice`、`jxhyPrice`、`offerPrice`、`onePiecePrice` 或 `promotionPrice`。若阶梯明确从 `startQuantity=1` 起，只能标为旧模型阶梯信息；涉及成本、利润或下单时仍须用实时订单预览确认 1 件成交价。
+- `promotionPrice` 的含义未因本次零售价改造而改变；不得用它代替零售价。最终可购性、优惠、运费和成交价以实时订单预览为准。
 
 ### `shippingInfo`
 
@@ -162,7 +174,9 @@ POST Body（JSON）只需传 1688 业务参数：
 | collect30DayWithin48HPercent | string | 最近 30 天 48 小时揽收率 |
 | qualityRefundWithin30Day | string | 最近 30 天品质退款率 |
 
-### 真实成功响应形状（节选）
+### 新零售价模型响应形状（字段示例）
+
+以下示例用于说明新字段位置和类型，不代表指定 offerId 当前一定已切换到新零售价模型；实际字段和值以实时响应为准。
 
 ```json
 {
@@ -173,6 +187,8 @@ POST Body（JSON）只需传 1688 业务参数：
   "skuList": [
     {
       "skuId": "6226287579433",
+      "retailPrice": "4.80",
+      "foreignCurrencyRetailPrice": 0.73,
       "price": "4.05",
       "amountOnSale": 457,
       "fenxiaoPriceInfo": {
@@ -183,9 +199,11 @@ POST Body（JSON）只需传 1688 业务参数：
   ],
   "saleInfo": {
     "amountOnSale": 1917,
+    "retailPrice": "4.80",
+    "foreignCurrencyRetailPrice": 0.73,
     "priceRanges": [
       {
-        "startQuantity": 1,
+        "startQuantity": 2,
         "price": "4.05",
         "foreignCurrencyPrice": 0.62
       }

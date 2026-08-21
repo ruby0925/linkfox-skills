@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-Mercado Libre Product Selection - LinkFox Skill
-调用 /mercado/productSelection 接口。
+SP 受众报告 - LinkFox Skill
+调用 /amazonAds/developerProxy 接口。
 
 Usage:
-  python linkfox_mercado_product_selection.py '<JSON parameters>'           # 自动：小结果全量；大结果写文件+摘要
-  python linkfox_mercado_product_selection.py '<JSON parameters>' --inline  # 强制全量打印到 stdout
+  python get_sp_audience_report.py '<JSON parameters>'           # 自动：小结果全量；大结果写文件+摘要
+  python get_sp_audience_report.py '<JSON parameters>' --inline  # 强制全量打印到 stdout
+  python get_sp_audience_report.py '<JSON parameters>' --no-cache # 跳过 24h 成功结果缓存
 
 输出策略（脚本默认行为）：
-  - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-mercado-product-selection-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
+  - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-amazon-ads-sp-insights-report-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
   - 响应体 ≤ 8 KB：落盘后把完整 JSON 打印到 stdout
   - 响应体 > 8 KB：落盘后 stdout 只输出摘要（顶层字段、常见计数如 `total`/`costToken`、最大列表字段的长度 + 前 3 条样本）
   - 加 `--inline` 强制全量打印到 stdout（同样落盘）
@@ -20,12 +21,19 @@ import os
 import sys
 import time
 import secrets
+import subprocess
+from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 
+from reporting_v1_workflow import run_report_workflow
 
-API_PATH = "/mercado/productSelection"
-SLUG = "linkfox-mercado-product-selection"
+
+API_PATH = "/amazonAds/developerProxy"
+SLUG = "linkfox-amazon-ads-sp-insights-report"
+REPORT_KIND = "audience"
+REQUIRED_SKILL = "linkfox-amazon-ads-auth"
+DEPENDENCY_EXIT_CODE = 42
 
 # 响应小于等于该字节数时，直接全量输出，不落文件
 SMALL_THRESHOLD = 8000
@@ -43,18 +51,49 @@ def get_api_url():
 
 
 def get_api_key():
-    """
-获取配置在环境变量的API Key。
-如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
-"""
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
         print(
-            "API Key 未配置",
+            "API Key not configured. Please complete authorization first:\n"
+            "1. Visit https://skill.linkfox.com/linkfoxskills/guide.htm to obtain your Key\n"
+            "2. Set the environment variable: export LINKFOX_AGENT_API_KEY=your-key-here",
             file=sys.stderr,
         )
         sys.exit(1)
     return key
+
+
+def ensure_auth_skill_available():
+    """Use the same local dependency guard as the existing Amazon Ads skills."""
+    checker = Path(__file__).resolve().parent / "check_auth_dependency.py"
+    if not checker.exists():
+        print(
+            "DEPENDENCY_MISSING: " + json.dumps({
+                "missingSkill": REQUIRED_SKILL,
+                "reason": "check_auth_dependency.py not found next to the entry script",
+            }, ensure_ascii=False),
+            file=sys.stderr,
+        )
+        sys.exit(DEPENDENCY_EXIT_CODE)
+    try:
+        result = subprocess.run(
+            [sys.executable, str(checker)], capture_output=True, text=True, timeout=10
+        )
+    except Exception as exc:
+        print(
+            "DEPENDENCY_MISSING: " + json.dumps({
+                "missingSkill": REQUIRED_SKILL,
+                "reason": "Failed to run dependency check: %s" % exc,
+            }, ensure_ascii=False),
+            file=sys.stderr,
+        )
+        sys.exit(DEPENDENCY_EXIT_CODE)
+    if result.stderr:
+        sys.stderr.write(result.stderr)
+        if not result.stderr.endswith("\n"):
+            sys.stderr.write("\n")
+    if result.returncode != 0:
+        sys.exit(DEPENDENCY_EXIT_CODE)
 
 
 def call_api(params):
@@ -89,15 +128,22 @@ def call_api(params):
 
 
 def _cache_key(params):
-    raw = json.dumps(params, ensure_ascii=False, sort_keys=True)
+    raw = json.dumps({"reportKind": REPORT_KIND, "params": params}, ensure_ascii=False, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
 def _cache_path(params):
     cwd = os.getcwd()
-    path = os.path.join(cwd, "linkfox", ".cache", SLUG)
+    path = os.path.join(cwd, "linkfox", ".cache", SLUG, _cache_session_id())
     os.makedirs(path, exist_ok=True)
     return os.path.join(path, f"{SLUG}-{_cache_key(params)}.json")
+
+
+def _cache_session_id():
+    """Keep caches isolated by explicit session while remaining stable across CLI processes."""
+    raw = (os.environ.get("SESSION_ID") or "default").strip() or "default"
+    safe = "".join(c if c.isalnum() or c in "-_" else "-" for c in raw)[:80]
+    return safe if safe and safe not in (".", "..") else "default"
 
 
 def _load_cache(path):
@@ -109,6 +155,9 @@ def _load_cache(path):
         with open(path, encoding="utf-8") as f:
             payload = json.load(f)
         if isinstance(payload, dict):
+            for item in payload.get("dataFiles") or []:
+                if isinstance(item, dict) and item.get("path") and not os.path.isfile(item["path"]):
+                    return None
             payload.setdefault("_cache", {})["hit"] = True
         return payload
     except (OSError, json.JSONDecodeError):
@@ -200,13 +249,8 @@ def _ensure_meta(root: str, session_dir: str, date_str: str, sid: str, ts: float
 def _linkfox_root() -> str:
     """选择可写的 linkfox 根目录。
 
-    优先级：
-      1. $ACPX_WORKSPACES 第一个路径下的 linkfox/（真实的工作目录）
-      2. 当前工作目录下的 linkfox/
-      3. ~/linkfox/
-      4. $TMPDIR/linkfox/
-
-    当某路径只读（如 cwd 为 /tmp 或只读目录）时，自动回退到后序选项。
+    优先级：$ACPX_WORKSPACES 第一个路径下的 linkfox/，其次为当前工作目录下的 linkfox/。
+    两处均不可写时明确报错，不回退到家目录或系统临时目录。
     选定结果在进程内缓存，保证同一次运行内所有落盘路径稳定一致。
     """
     cached = _SESSION_CACHE.get("_root")
@@ -221,12 +265,6 @@ def _linkfox_root() -> str:
             candidates.append(os.path.join(acpx, "linkfox"))
     # 2. 当前工作目录
     candidates.append(os.path.join(os.getcwd(), "linkfox"))
-    # 3. 家目录
-    candidates.append(os.path.join(os.path.expanduser("~"), "linkfox"))
-    # 4. 临时目录
-    import tempfile
-    candidates.append(os.path.join(tempfile.gettempdir(), "linkfox"))
-
     for root in candidates:
         try:
             os.makedirs(root, exist_ok=True)
@@ -239,9 +277,7 @@ def _linkfox_root() -> str:
         root = os.path.abspath(root)
         _SESSION_CACHE["_root"] = root
         return root
-    fallback = os.path.abspath(candidates[-1])
-    _SESSION_CACHE["_root"] = fallback
-    return fallback
+    raise OSError("No writable workspace directory available for LinkFox outputs")
 
 def _format_iso(ts: float) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(ts))
@@ -250,7 +286,10 @@ def _session_id(ts: float) -> str:
     """优先 env SESSION_ID；缺省按 HHMMSS-<6 hex> 生成（同一进程内稳定）。"""
     env = os.environ.get("SESSION_ID")
     if env:
-        return env.strip()
+        raw = env.strip()
+        safe = "".join(c if c.isalnum() or c in "-_" else "-" for c in raw)[:80]
+        if safe and safe not in (".", ".."):
+            return safe
     if "_auto" not in _SESSION_CACHE:
         _SESSION_CACHE["_auto"] = (
             time.strftime("%H%M%S", time.localtime(ts)) + "-" + secrets.token_hex(3)
@@ -315,7 +354,7 @@ def main():
 
     if not argv:
         print(
-            "Usage: linkfox_mercado_product_selection.py '<JSON parameters>' [--inline]",
+            "Usage: get_sp_audience_report.py '<JSON parameters>' [--inline] [--no-cache]",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -326,18 +365,20 @@ def main():
         print(f"Invalid parameter format: {e}", file=sys.stderr)
         sys.exit(1)
 
+    ensure_auth_skill_available()
+
     cache_path = _cache_path(params)
     result = _load_cache(cache_path) if use_cache else None
     if result is None:
-        result = call_api(params)
-        if use_cache:
+        result = run_report_workflow(params, call_api, resolve_data_path, REPORT_KIND, SLUG)
+        if use_cache and result.get("_cacheable", True):
             _save_cache(cache_path, result)
 
     serialized = json.dumps(result, ensure_ascii=False, indent=2)
-    ts = int(time.time())
+    ts = time.time()
     out_path = _resolve_output_path(ts)
     try:
-        with open(out_path, "w") as f:
+        with open(out_path, "w", encoding="utf-8") as f:
             f.write(serialized)
         print(f"Saved full response: {out_path} ({len(serialized)} bytes)")
         if result.get("_cache", {}).get("hit"):

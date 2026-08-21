@@ -47,6 +47,7 @@ CONFIRM_FIELDS = {
 
 ORDER_FLOW_OPERATIONS = {"orderPreview", "createOrder"}
 VALID_ORDER_FLOWS = {"general", "fenxiao", "boutiquefenxiao"}
+VALID_USE_RED_ENVELOPE = {"y", "n"}
 
 AUTH_PRECHECK_EXEMPT_OPERATIONS = {"authorizeUrl", "authorizedStores"}
 
@@ -137,6 +138,28 @@ def require_confirmation(operation, params):
 
 
 def normalize_params(operation, params):
+    if operation == "createOrder":
+        use_red_envelope = params.get("useRedEnvelope")
+        if use_red_envelope is None or (isinstance(use_red_envelope, str) and not use_red_envelope.strip()):
+            params["useRedEnvelope"] = "n"
+        elif isinstance(use_red_envelope, str) and use_red_envelope.strip() in VALID_USE_RED_ENVELOPE:
+            params["useRedEnvelope"] = use_red_envelope.strip()
+        else:
+            print(
+                json.dumps(
+                    {
+                        "error": "invalid_parameter",
+                        "operation": operation,
+                        "field": "useRedEnvelope",
+                        "message": "useRedEnvelope only supports y/n. Omit it to default to n.",
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                file=sys.stderr,
+            )
+            sys.exit(2)
+
     if operation not in ORDER_FLOW_OPERATIONS:
         return params
 

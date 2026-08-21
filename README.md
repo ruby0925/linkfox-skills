@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-141-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-142-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 141 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 142 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -62,6 +62,7 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-ads-auth` | Amazon Ads OAuth authorization, profile discovery, and access-token management |
 | `linkfox-amazon-ads-manager` | Manage Amazon Ads SP/SB/SD entities: list, create, and update campaigns, ad groups, keywords, targets, product ads, and budget rules |
 | `linkfox-amazon-ads-report` | One-stop Amazon Ads SP/SB reporting: request, poll, download, and auto-extract |
+| `linkfox-amazon-ads-sp-insights-report` | Retrieve Sponsored Products audience performance and search-term impression share/rank reports through the beta Amazon Ads Reporting API v1 |
 | `linkfox-amazon-alexa-search` | Amazon Alexa Search |
 | `linkfox-amazon-opportunity-report-by-keyword` | Amazon Opportunity Report By Keyword |
 | `linkfox-amazon-opportunity-search-by-metrics` | Amazon Opportunity Search By Metrics |
@@ -270,7 +271,7 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-1688-procurement` | Run authorized 1688 procurement workflows including OAuth checks, SKU and address lookup, order preview, guarded order creation, payment links, order status, logistics, cancellation, and receipt confirmation |
-| `linkfox-1688-product-detail` | Retrieve 1688 product, SKU, pricing, logistics, and supplier details by offer ID |
+| `linkfox-1688-product-detail` | Retrieve 1688 product details by offer ID with one-piece retail prices, wholesale tiers for two or more units, SKU stock, logistics, and supplier data |
 | `linkfox-1688-search-by-image` | Find similar 1688 supplier products using image-based visual search |
 | `linkfox-1688-sourcing` | 1688 Sourcing |
 | `linkfox-ai-mode-google-search` | Ai Mode Google Search |

@@ -52,7 +52,8 @@ POST Body（JSON）：
 | `orderPreview` | `flow` | 是 | 下单流程类型。当前主流程为普通采购，默认 `general`；脚本缺省时会补 `general`，直接调 API 时必须显式传。仅当用户明确要求分销/精选货源分销时，才可透传 `fenxiao`/`boutiquefenxiao`；本 Skill 不提供分销专属校验或保障。 |
 | `orderPreview` | `isvBizType` | 否 | 默认 `cross`；仅支持 `cross`、`cross_daigou`、`cross_distribution`。 |
 | `createOrder` | `confirmCreateOrder` | 是 | 必须是 JSON boolean `true`。未传或 false 时不会调用 1688 下单。 |
-| `createOrder` | 下单参数 | 是 | 与 `orderPreview` 保持一致，必须显式包含相同 `flow`；可额外传 `message`、`tradeType`、`shopPromotionId`、`anonymousBuyer`、`outOrderId` 等。 |
+| `createOrder` | 下单参数 | 是 | 与 `orderPreview` 保持一致，必须显式包含相同 `flow`；可额外传 `message`、`tradeType`、`shopPromotionId`、`useRedEnvelope`、`anonymousBuyer`、`outOrderId` 等。 |
+| `createOrder` | `useRedEnvelope` | 否 | 是否使用红包，仅支持 `y`/`n`；默认 `n`。 |
 | `paymentUrl` | `confirmGetPaymentUrl` | 是 | 必须是 JSON boolean `true`。只获取支付链接，不自动打开、不自动支付。 |
 | `paymentUrl` | `orderIdList` | 是 | 1688 订单 ID 字符串数组。使用 `createOrder` 返回的 `orderId`。 |
 | `orderStatus` | `aliOrderId` | 是 | 1688 订单 ID 字符串；可使用 `createOrder` 返回的 `orderId`。 |

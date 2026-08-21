@@ -14,20 +14,22 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| date | string | 是 | - | 查询日期，格式 `YYYY-MM-DD`（每日快照）。排行数据通常滞后 1–2 天，当天/昨日可能返回 `errcode:10000`（无符合数据），需改用更早的日期 |
-| rankType | integer | 是 | - | 排行类型。`1` = 每日排行（详见下方枚举说明） |
+| date | string | 是 | - | 榜单查询日期，格式 `YYYY-MM-DD` |
+| rankType | integer | 是 | - | 榜单类型：`1` = 日榜，`2` = 周榜，`3` = 月榜 |
 | region | string | 是 | - | 区域码。可选值：US（美国）、ID（印度尼西亚）、TH（泰国）、PH（菲律宾）、MY（马来西亚）、VN（越南）、GB（英国）、MX（墨西哥）、SG（新加坡）、SA（沙特阿拉伯）、BR（巴西）、ES（西班牙）、JP（日本）、DE（德国）、IT（意大利）、FR（法国） |
-| videoRankField | integer | 是 | - | 视频排名指标（按该指标对视频排名）。`1` = 按播放量排名（详见下方枚举说明） |
+| videoRankField | integer | 是 | - | 视频排名指标：`1` = 按播放量排名，`2` = 按视频销量排名 |
+| productCategoryId | string | 否 | - | 商品一级类目 ID，用于带货视频榜单的商品分类筛选 |
+| createdByAi | string | 否 | - | 是否 AI 视频，可选字符串 `true` / `false` |
 | pageNum | integer | 否 | 1 | 分页页码，从1开始 |
-| pageSize | integer | 否 | 50 | 每页条数 |
+| pageSize | integer | 否 | 50 | 每页条数。**须为10的倍数，最大100**；官方接口单页上限10，内部按10每页多次拉取后合并 |
 
 ### rankType 枚举
 
 | 值 | 含义 |
 |----|------|
-| 1 | 每日排行（daily，已实测可用） |
-
-> 其余取值未实测；不熟悉的取值先用最小参数实测，避免组合试错消耗积分。
+| 1 | 日榜（day） |
+| 2 | 周榜（week） |
+| 3 | 月榜（month） |
 
 ### videoRankField 枚举
 
@@ -35,9 +37,8 @@ POST Body（JSON）：
 |----|------|------|
 | 1 | 按播放量排名（`totalViewsCnt`） | ✓ 200，返回高播放量视频 |
 | 2 | 按视频销量排名（`totalVideoSaleCnt`） | ✓ 200，返回高销量视频 |
-| 3 及以上 | 未确认 | 返回 `errcode:10000`（无预计算榜单）；是否为合法枚举值未确认，优先使用 1/2，其余取值先实测 |
 
-> **指标稀疏现象**：按某 `videoRankField` 排序时，非该指标的计数字段常返回 0（按销量排名时播放/点赞/评论等为 0；按播放量排名时销量/GMV 为 0）。`rankType` 与 `videoRankField` 的完整合法值集合由上游 EchoTik 服务定义。
+> **指标稀疏现象**：按某 `videoRankField` 排序时，非该指标的计数字段可能返回 0（按销量排名时播放/点赞/评论等可能为 0；按播放量排名时销量/GMV 可能为 0）。
 
 ## 响应结构
 
@@ -53,7 +54,7 @@ POST Body（JSON）：
 
 ### 视频对象字段
 
-> 以下 25 个字段为 `data[*]` 实际返回字段，与 `columns` 一一对应。指标字段名虽以 `total` 开头，但在日排行语境下表示**该排行周期内**的累计值（`columns` 列标题为"周期…"）。
+> 以下 25 个字段为 `data[*]` 返回字段，与 `columns` 定义对应。指标字段名虽以 `total` 开头，但表示**所选排行周期内**的累计值（`columns` 列标题为"周期…"）。
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -63,7 +64,7 @@ POST Body（JSON）：
 | uniqueId | string | TikTok账号ID |
 | nickName | string | 达人昵称 |
 | avatar | string | 达人头像 |
-| category | string | 视频分类 |
+| category | string | 达人分类 |
 | videoDesc | string | 视频描述 |
 | createDate | string | 视频发布日期 |
 | coverUrl | string | 视频封面URL |
@@ -139,9 +140,28 @@ curl -X POST ${LINKFOX_TOOL_GATEWAY}/echotik/listVideoRank \
   -H "User-Agent: LinkFox-Skill/2.0" \
   -d '{
     "date": "2026-08-10",
-    "rankType": 1,
+    "rankType": 2,
     "region": "GB",
     "videoRankField": 1
+  }'
+```
+
+### 美国月度 AI 带货视频销量排行
+
+```bash
+curl -X POST ${LINKFOX_TOOL_GATEWAY}/echotik/listVideoRank \
+  -H "Authorization: $LINKFOX_AGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: LinkFox-Skill/2.0" \
+  -d '{
+    "date": "2026-08-01",
+    "rankType": 3,
+    "region": "US",
+    "videoRankField": 2,
+    "createdByAi": "true",
+    "productCategoryId": "601450",
+    "pageNum": 1,
+    "pageSize": 10
   }'
 ```
 

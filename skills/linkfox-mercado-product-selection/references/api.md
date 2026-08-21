@@ -5,7 +5,7 @@
 本 Skill 只调用 LinkFox 后端生产网关，不直连 XP-MCP 上游服务。
 
 - **网关**：由环境变量 `LINKFOX_TOOL_GATEWAY` 指定，缺省回退 `https://tool-gateway.linkfox.com`
-- **请求地址**：`POST ${LINKFOX_TOOL_GATEWAY}/lingdong/call`
+- **请求地址**：`POST ${LINKFOX_TOOL_GATEWAY}/mercado/productSelection`
 - **Content-Type**：`application/json`
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
@@ -139,7 +139,7 @@ python scripts/linkfox_mercado_product_selection.py '{"toolName":"myUsage","argu
 ## curl 示例
 
 ```bash
-curl -X POST "${LINKFOX_TOOL_GATEWAY}/lingdong/call" \
+curl -X POST "${LINKFOX_TOOL_GATEWAY}/mercado/productSelection" \
   -H "Authorization: $LINKFOX_AGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -H "User-Agent: LinkFox-Skill/2.0" \

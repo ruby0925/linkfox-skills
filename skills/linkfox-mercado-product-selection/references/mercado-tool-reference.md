@@ -516,7 +516,7 @@
 
 ### B. 认证说明
 
-本 Skill 不直连 XP-MCP。上游认证由 LinkFox Java 后端统一托管，Agent / Skill 侧只调用 LinkFox 生产网关 `POST https://tool-gateway.linkfox.com/lingdong/call`，不要向用户索要或传递上游凭证。
+本 Skill 不直连 XP-MCP。上游认证由 LinkFox Java 后端统一托管，Agent / Skill 侧只调用 LinkFox 生产网关 `POST https://tool-gateway.linkfox.com/mercado/productSelection`，不要向用户索要或传递上游凭证。
 
 ### C. 分页说明
 

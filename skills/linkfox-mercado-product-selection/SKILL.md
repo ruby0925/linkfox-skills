@@ -5,11 +5,11 @@ description: Mercado Libre（美客多）选品数据查询与分析，通过 Li
 
 # Mercado Libre Product Selection
 
-This skill queries Mercado Libre product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data through the LinkFox gateway. The gateway exposes one unified route, `POST /lingdong/call`, and the skill selects one of 24 supported `toolName` values with matching `arguments`.
+This skill queries Mercado Libre product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data through the LinkFox gateway. The gateway exposes one unified route, `POST /mercado/productSelection`, and the skill selects one of 24 supported `toolName` values with matching `arguments`.
 
 ## Core Concepts
 
-- Call only `${LINKFOX_TOOL_GATEWAY}/lingdong/call`. Do not call the upstream XP-MCP server directly, and do not ask the user for upstream `secret-key` / `X-API-Key` — upstream credentials are owned by the backend.
+- Call only `${LINKFOX_TOOL_GATEWAY}/mercado/productSelection`. Do not call the upstream XP-MCP server directly, and do not ask the user for upstream `secret-key` / `X-API-Key` — upstream credentials are owned by the backend.
 - The request body is always `{"toolName":"...","arguments":{...}}`. The script takes this whole object as a single JSON argument.
 - Field names inside `arguments` must match `references/mercado-tool-reference.md` exactly, including camelCase names such as `siteId`, `itemId`, `productId`, `categoryId`, `runDate`, `runMonth`, `pageNo`, `pageSize`.
 - Read `data` first when presenting results. Read `contentText` when `data` is text or ambiguous. Show `rawResponse` only when the user asks for raw diagnostics.
@@ -46,7 +46,7 @@ Free tools: `categorySearch`, `categorySmallSearch`, `reviewSearch`, `rateInfo`,
 
 ## 调用方式
 
-- **API 端点**：`POST /lingdong/call`（完整参数/响应/错误码见 `references/api.md`）
+- **API 端点**：`POST /mercado/productSelection`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/linkfox_mercado_product_selection.py '<JSON 参数>' [--inline]`
 - **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 

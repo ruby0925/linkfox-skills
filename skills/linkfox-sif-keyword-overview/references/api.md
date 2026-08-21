@@ -27,7 +27,7 @@ POST Body（JSON）：
 |------|------|------|
 | msg | string | 消息 |
 | total | integer | 数据总量。注意：本接口通常只返回单条数据，total 通常为1 |
-| code | string | 返回码 |
+| code | string | SIF 业务返回码，`"1"` 表示成功 |
 | data | array | 返回数据（详见下方数据字段） |
 | costTime | integer | 耗时（ms） |
 | costToken | integer | 消耗token |
@@ -63,7 +63,7 @@ POST Body（JSON）：
 
 ## 错误码
 
-正常情况下，接口的 HTTP 状态码均为 200，业务的成功与否通过响应体中的 errorCode 字段区分（errorCode = 200 表示成功，其他值表示业务错误）。当遇到未授权等情况时，HTTP 状态码为 401，且对应的 errorCode 也是 401。
+接口包含两层状态码：网关调用状态通过 `errcode` 字段区分，`errcode = 200` 表示网关调用成功；SIF 业务成功通过响应体中的 `code` 字段区分，`code = "1"` 表示成功。当遇到未授权等网关错误时，HTTP 状态码和 `errcode` 为对应的错误码。
 
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
