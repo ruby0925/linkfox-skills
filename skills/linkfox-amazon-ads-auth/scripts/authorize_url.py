@@ -27,7 +27,7 @@ API_ENDPOINT = f"{API_BASE_URL}/amazonAds/authorizeUrl"
 def get_api_key():
     """
 获取配置在环境变量的API Key。
-如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
 """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -54,7 +54,11 @@ def call_api(params: dict) -> dict:
     )
     try:
         with urlopen(req, timeout=150) as response:
-            return json.loads(response.read().decode("utf-8"))
+            result = json.loads(response.read().decode("utf-8"))
+            error_code = str(result.get("errcode", ""))
+            if error_code.isdigit() and 1500 <= int(error_code) <= 1599:
+                raise SystemExit(json.dumps(result, ensure_ascii=False))
+            return result
     except HTTPError as e:
         body = e.read().decode("utf-8") if e.fp else ""
         return {"error": f"HTTP {e.code}: {e.reason}", "details": body}

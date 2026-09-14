@@ -67,7 +67,7 @@ def ensure_auth_skill_available(caller: str = "uploads script") -> None:
 def get_api_key() -> str:
     """
     获取配置在环境变量的API Key。
-    如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+    如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
     """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -89,6 +89,10 @@ def call_api(endpoint: str, params: dict, timeout: int = 150) -> dict:
             "Authorization": api_key,
             "Content-Type": "application/json",
             "User-Agent": "LinkFox-Skill/1.0",
+            "SESSION_ID": os.environ.get("SESSION_ID", ""),
+            "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
+            "MODE_ID": os.environ.get("MODE_ID", ""),
+            "APP_NAME": os.environ.get("APP_NAME", ""),
         },
         method="POST",
     )
@@ -127,9 +131,9 @@ def developer_proxy_post(
 
 
 def path_for_upload_destination(resource: str) -> str:
-    """resource 为下游 API 资源路径，如 aplus/2020-11-01/contentDocuments（勿带前导 /）。"""
+    """构造 Uploads greedy path；保留 resource 内作为路径分隔符的斜杠。"""
     res = str(resource).strip().lstrip("/")
-    enc = quote(res, safe="")
+    enc = quote(res, safe="/")
     return f"{UPLOADS_PATH_PREFIX}/uploadDestinations/{enc}"
 
 

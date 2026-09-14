@@ -1,11 +1,11 @@
 ---
 name: linkfox-sorftime-walmart-category-market
-description: 调用 Sorftime 研究 Walmart 美国站类目：获取完整类目树、按自然语言类目名称匹配相关 NodeId，或使用下划线分隔的 NodePath 查询类目市场数据及 Best Seller Top 80。用户提到 Walmart 类目树、类目名称搜索、类目匹配、类目节点、NodeId、NodePath、类目市场分析、类目调研、类目规模、类目热销商品、Best Seller，或需要先定位类目再研究市场时使用。
+description: 调用 Sorftime 研究 Walmart 美国站类目：获取完整类目树、按自然语言类目名称匹配相关 NodeId，或使用下划线分隔的 NodePath 查询类目市场数据及 Best Seller 商品。用户提到 Walmart 类目树、类目名称搜索、类目匹配、类目节点、NodeId、NodePath、类目市场分析、类目调研、类目规模、类目热销商品、Best Seller，或需要先定位类目再研究市场时使用。
 ---
 
 # Walmart 类目市场研究
 
-Use Sorftime data to retrieve the Walmart US category hierarchy, match a natural-language category name, or inspect one category's market report and Best Seller Top 80.
+Use Sorftime data to retrieve the Walmart US category hierarchy, match a natural-language category name, or inspect one category's market report and returned Best Seller products.
 
 ## Core Concepts
 
@@ -29,7 +29,7 @@ Complete parameter and response details are in `references/api.md`.
 
 - **API 端点**：`POST /sorftime/walmart/categoryMarket`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/sorftime_walmart_category_market.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-sorftime-walmart-category-market-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -39,13 +39,13 @@ Complete parameter and response details are in `references/api.md`.
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 
 发生以下异常情况时，采用 `references/onboarding.md` 引导解决问题：
 
 - **未配置 API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`
 - **响应 401 或 402 状态码**
-- **响应提示积分或余额不足**：消息含“积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值”或类似含义
+- **响应提示算力或余额不足**：消息含“算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值”或类似含义
 
 ## Usage Examples
 
@@ -59,11 +59,11 @@ Prefer `searchByName` when the user supplies a natural-language category name. U
 
 ## Display Rules
 
-1. State the selected operation and show `requestConsumed` and `costToken` when returned.
+1. State the selected operation and show `requestConsumed`, `costCredit`, and `costToken` when returned. If `_cache.hit=true`, make clear that the cached values describe the original live request and no new production charge occurred.
 2. For `tree`, show matched category names, their ID hierarchy, and the derived `nodePath`; never dump the full tree into conversation.
 3. For `searchByName`, show at most the returned three `NodeId` and `CategoryName` pairs; label them as related matches rather than exact classification.
 4. For `marketReport`, summarize only returned metrics and present Best Seller products compactly.
-5. Label Best Seller data as a maximum Top 80 scope, not the entire category catalog.
+5. State the number of Best Seller products actually returned and do not present the result as the entire category catalog.
 6. Preserve upstream field meanings and never invent missing category relationships or metrics.
 
 ## Important Limitations
@@ -83,11 +83,11 @@ Prefer `searchByName` when the user supplies a natural-language category name. U
 
 **Boundary judgment**: If the primary object is a Walmart product ID, use product analysis. Use `searchByName` for a category name, `tree` for hierarchy traversal, and `marketReport` for a known category path.
 
-## 积分消耗规则
+## 算力消耗规则
 
-按动态规则计费：消耗积分 = Sorftime内部查询次数 × 12。Sorftime内部查询次数：不同 operation 需要的查询次数可能不同，实际次数由 Sorftime 决定。
+按动态规则计费：单个 Sorftime Request 当前显示为 6 算力；多 Request 操作由网关按整单计算并取整，最终以入口脚本返回的 `costCredit` 为准，不要简单用 `requestConsumed × 6` 代替实际账单。
 
-> 用户会因积分消耗而支付费用。必须提醒用户并让用户决定是否继续执行另一个 operation。
+> 用户会因算力消耗而支付费用。必须提醒用户并让用户决定是否继续执行另一个 operation。
 
 **Feedback:**
 

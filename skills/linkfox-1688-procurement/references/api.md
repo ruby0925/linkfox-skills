@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/alibaba1688/<endpoint>`，默认网关为 `https://tool-gateway.linkfox.com`
 - **请求方式**：POST，Content-Type: `application/json; charset=utf-8`
-- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置，按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置，按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 - **缓存**：本采购 Skill 不做 24h 响应缓存；授权、价格、库存、订单状态和物流以实时返回为准，高风险写操作不得缓存或自动重放。
@@ -169,8 +169,8 @@ Agent 在收到中文确认后，调用脚本时必须自动加入对应 JSON bo
 | errcode / error | 含义 | 处理建议 |
 |---|---|---|
 | 200 | 请求已有返回 | 是否可继续下单以具体预览结果、订单结果或提示信息为准 |
-| 401 / authorized error | 认证失败 | 按 SKILL.md 的 **## 解决认证和积分问题** 处理 |
-| 402 | 积分或余额不足 | 按 SKILL.md 的 **## 解决认证和积分问题** 处理 |
+| 401 / authorized error | 认证失败 | 按 SKILL.md 的 **## 解决认证和算力问题** 处理 |
+| 402 | 算力或余额不足 | 按 SKILL.md 的 **## 解决认证和算力问题** 处理 |
 | `authorization_required` | 当前用户没有 ACTIVE 且未过期的 1688 授权 | 先运行 `authorize_url.py`，用户授权后再运行 `authorized_stores.py` 验证 |
 | `confirmation_required` | 高风险确认字段缺失或不是 JSON boolean `true` | 停止并让用户单独中文确认；不要自动补字符串 `"true"` |
 | 1002 | 参数缺失或不合法 | 检查字段名、必填项、枚举值、订单号是否为数字字符串 |

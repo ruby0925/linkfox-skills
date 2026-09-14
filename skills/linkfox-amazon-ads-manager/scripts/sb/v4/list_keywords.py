@@ -14,6 +14,7 @@ if __name__ == "__main__":
     run_get_offset_list(
         __doc__,
         path="sb/keywords",
+        accept="application/vnd.sbkeyword.v3+json",
         response_key="keywords",
         query_keys=[
             "keywordIdFilter",

@@ -8,7 +8,9 @@ Amazon Ads 授权、已授权账号列表、profile 管理、令牌读取与刷�
 
 - **Base URL**：`${LINKFOX_TOOL_GATEWAY}`
 - **Method**：POST，`Content-Type: application/json`
-- **Auth**：Header `Authorization: <api_key>`（读环境变量 `LINKFOX_AGENT_API_KEY`（优先）或 `LINKFOXAGENT_API_KEY`；如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **Auth**：Header `Authorization: <api_key>`（读环境变量 `LINKFOX_AGENT_API_KEY`（优先）或 `LINKFOXAGENT_API_KEY`；如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
+
+- **解绑脚本**：`LinkFox-Skill/2.0`；透传 `SESSION_ID` / `MESSAGE_ID` / `MODE_ID` / `APP_NAME`，超时 150s，不缓存、不自动重试。
 
 ## 关键 ID 关系
 
@@ -133,12 +135,44 @@ Amazon Ads 授权、已授权账号列表、profile 管理、令牌读取与刷�
 
 ---
 
+### 6. 解绑广告连接 — `/amazonAds/cancelAuthorization`
+
+**Request**：
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `authRecordId` | integer | 是 | 授权记录 ID，范围 1–9223372036854775807；不接受 profileId 替代 |
+
+后端兼容纯数字字符串；脚本要求 JSON 整数。
+
+**Response**：
+
+```json
+{
+  "success": true,
+  "authRecordId": 1001,
+  "removedBindings": 1,
+  "affectedProfileIds": [1111111111, 2222222222, 3333333333],
+  "localAuthorizationRevoked": false,
+  "amazonRevoked": false,
+  "message": "已解除当前用户的指定广告授权绑定；token 与其他用户绑定保留，未撤销 Amazon 授权"
+}
+```
+
+- 仅解除当前成员的整份连接（全部 profile），保留 token、profile 快照和其他成员绑定。
+- 未绑定或重复解绑仍返回 `success=true`、`removedBindings=0`、`affectedProfileIds=[]`；两个 revoked 字段固定为 `false`。
+- `affectedProfileIds` 表示被移除连接的范围；其他授权仍可能提供相同 profile 的访问。
+- 已发出的请求和未完成的授权回调不受影响，后者可能恢复绑定。Amazon 官方撤销需原授权人通过广告后台的第三方应用管理进入 Login with Amazon 移除应用。
+
+---
+
 ## 错误码
 
 | errcode | 含义 | 建议 |
 |---------|------|------|
 | 200 | 成功 | — |
-| 402 | 计费/积分不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
+| 400 | 解绑参数格式错误 | 检查 authRecordId；整数溢出返回 1002 |
+| 402 | 计费/算力不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
 | 1002 | 缺参数或认证失败 | 检查必填参数与 API Key |
 | 1003 | 上游 Amazon Ads 调用失败 | 稍后重试 |
 | 1004 | 授权记录不存在或不属于当前用户 | 核对 profileId / authRecordId |
@@ -177,6 +211,10 @@ curl -X POST $BASE/amazonAds/refreshToken -H "Authorization: $KEY" \
 # 5. 查令牌
 curl -X POST $BASE/amazonAds/storeTokens -H "Authorization: $KEY" \
   -H "Content-Type: application/json" -d '{"profileId":1111111111}'
+
+# 6. 解绑广告连接
+curl -X POST $BASE/amazonAds/cancelAuthorization -H "Authorization: $KEY" \
+  -H "Content-Type: application/json" -d '{"authRecordId":1001}'
 ```
 
 ---

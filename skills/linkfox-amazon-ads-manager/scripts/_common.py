@@ -92,7 +92,7 @@ def ensure_auth_skill_available() -> None:
 def get_api_key() -> str:
     """
     获取配置在环境变量的API Key。
-    如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+    如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
     """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -114,6 +114,10 @@ def call_gateway(endpoint: str, payload: dict) -> dict:
             "Authorization": api_key,
             "Content-Type": "application/json",
             "User-Agent": "LinkFox-Skill/1.0",
+            "SESSION_ID": os.environ.get("SESSION_ID", ""),
+            "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
+            "MODE_ID": os.environ.get("MODE_ID", ""),
+            "APP_NAME": os.environ.get("APP_NAME", ""),
         },
         method="POST",
     )
@@ -135,7 +139,7 @@ def get_access_token(profile_id: int) -> str:
 
 def _developer_proxy_call(region: str, path: str, method: str, access_token: str,
                           profile_id: int, body: str | None, content_type: str | None,
-                          query_string: str | None) -> dict:
+                          query_string: str | None, accept: str | None = None) -> dict:
     payload: dict[str, Any] = {
         "region": region,
         "path": path,
@@ -148,6 +152,8 @@ def _developer_proxy_call(region: str, path: str, method: str, access_token: str
         payload["body"] = body
     if content_type:
         payload["contentType"] = content_type
+    if accept:
+        payload["accept"] = accept
     if query_string:
         payload["queryString"] = query_string
     return call_gateway(DEVELOPER_PROXY_ENDPOINT, payload)
@@ -159,7 +165,8 @@ def list_sp_entities(region: str, profile_id: int,
                      entity_path: str, entity_content_type: str, response_key: str,
                      request_body: dict, fetch_all: bool = True,
                      max_pages: int = DEFAULT_MAX_PAGES,
-                     access_token: str = "") -> dict:
+                     access_token: str = "",
+                     accept: str | None = None) -> dict:
     """
     POST a SP v3 list endpoint and optionally auto-paginate via nextToken.
 
@@ -193,6 +200,7 @@ def list_sp_entities(region: str, profile_id: int,
             body=json.dumps(page_body),
             content_type=entity_content_type,
             query_string=None,
+            accept=accept,
         )
 
         if "error" in resp:
@@ -626,7 +634,8 @@ def list_sd_entities(region: str, profile_id: int,
 def mutate_entity(region: str, profile_id: int,
                   path: str, method: str, content_type: str,
                   payload,
-                  access_token: str = "") -> dict:
+                  access_token: str = "",
+                  accept: str | None = None) -> dict:
     """POST (create) or PUT (update) an entity batch via developerProxy.
 
     Returns either:
@@ -645,6 +654,7 @@ def mutate_entity(region: str, profile_id: int,
         body=body_str,
         content_type=content_type,
         query_string=None,
+        accept=accept,
     )
 
     if "error" in resp:
@@ -818,7 +828,7 @@ def emit_result(result, slug=SLUG, inline=False):
     _lf_ensure_meta(root, session_dir, date_str, sid, ts)
     data_dir = os.path.join(session_dir, "data")
     os.makedirs(data_dir, exist_ok=True)
-    out = os.path.join(data_dir, f"{slug}-{int(ts * 1_000_000)}.json")
+    out = os.path.join(data_dir, f"{slug}-{int(ts * 1_000_000)}-{_lf_secrets.token_hex(3)}.json")
     try:
         with open(out, "w", encoding="utf-8") as f:
             f.write(serialized)

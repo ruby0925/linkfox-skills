@@ -1,4 +1,4 @@
-# 认证、授权和积分引导
+# 认证、授权和算力引导
 
 ## 业务前置条件
 
@@ -22,7 +22,6 @@
 3. 手机号流程：
    - `python scripts/onboarding.py send-code <phone>`
    - 获取验证码后运行 `python scripts/onboarding.py login <phone> <code>`
-   - WorkBuddy 宿主加 `--channel workbuddy`。
 4. 配置返回的 `api_key`并重启会话：
    - Windows PowerShell：`setx LINKFOX_AGENT_API_KEY "<key>"`
    - macOS zsh：`echo 'export LINKFOX_AGENT_API_KEY="<key>"' >> ~/.zshrc && source ~/.zshrc`
@@ -30,7 +29,7 @@
 
 ## LinkFox billing 场景
 
-`errcode=402` 或消息包含 `积分`、`余额`、`quota`、`insufficient`、`充值`、`套餐到期` 时：
+`errcode=402` 或消息包含 `算力`、`余额`、`quota`、`insufficient`、`充值`、`套餐到期` 时：
 
 1. `python scripts/onboarding.py list-plans`
 2. 校验 `plan_id` 属于返回清单，支付方式属于该套餐 `available_methods`。

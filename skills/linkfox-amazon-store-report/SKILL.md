@@ -1,6 +1,6 @@
 ---
 name: linkfox-amazon-store-report
-description: 亚马逊店铺报告自动化获取技能，支持库存报告、订单报告、销售流量报告、FBA报告、财务结算报告等95+种报告类型的全流程自动获取（请求→轮询→下载→解压）；完成后默认启动本机短时HTTP服务，生成extractedFileHttpUrl供浏览器下载已解压文件。本技能依赖 linkfox-amazon-store-auth（授权与令牌管理）。当用户提到拉取亚马逊报告、下载Amazon报告、获取库存报告、获取订单报告、FBA报告、销售流量报告、财务结算报告、Brand Analytics报告、ABA搜索词报告、pull Amazon report, download Amazon report, fetch inventory report, fetch orders report, FBA report, sales and traffic report, settlement report, Amazon store report时触发此技能。只要其需求涉及从亚马逊卖家后台拉取任何形式的结构化数据（库存、订单、销量、财务、退货等），也应触发此技能。
+description: 亚马逊卖家店铺报告获取与下载。支持库存、订单、销量与流量、FBA、财务结算、退货、Brand Analytics 等 95+ 种报告的请求、状态轮询、下载和解压，并生成可下载的已解压文件地址。用户提到拉取或下载亚马逊报告、库存报告、订单报告、销售与流量报告、Business Report、FBA 报告、结算报告、退货报告、Brand Analytics、ABA 搜索词、Amazon store report、pull or download Amazon report 时触发。即使未明确说“报告”，只要希望从 Amazon Seller Central 批量导出某一时间段的结构化经营数据，也应触发此技能；查询少量实时订单、商品或价格优先使用对应专用技能。本技能依赖 linkfox-amazon-store-auth。
 ---
 
 # Amazon 店铺报告获取
@@ -92,7 +92,7 @@ description: 亚马逊店铺报告自动化获取技能，支持库存报告、�
 
 - **API 端点**：`POST /spApi/developerProxy`（不同操作通过请求体区分；完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/<脚本名>.py '<JSON 参数>' [--inline]`（可用脚本见下文脚本一览）
-- **成本约束**：本工具会消耗积分；失败/空结果不得自动换关键词、翻页或连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；失败/空结果不得自动换关键词、翻页或连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/<skill-name>-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -107,13 +107,13 @@ description: 亚马逊店铺报告自动化获取技能，支持库存报告、�
 - `scripts/get_report.py` ⭐ — 端到端自动化报告获取（**推荐**）
 - `scripts/check_auth_dependency.py` — 主动检测依赖 skill `linkfox-amazon-store-auth` 是否已安装
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Usage Scenarios
 
@@ -266,9 +266,25 @@ python scripts/get_report.py '{
 
 ---
 
-## 积分消耗规则
+## Amazon SP-API 接口保护与重试指引
 
-不消耗积分。
+同一店铺连续收到 Amazon SP-API 的 400、403、404 或 429 时，网关会返回 450、453、454 或 459 并短暂冷却。这些自定义状态码不是 Amazon 原生状态，也不表示封号；目的是避免持续异常或高频调用扩大店铺风险。
+
+| 状态与 message | 范围 | 触发与冷却 | 处理 |
+|---|---|---|---|
+| `450`：`400，请求异常，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：20 分钟 | 停止原参数重试，检查必填字段、marketplace、ID、日期和请求体 |
+| `453`：`403，店铺未授权，请先授权` | 店铺全部接口 | 60 秒内超过 2 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 停止该店铺调用，检查授权、权限、店铺归属和区域 |
+| `454`：`404，资源不存在，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 确认资源 ID、所属店铺/站点、资源状态和接口路径 |
+| `459`：`429限流中，请降低频率` | 店铺+接口 | 首次：15 秒；2 分钟内超过 2 次：30 秒；3 分钟内超过 4 次：2 分钟 | 降低并发、分页和轮询频率并逐级退避 |
+
+- 立即停止自动或并发重试，不得通过换脚本或重复创建任务绕过保护；优先遵循 `retryAfter`、`blockedUntil`，没有时按表中时长说明。
+- 450/453/454 必须先修正参数、授权或资源标识，冷却后最多谨慎重试一次；再次触发则停止调用。453 期间停止该店铺全部 SP-API。
+- 保留已有 `reportId`、`feedId` 等任务 ID；写操作结果不确定时先查询状态，不直接重放。
+- 向用户先说明店铺保护，再给原因、处理和等待时间。可回复：“为保护您的亚马逊店铺安全，检测到 Amazon SP-API 连续返回{原因}，当前已进入短暂保护。请先{处理动作}，预计{等待时间}后再试；这不代表封号，也不是套餐或算力限制。”不要只说“LinkFox 限流”或“服务器繁忙”。
+
+## 算力消耗规则
+
+不消耗算力。
 
 **Feedback**：
 

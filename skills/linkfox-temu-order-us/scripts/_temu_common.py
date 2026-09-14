@@ -57,6 +57,10 @@ def build_gateway_headers(linkfox_token: str) -> dict:
         "Token": linkfox_token,
         "Content-Type": "application/json",
         "User-Agent": "LinkFox-Skill/1.0",
+        "SESSION_ID": os.environ.get("SESSION_ID", ""),
+        "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
+        "MODE_ID": os.environ.get("MODE_ID", ""),
+        "APP_NAME": os.environ.get("APP_NAME", ""),
     }
 
 def load_json_arg(argv: list) -> dict:

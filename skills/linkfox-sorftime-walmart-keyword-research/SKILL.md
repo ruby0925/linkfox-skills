@@ -42,7 +42,7 @@ Read `references/api.md` for the complete conditional parameter matrix before ca
 
 - **API 端点**：`POST /sorftime/walmart/keywordResearch`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/sorftime_walmart_keyword_research.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；只读研究操作对同一参数组合使用 24h 本地缓存，`favoriteAdd`、`favoriteChange`、`favoriteList` 始终绕过缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；只读研究操作对同一参数组合使用 24h 本地缓存，`favoriteAdd`、`favoriteChange`、`favoriteList` 始终绕过缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-sorftime-walmart-keyword-research-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -52,22 +52,23 @@ Read `references/api.md` for the complete conditional parameter matrix before ca
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 
 发生以下异常情况时，采用 `references/onboarding.md` 引导解决问题：
 
 - **未配置 API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`
 - **响应 401 或 402 状态码**
-- **响应提示积分或余额不足**：消息含“积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值”或类似含义
+- **响应提示算力或余额不足**：消息含“算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值”或类似含义
 
 ## Keyword Library Safety
 
 - Add to the default “未分类” folder by omitting `dict`; a provided folder may be created by Sorftime.
-- Delete with `command="del"`. Omitting `dict` deletes the keyword from every folder, so explicitly confirm that scope.
+- Delete with `command="del"`. Omitting `dict` operates on the default “未分类” folder; specify `dict` to delete from another folder.
 - Move with `command="move=<目标目录>"`. Omitting `dict` means the source is “未分类”.
 - List with `command` equal to `all`, `dict`, or `dict=<目录>`.
 - If an explicitly authorized mutation truly must be repeated after external state changed, use `--no-cache`; never use it to bypass the confirmation guard.
 - `favoriteAdd`, `favoriteChange`, and `favoriteList` always bypass the local cache, so mutations are never suppressed and list results reflect the latest upstream state.
+- The exposed operations do not delete folders. Removing the final keyword can leave an empty folder in the API library.
 
 ## Usage Examples
 
@@ -82,7 +83,7 @@ Run mutation operations only after explicit authorization.
 
 ## Display Rules
 
-1. State the selected operation and show `requestConsumed` and `costToken` when returned.
+1. State the selected operation and show `requestConsumed`, `costCredit`, and `costToken` when returned. If `_cache.hit=true`, make clear that the cached values describe the original live request and no new production charge occurred.
 2. Preserve metric meanings and observation windows; do not turn estimates into guaranteed demand or sales.
 3. Report the requested page and offer another only after explaining that it creates another paid call.
 4. Treat product IDs and keywords as strings.
@@ -106,11 +107,11 @@ Run mutation operations only after explicit authorization.
 
 **Boundary judgment**: Choose exactly one operation that matches the user's stated intent; never turn one keyword request into an automatic multi-step research chain.
 
-## 积分消耗规则
+## 算力消耗规则
 
-按动态规则计费：消耗积分 = Sorftime内部查询次数 × 12。Sorftime内部查询次数：不同 operation 需要的查询次数可能不同，实际次数由 Sorftime 决定。
+按动态规则计费：单个 Sorftime Request 当前显示为 6 算力；多 Request 操作由网关按整单计算并取整，最终以入口脚本返回的 `costCredit` 为准，不要简单用 `requestConsumed × 6` 代替实际账单。
 
-> 用户会因积分消耗而支付费用。高消耗筛选、扩展词或连续分页前必须提醒用户；任何收藏变更都须明确授权。
+> 用户会因算力消耗而支付费用。高消耗筛选、扩展词或连续分页前必须提醒用户；任何收藏变更都须明确授权。
 
 **Feedback:**
 

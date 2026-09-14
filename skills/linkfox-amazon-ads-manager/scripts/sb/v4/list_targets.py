@@ -18,6 +18,6 @@ if __name__ == "__main__":
         content_type="application/json",
         response_key="targets",
         api_version="V4",
-        resource_version="V3.2_SHARED_TARGETING",
+        resource_version="SHARED_TARGETING",
         map_target_filters=True,
     )

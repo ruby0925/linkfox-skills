@@ -1,6 +1,6 @@
 ---
 name: linkfox-amazon-store-fulfillment-inbound
-description: 亚马逊 FBA 入仓与 Fulfillment Inbound SP-API 能力，经 LinkFox /spApi/developerProxy 管理 inbound plan、装箱、placement、shipment、shipment content update、delivery window、自配送预约、运输方案、合规、预处理、标签及 BOL。用户提到 createInboundPlan、packing option、placement option、transportation option、FBA 入库计划、货件箱唛、入仓标签、送仓预约、shipmentConfirmationId、Fulfillment Inbound API 或 v2024-03-20/v0 时触发。
+description: 亚马逊 FBA 入仓与 Fulfillment Inbound 全流程管理。用于创建和管理 inbound plan，处理装箱、placement、shipment、货件内容更新、送达窗口、自配送预约、运输方案、商品合规、预处理、箱唛标签、提单及异步操作状态。用户提到 FBA 入库计划、Send to Amazon、创建入仓计划、packing option、placement option、transportation option、货件箱唛、入仓标签、送仓预约、shipmentConfirmationId、createInboundPlan、Fulfillment Inbound API、v2024-03-20 或 v0 入仓接口时触发。即使未明确说“Fulfillment Inbound”，只要希望把库存发往亚马逊运营中心并完成建仓、装箱、分仓、运输或交仓步骤，也应触发此技能。
 ---
 
 # Amazon 店铺 Fulfillment Inbound
@@ -100,7 +100,7 @@ python scripts/get_labels.py '{"sellerId":"A1...","region":"NA","shipmentConfirm
 - 完整响应保存到 `linkfox/<YYYY-MM-DD>/<session>/data/linkfox-amazon-store-fulfillment-inbound-<timestamp>.json`；stdout 会打印实际路径。
 - 响应不超过 8 KB 时打印完整 JSON；更大时打印摘要；`--inline` 强制打印完整 JSON。
 - 始终先判断 `developerProxy.errcode`，再判断 `httpStatus`，最后读取 operation 结果字段。
-- 401/402、API Key、授权、积分或余额问题按 [references/onboarding.md](references/onboarding.md) 处理。
+- 401/402、API Key、授权、算力或余额问题按 [references/onboarding.md](references/onboarding.md) 处理。
 - Amazon 返回 400/403/404/409/413/415/422 时，修正输入或流程状态后由用户决定是否再次调用。
 
 ## 参考路由
@@ -113,9 +113,25 @@ python scripts/get_labels.py '{"sellerId":"A1...","region":"NA","shipmentConfirm
 
 问题反馈使用 `skillName: linkfox-amazon-store-fulfillment-inbound`，并附脱敏后的 operation、关联 ID 与 `developerProxy` 响应。
 
-## 积分消耗规则
+## Amazon SP-API 接口保护与重试指引
 
-不消耗积分（以网关实际计费为准）。
+同一店铺连续收到 Amazon SP-API 的 400、403、404 或 429 时，网关会返回 450、453、454 或 459 并短暂冷却。这些自定义状态码不是 Amazon 原生状态，也不表示封号；目的是避免持续异常或高频调用扩大店铺风险。
+
+| 状态与 message | 范围 | 触发与冷却 | 处理 |
+|---|---|---|---|
+| `450`：`400，请求异常，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：20 分钟 | 停止原参数重试，检查必填字段、marketplace、ID、日期和请求体 |
+| `453`：`403，店铺未授权，请先授权` | 店铺全部接口 | 60 秒内超过 2 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 停止该店铺调用，检查授权、权限、店铺归属和区域 |
+| `454`：`404，资源不存在，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 确认资源 ID、所属店铺/站点、资源状态和接口路径 |
+| `459`：`429限流中，请降低频率` | 店铺+接口 | 首次：15 秒；2 分钟内超过 2 次：30 秒；3 分钟内超过 4 次：2 分钟 | 降低并发、分页和轮询频率并逐级退避 |
+
+- 立即停止自动或并发重试，不得通过换脚本或重复创建任务绕过保护；优先遵循 `retryAfter`、`blockedUntil`，没有时按表中时长说明。
+- 450/453/454 必须先修正参数、授权或资源标识，冷却后最多谨慎重试一次；再次触发则停止调用。453 期间停止该店铺全部 SP-API。
+- 保留已有 `reportId`、`feedId` 等任务 ID；写操作结果不确定时先查询状态，不直接重放。
+- 向用户先说明店铺保护，再给原因、处理和等待时间。可回复：“为保护您的亚马逊店铺安全，检测到 Amazon SP-API 连续返回{原因}，当前已进入短暂保护。请先{处理动作}，预计{等待时间}后再试；这不代表封号，也不是套餐或算力限制。”不要只说“LinkFox 限流”或“服务器繁忙”。
+
+## 算力消耗规则
+
+不消耗算力（以网关实际计费为准）。
 
 ---
 *更多跨境 Skill：[LinkFox Skills](https://skill.linkfox.com/)*

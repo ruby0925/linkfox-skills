@@ -106,19 +106,19 @@ Get product attributes without historical data for faster response:
 
 **Boundary judgment**: If the user has a specific Walmart product ID or URL and wants detailed attributes, pricing history, or sales trends, this skill applies. If they want to search/browse products by keyword or category, use `linkfox-walmart-search` instead.
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
-## 积分消耗规则
+## 算力消耗规则
 
-按动态规则计费：消耗积分 = tokens × 10.5。只查商品详情、不带历史统计时 tokens = 1；顺带查近 90 天历史统计时每个商品详情 tokens = 2。
+按动态规则计费：消耗算力 = tokens × 10.5。只查商品详情、不带历史统计时 tokens = 1；顺带查近 90 天历史统计时每个商品详情 tokens = 2。
 
-> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量算力，必须提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

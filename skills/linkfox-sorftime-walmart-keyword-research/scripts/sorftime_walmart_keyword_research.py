@@ -22,6 +22,7 @@ import time
 import secrets
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
+from xml.etree import ElementTree
 
 for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
@@ -63,6 +64,61 @@ def get_api_key():
     return key
 
 
+def _decode_gateway_response(body, http_status=None, reason=None):
+    """Parse JSON responses and normalize gateway ToolErrorResponse XML."""
+    if body:
+        try:
+            return json.loads(body)
+        except json.JSONDecodeError:
+            try:
+                root = ElementTree.fromstring(body)
+                if root.tag.rsplit("}", 1)[-1] == "ToolErrorResponse":
+                    fields = {
+                        child.tag.rsplit("}", 1)[-1]: (child.text or "")
+                        for child in root
+                    }
+                    code = fields.get("errcode")
+                    if code is not None:
+                        try:
+                            code = int(code)
+                        except ValueError:
+                            pass
+                    return {"errcode": code, "errmsg": fields.get("errmsg", "")}
+            except ElementTree.ParseError:
+                pass
+
+    if http_status is not None:
+        label = f"HTTP {http_status}"
+        if reason:
+            label += f": {reason}"
+        result = {"error": label}
+    else:
+        result = {"error": "Invalid gateway response format"}
+    if body:
+        result["details"] = body
+    return result
+
+
+def _attach_gateway_cost_headers(result, headers):
+    """Expose gateway billing headers in the normalized JSON result."""
+    if not isinstance(result, dict) or headers is None:
+        return result
+    for header, field in (
+        ("X-Cost-Token", "costToken"),
+        ("X-Cost-Credit", "costCredit"),
+    ):
+        value = headers.get(header)
+        if value is None:
+            continue
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            pass
+        # The gateway headers are the authoritative values for this request.
+        result[field] = value
+    return result
+
+
 def call_api(params):
     api_url = get_api_url()
     api_key = get_api_key()
@@ -72,6 +128,7 @@ def call_api(params):
         "Content-Type": "application/json",
         "User-Agent": "LinkFox-Skill/2.0",
         "SESSION_ID": os.environ.get("SESSION_ID", ""),
+        "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
         "MODE_ID": os.environ.get("MODE_ID", ""),
         "APP_NAME": os.environ.get("APP_NAME", ""),
     }
@@ -82,14 +139,14 @@ def call_api(params):
         method="POST",
     )
     try:
-        with urlopen(req, timeout=120) as response:
-            return json.loads(response.read().decode("utf-8"))
+        with urlopen(req, timeout=150) as response:
+            body = response.read().decode("utf-8")
+            result = _decode_gateway_response(body)
+            return _attach_gateway_cost_headers(result, response.headers)
     except HTTPError as e:
         body = e.read().decode("utf-8") if e.fp else ""
-        try:
-            return json.loads(body) if body else {"error": f"HTTP {e.code}: {e.reason}"}
-        except Exception:
-            return {"error": f"HTTP {e.code}: {e.reason}", "details": body}
+        result = _decode_gateway_response(body, e.code, e.reason)
+        return _attach_gateway_cost_headers(result, e.headers)
     except URLError as e:
         return {"error": f"Connection failed: {e.reason}"}
 

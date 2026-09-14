@@ -63,6 +63,16 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 | dateRange | string | No | Relative time window, e.g. `last7Day`, `last30Day` |
 | currency | string | No | Currency for monetary metrics, e.g. `USD` |
 | language | string | No | Response language, e.g. `zh-CN`, `en-US` |
+| category_ids | array<string> | No | Category ID list filter |
+| shop_id | string | No | Shop ID filter |
+| creator_id | string | No | Creator ID filter |
+| video_id | string | No | Return products associated with the specified video |
+| livestream_id | string | No | Return products associated with the specified livestream |
+| revenue_range | string | No | Revenue / GMV range filter |
+| is_affiliate | string | No | Affiliate filter: `PUBLIC_PLAN` or `NON_AFFILIATE` |
+| commission_rate | number | No | Affiliate commission rate, e.g. `0.15` |
+| is_tts_product | integer | No | Fully managed product filter: `1` or `0` |
+| unit_price_range | string | No | Product unit-price range filter |
 | sortField | object | No | Sorting specification; omit for default ranking |
 | pageNumber | integer | No | Page number, 1-5 |
 | pageSize | integer | No | Page size, 5-100 |
@@ -81,7 +91,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 - **API 端点**：`POST /kalodata/product/rank` 或 `POST /kalodata/product/detail`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/kalodata_product_search.py '<JSON 参数>' [--inline]` 或 `python scripts/kalodata_product_detail.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-kalodata-tiktok-product-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -91,7 +101,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
@@ -99,7 +109,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Usage Examples
 
@@ -159,11 +169,11 @@ Run kalodata_product_search.py first, choose a row's product_id, then pass that 
 - Amazon / Shopify / 1688 product research (use the platform-specific skills)
 - TikTok advertising / ad campaign management or content creation
 
-## 积分消耗规则
+## 算力消耗规则
 
-每次调用消耗 7.0 积分。
+每次调用消耗 7.0 算力。
 
-> 用户会因积分消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对积分消耗量预期不足时，务必提醒用户，由用户决定是否继续。
+> 用户会因算力消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对算力消耗量预期不足时，务必提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

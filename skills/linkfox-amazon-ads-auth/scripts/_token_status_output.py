@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply status-only post-processing for token query auth scripts."""
+"""Apply status-only post-processing for token refresh scripts."""
 import json
 import sys
 

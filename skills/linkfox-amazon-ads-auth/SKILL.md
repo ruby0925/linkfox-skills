@@ -1,6 +1,6 @@
 ---
 name: linkfox-amazon-ads-auth
-description: 亚马逊广告（Amazon Ads）店铺授权与管理技能，提供完整的授权流程、已绑定账号与站点的查询、令牌刷新与读取等能力。发起授权链接时需要先向用户确认一个账号名称；一次授权即可自动发现并绑定同账号下所有可用站点的广告 profile（每个站点对应一个 profileId）。当用户提到亚马逊广告授权、Amazon Ads 授权、绑定广告账户、刷新广告令牌、查询 profile 列表、管理已授权广告账户、Amazon Advertising authorization, Ads token refresh, list profiles, ad account management时触发此技能。即使未明确提及"Amazon Ads"或"授权"，只要涉及亚马逊广告账号绑定、访问令牌管理或广告 profile 列表查询，也应触发。
+description: 亚马逊广告（Amazon Ads）店铺授权与管理技能，提供完整的授权流程、已绑定账号与站点的查询、令牌刷新与读取、当前用户广告授权连接解绑等能力。发起授权链接时需要先向用户确认一个账号名称；一次授权即可自动发现并绑定同账号下所有可用站点的广告 profile（每个站点对应一个 profileId）。当用户提到亚马逊广告授权、Amazon Ads 授权、绑定广告账户、解绑广告账户、断开广告连接、取消广告授权、刷新广告令牌、查询 profile 列表、管理已授权广告账户、Amazon Advertising authorization, Ads token refresh, list profiles, ad account management时触发此技能。即使未明确提及"Amazon Ads"或"授权"，只要涉及亚马逊广告账号绑定、访问令牌管理或广告 profile 列表查询，也应触发。
 ---
 
 # Amazon Ads 授权与广告账户管理
@@ -26,14 +26,15 @@ Amazon Ads 的授权（LWA OAuth）、profile 发现、访问令牌管理。**�
 | `profiles.py` | 列 profile 列表（`refresh=true` 穿透上游刷新） |
 | `refresh_token.py` | 刷新 accessToken |
 | `store_tokens.py` | 查授权/令牌**状态**（非下游 token 来源） |
+| `cancel_authorization.py` | 按 `authRecordId` 解绑广告连接 |
 
 入参、响应字段、错误码见 `references/api.md`。
 
 ## 调用方式
 
-- **API 端点**：`POST /amazonAds/{authorizeUrl|storeTokens|authorizedStores|refreshToken}`（完整参数/响应/错误码见 `references/api.md`）
+- **API 端点**：`POST /amazonAds/{authorizeUrl|storeTokens|authorizedStores|refreshToken|cancelAuthorization}`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/<脚本名>.py '<JSON 参数>' [--inline]`（可用脚本见上文）
-- **成本约束**：本工具会消耗积分；失败/空结果不得自动连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；失败/空结果不得自动连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/<skill-name>-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -43,13 +44,13 @@ Amazon Ads 的授权（LWA OAuth）、profile 发现、访问令牌管理。**�
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## 支持区域
 
@@ -89,6 +90,15 @@ Amazon Ads 的授权（LWA OAuth）、profile 发现、访问令牌管理。**�
 
 **静默原则**：映射成功时不播报 profileId 数值；仅在歧义或失败时向用户开口。
 
+### 5. 解绑广告连接
+
+仅在用户要求时执行。当前用户按 API key 对应的成员身份识别；共用该身份的使用者会一起受影响。
+
+1. 调 `profiles.py`（不传 `refresh=true`），按 `authRecordId` 定位连接；`authorized_stores.py` 按 profile 去重，不能据此判断完整授权关系。
+2. 展示连接下全部账户和站点；若用户只要求单站点，须先取得对整份连接解绑的明确同意。
+3. 调 `cancel_authorization.py`，传入选定的 `authRecordId`，不能用 `profileId` 替代。
+4. 按 `references/api.md` 解释结果；后续重新查询连接，不自动重新授权。
+
 ## 调用原则
 
 - 先问 `accountName` 再调 `authorize_url.py`
@@ -116,9 +126,25 @@ Amazon Ads 的授权（LWA OAuth）、profile 发现、访问令牌管理。**�
 - 修改 / 创建 / 删除广告 → 本系列为只读
 - 店铺订单 / 库存 / 财务 → `linkfox-amazon-store-*`
 
-## 积分消耗规则
+## Amazon Ads API 接口保护与重试指引
 
-不消耗积分。
+同一广告账号/profile 连续收到 Amazon Ads API 的 400、403、404 或 429 时，网关会返回 450、453、454 或 459 并短暂冷却。这些自定义状态码不是 Amazon 原生状态，也不表示封号；目的是避免持续异常或高频调用扩大广告账号风险。
+
+| 状态与 message | 范围 | 触发与冷却 | 处理 |
+|---|---|---|---|
+| `450`：`400，请求异常，请优化您的参数` | 广告账号/profile+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：20 分钟 | 停止原参数重试，检查 profileId、region、实体/报告 ID、日期和请求体 |
+| `453`：`403，店铺未授权，请先授权` | 广告账号/profile 全部接口 | 60 秒内超过 2 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 停止该广告账号调用，检查 Ads 授权、应用权限、profile 归属和区域 |
+| `454`：`404，资源不存在，请优化您的参数` | 广告账号/profile+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 确认资源 ID、所属 profile/区域、资源状态和接口路径 |
+| `459`：`429限流中，请降低频率` | 广告账号/profile+接口 | 首次：15 秒；2 分钟内超过 2 次：30 秒；3 分钟内超过 4 次：2 分钟 | 降低并发、分页和轮询频率并逐级退避 |
+
+- 立即停止自动或并发重试，不得通过换脚本或重复创建任务绕过保护；优先遵循 `retryAfter`、`blockedUntil`，没有时按表中时长说明。
+- 450/453/454 必须先修正参数、授权或资源标识，冷却后最多谨慎重试一次；再次触发则停止调用。453 期间停止该广告账号/profile 全部 Ads API。
+- 保留已有 `reportId` 等任务 ID；写操作结果不确定时先查询状态，不直接重放。
+- 向用户先说明广告账号保护，再给原因、处理和等待时间。可回复：“为保护您的亚马逊广告账号安全，检测到 Amazon Ads API 连续返回{原因}，当前已进入短暂保护。请先{处理动作}，预计{等待时间}后再试；这不代表封号，也不是套餐或积分限制。”不要只说“LinkFox 限流”或“服务器繁忙”。
+
+## 算力消耗规则
+
+不消耗算力。
 
 **Feedback:**
 

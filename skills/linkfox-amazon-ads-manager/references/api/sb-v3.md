@@ -2,6 +2,8 @@
 
 V3 仅用于历史 Legacy Campaign。共存与路由规则见 [sb-coexistence.md](./sb-coexistence.md)。
 
+注意：V3 是保留的 Legacy 兼容入口，不是 V4 的替代方案。部分 profile 或 Amazon Ads 应用权限下，V3 主资源可能返回 deprecated / access denied 类错误；新业务应优先用 V4。
+
 ## 脚本
 
 | 脚本 | Amazon 路径 | 方法 | 说明 |

@@ -17,5 +17,5 @@ if __name__ == "__main__":
         method="PUT",
         content_type="application/json",
         api_version="V3",
-        resource_version="V3.2_SHARED_TARGETING",
+        resource_version="SHARED_TARGETING",
     )

@@ -27,7 +27,7 @@ from urllib.error import HTTPError, URLError
 API_PATH = "/fastmoss/productRankTopSelling"
 SLUG = "linkfox-fastmoss-product-rank-top-selling"
 
-# 响应小于等于该字节数时，直接全量输出，不落文件
+# 响应小于等于该字节数时，落盘后直接全量输出
 SMALL_THRESHOLD = 8000
 CACHE_TTL_SEC = 24 * 60 * 60
 
@@ -45,7 +45,7 @@ def get_api_url():
 def get_api_key():
     """
 获取配置在环境变量的API Key。
-如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
 """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -66,6 +66,7 @@ def call_api(params):
         "Content-Type": "application/json",
         "User-Agent": "LinkFox-Skill/2.0",
         "SESSION_ID": os.environ.get("SESSION_ID", ""),
+        "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
         "MODE_ID": os.environ.get("MODE_ID", ""),
         "APP_NAME": os.environ.get("APP_NAME", ""),
     }
@@ -337,7 +338,7 @@ def main():
     ts = int(time.time())
     out_path = _resolve_output_path(ts)
     try:
-        with open(out_path, "w") as f:
+        with open(out_path, "w", encoding="utf-8") as f:
             f.write(serialized)
         print(f"Saved full response: {out_path} ({len(serialized)} bytes)")
         if result.get("_cache", {}).get("hit"):

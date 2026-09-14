@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Update SB targets for V4 campaigns.
+"""Update SB targets for V4 campaign management.
 
 Required JSON: profileId, region, payload (Amazon-native request body).
-V3 entry points reject an explicitly identified MULTI_AD_GROUP campaign.
+Uses Amazon shared sb/targets targeting path; this is not a V4->V3 fallback.
 """
 import sys
 from pathlib import Path
@@ -17,5 +17,5 @@ if __name__ == "__main__":
         method="PUT",
         content_type="application/json",
         api_version="V4",
-        resource_version="V3.2_SHARED_TARGETING",
+        resource_version="SHARED_TARGETING",
     )

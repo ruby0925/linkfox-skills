@@ -47,7 +47,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/keywords/list"
-ENTITY_CONTENT_TYPE = "application/vnd.spkeyword.v3+json"
+ENTITY_CONTENT_TYPE = "application/vnd.spKeyword.v3+json"
 RESPONSE_KEY = "keywords"
 
 FILTER_KEYS = [

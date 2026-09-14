@@ -5,7 +5,7 @@
 - **请求地址（直播榜单）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/livestream/rank`
 - **请求地址（直播详情）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/livestream/detail`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 
@@ -23,6 +23,11 @@ POST Body（JSON），所有参数均可选：
 | pageSize | integer | 否 | 每页数量，取值 5–100 |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US`。最大长度 1000 |
 | currency | string | 否 | 货币单位，例如 `USD`。最大长度 1000 |
+| category_id | string | 否 | 类目 ID 筛选 |
+| shop_id | string | 否 | 店铺 ID 筛选 |
+| creator_id | string | 否 | 达人 ID 筛选 |
+| product_id | string | 否 | 商品 ID 筛选 |
+| followers_range | string | 否 | 达人粉丝数范围筛选 |
 | sortField | object | 否 | 排序条件，结构由网关定义；不排序时传空对象 `{}` 走默认榜单顺序 |
 
 > 该接口用于浏览直播榜单，不支持关键词搜索。`sortField` 在 `inputSchema` 中声明为对象（`properties` 为空）；默认按 `revenue`（GMV）降序排列，传入空对象 `{}` 走默认排序。可用的排序字段以网关实际接受的为准；若传入不被支持的排序字段，网关会返回业务错误，此时应回退为默认排序，不要尝试其它绕过逻辑。
@@ -170,8 +175,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和积分问题** 处理 |
-| 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和算力问题** 处理 |
+| 402 | 算力不足 | HTTP 402：按 SKILL.md 的 **解决认证和算力问题** 处理 |
 | 501 | 上游调用失败 / 参数无效 | 多种形态：①`errmsg` 形如 `调用 Kalodata 接口失败: Kalodata API HTTP 554: `（上游 Kalodata 瞬时错误），用相同参数重试 1-2 次，不要改参数；持续失败联系网关侧确认 Kalodata 上游配置。②`errmsg` 形如 `page_number 范围为 1-5，当前: 999`（榜单页码越界），修正参数后重试。③详情接口缺少必填 `livestreamId` 时也会返回 501，核对 ID 是否来自榜单结果 |
 | 其他非 200 值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 

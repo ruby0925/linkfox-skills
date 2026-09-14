@@ -9,9 +9,9 @@ This skill guides you on how to query and analyze the TikTok top selling product
 
 ## Core Concepts
 
-The TikTok Top Selling Ranking tracks the best-performing products on TikTok Shop across 9 global markets. It reveals which products are leading in sales volume, GMV, and growth rate over configurable time windows (daily, weekly, monthly). This is an essential tool for product scouting, trend analysis, and competitive intelligence in TikTok e-commerce.
+The TikTok Top Selling Ranking tracks the best-performing products on TikTok Shop across 15 global markets. It reveals which products are leading in sales volume, GMV, and growth rate over configurable time windows (daily, weekly, monthly). This is an essential tool for product scouting, trend analysis, and competitive intelligence in TikTok e-commerce.
 
-**Data scope**: The ranking covers 9 TikTok Shop markets and supports three time granularities — day, week, and month — via the `dateInfo` parameter. Each product entry includes sales volume, GMV, growth rate, commission rate, shop information, category, and more.
+**Data scope**: The ranking covers 15 TikTok Shop markets and supports three time granularities — day, week, and month — via the `dateInfo` parameter. Each product entry includes sales volume, GMV, growth rate, commission rate, shop information, category, and more.
 
 **dateInfo format is important**:
 - type: `"day"` -> value: `"2025-02-01"` (YYYY-MM-DD)
@@ -24,7 +24,7 @@ The TikTok Top Selling Ranking tracks the best-performing products on TikTok Sho
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| region | string | Yes | Market region code (US, GB, MX, ES, ID, VN, MY, TH, PH) |
+| region | string | Yes | Market region code (US, GB, MX, ES, DE, IT, FR, ID, VN, MY, TH, PH, BR, JP, SG) |
 | dateInfo | object | Yes | Date specification with `type` (day/week/month) and `value` (see format above) |
 | category | string | No | Category name in English, matched to TikTok category ID. Non-English input should be translated first |
 | orderby | object | No | Sorting: `field` (units_sold/gmv/total_units_sold/total_gmv/growth_rate) + `order` (desc/asc). Default: desc |
@@ -39,11 +39,17 @@ The TikTok Top Selling Ranking tracks the best-performing products on TikTok Sho
 | GB | United Kingdom |
 | MX | Mexico |
 | ES | Spain |
+| DE | Germany |
+| IT | Italy |
+| FR | France |
 | ID | Indonesia |
 | VN | Vietnam |
 | MY | Malaysia |
 | TH | Thailand |
 | PH | Philippines |
+| BR | Brazil |
+| JP | Japan |
+| SG | Singapore |
 
 Default market is **US**. Use US when the user does not specify a market.
 
@@ -51,7 +57,7 @@ Default market is **US**. Use US when the user does not specify a market.
 
 - **API 端点**：`POST /fastmoss/productRankTopSelling`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/fastmoss_product_rank_top_selling.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-fastmoss-product-rank-top-selling-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -60,13 +66,13 @@ Default market is **US**. Use US when the user does not specify a market.
 - 加 `--inline` 强制全量打印到 stdout（同样落盘）
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Usage Examples
 
@@ -102,9 +108,9 @@ region: "US", dateInfo: {"type": "day", "value": "2026-04-15"}, category: "Beaut
 | Product ID | productId | Unique product identifier |
 | Region | region | Market region code |
 | Price | price | Product price |
-| Min Price | minPrice | Lowest price |
-| Max Price | maxPrice | Highest price |
-| Currency | currency | Currency code |
+| Min Price | minPrice | Lowest price; optional and present only for price-range products |
+| Max Price | maxPrice | Highest price; optional and present only for price-range products |
+| Currency | currency | Currency symbol or label returned by the API |
 | Total Sales | totalSaleCnt | Total units sold |
 | 1-Day Sales | totalSale1dCnt | Units sold in the last 1 day (when dateType=day) |
 | 7-Day Sales | totalSale7dCnt | Units sold in the last 7 days (when dateType=week) |
@@ -118,9 +124,16 @@ region: "US", dateInfo: {"type": "day", "value": "2026-04-15"}, category: "Beaut
 | Shop Total Units Sold | shopTotalUnitsSold | Total units sold by the shop |
 | Shop Seller ID | shopSellerId | Unique shop seller identifier |
 | Category Name | categoryName | Product category |
+| Category IDs | categoryIds | Category ID path from level 1 to level 3 |
 | Commission Rate | productCommissionRate | Commission rate in basis points (1000 = 10%) |
 | Image URL | imageUrl | Product image URL |
+| Cover URLs | coverUrl | Product cover image URL list |
+| Shop Avatar | shopAvatar | Shop avatar URL |
+| Source Tool | sourceTool | Source tool identifier |
+| Source Type | sourceType | Product source type |
 | Delisted Status | offShelvesText | Delisted indicator ("是" = delisted, "否" = active) |
+
+Top-level responses include `errcode`, `errmsg`, `page`, `pageSize`, `total`, `products`, `columns`, `type`, and `costTime`. Some response variants may also include `costToken`, `matchedCategoryIdPath`, or `matchedCategoryNamePath`; consumers should treat these as optional.
 
 ## Display Rules
 
@@ -163,11 +176,11 @@ region: "US", dateInfo: {"type": "day", "value": "2026-04-15"}, category: "Beaut
 
 **Boundary judgment**: When users say "product research" or "what's selling well", if the context clearly involves TikTok Shop or TikTok e-commerce rankings, this skill applies. If they are asking about Amazon, Shopify, or other platforms, it does not apply. If they want to search products by keyword rather than browse rankings, use linkfox-fastmoss-product-search instead.
 
-## 积分消耗规则
+## 算力消耗规则
 
-消耗 11 积分。
+消耗 11 算力。
 
-> 用户会因积分消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对积分消耗量预期不足时，务必提醒用户，由用户决定是否继续。
+> 用户会因算力消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对算力消耗量预期不足时，务必提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

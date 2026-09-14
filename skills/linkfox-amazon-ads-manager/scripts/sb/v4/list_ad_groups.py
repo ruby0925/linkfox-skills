@@ -16,7 +16,8 @@ if __name__ == "__main__":
     run_post_token_list(
         __doc__,
         path="sb/v4/adGroups/list",
-        content_type="application/json",
+        content_type="application/vnd.sbadgroupresource.v4+json",
+        accept="application/vnd.sbadgroupresource.v4+json",
         response_key="adGroups",
         api_version="V4",
         resource_version="V4",

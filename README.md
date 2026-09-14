@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Open%20Standard-orange)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-142-brightgreen)](#skills-catalog)
+[![Skills](https://img.shields.io/badge/skills-153-brightgreen)](#skills-catalog)
 
-**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 142 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
+**LinkFox Skills** is an AI skill set designed for cross-border e-commerce. It provides 153 API-driven skills covering product research, competitor analysis, keyword tracking, Amazon Ads reporting, patent search, compliance detection, and more.
 
 Built on the [Agent Skills](https://agentskills.io) open standard, compatible with Claude Code, Cursor, GitHub Copilot, and 30+ AI agent platforms.
 
@@ -58,7 +58,6 @@ Get your API key and configure the environment before using any skill.
 | Skill | Description |
 | --- | --- |
 | `linkfox-aba-intelligent-query` | Aba Intelligent Query |
-| `linkfox-amazon-ads` | Amazon Ads |
 | `linkfox-amazon-ads-auth` | Amazon Ads OAuth authorization, profile discovery, and access-token management |
 | `linkfox-amazon-ads-manager` | Manage Amazon Ads SP/SB/SD entities: list, create, and update campaigns, ad groups, keywords, targets, product ads, and budget rules |
 | `linkfox-amazon-ads-report` | One-stop Amazon Ads SP/SB reporting: request, poll, download, and auto-extract |
@@ -68,7 +67,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-opportunity-search-by-metrics` | Amazon Opportunity Search By Metrics |
 | `linkfox-amazon-policy-feed` | Query Amazon latest policy and regulation feed with AI Chinese summaries, and read full article bodies by record ID |
 | `linkfox-amazon-product-detail` | Get detailed Amazon product info by ASIN (price, BSR, bullets, etc.) |
-| `linkfox-amazon-product-selection` | Amazon Product Selection |
 | `linkfox-amazon-reviews-list` | Amazon Reviews List |
 | `linkfox-amazon-search` | Search Amazon products by keyword with real-time ranking data |
 | `linkfox-amazon-search-by-image` | Find similar Amazon products using image-based search |
@@ -82,7 +80,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-amazon-store-fulfillment-inbound` | Manage Amazon FBA inbound plans, packing, placement, transportation, shipments, delivery windows, labels, and bills of lading with Fulfillment Inbound v2024-03-20 and retained v0 operations |
 | `linkfox-amazon-store-fulfillment-outbound` | Manage Amazon Multi-Channel Fulfillment quotes, previews, orders, tracking, sandbox status simulations, and related invoice-header discovery with Fulfillment Outbound v2026-07-04 |
 | `linkfox-amazon-store-listings` | Amazon Store Listings |
-| `linkfox-amazon-store-operations` | Amazon Store Operations |
 | `linkfox-amazon-store-orders` | Amazon Store Orders |
 | `linkfox-amazon-store-pricing` | Amazon Store Pricing |
 | `linkfox-amazon-store-report` | Amazon Store Report |
@@ -146,7 +143,7 @@ Get your API key and configure the environment before using any skill.
 | --- | --- |
 | `linkfox-mpstats-ozon-brand-products` | Drill into all Ozon SKUs under a brand with filters, sorting, and currency conversion via MPSTATS |
 | `linkfox-mpstats-ozon-category-products` | Drill into all Ozon SKUs under a Russian category path with filters for niche mining via MPSTATS |
-| `linkfox-mpstats-ozon-product-detail` | Batch-fetch full Ozon product card (price, sales, stock, rating, lost profit) for up to 100 SKUs via MPSTATS |
+| `linkfox-mpstats-ozon-product-detail` | Fetch one full Ozon product card by productId (price, sales, stock, rating, lost profit) via MPSTATS |
 | `linkfox-mpstats-ozon-product-search` | Search Ozon (Russia) products by Russian keyword, SKU list, brand, or seller - the MPSTATS Ozon discovery entry point |
 | `linkfox-mpstats-ozon-product-trend` | Daily time-series for a single Ozon SKU (sales, price, stock, optional search visibility) via MPSTATS |
 | `linkfox-mpstats-ozon-seller-products` | Drill into all Ozon SKUs under a seller ID for shop structure audits via MPSTATS |
@@ -214,7 +211,7 @@ Get your API key and configure the environment before using any skill.
 | --- | --- |
 | `linkfox-sorftime-amazon-product-detail` | Sorftime Amazon Product Detail |
 | `linkfox-sorftime-amazon-product-query` | Sorftime Amazon Product Query |
-| `linkfox-sorftime-walmart-category-market` | Retrieve the Walmart US category tree, match natural-language category names, and analyze category markets with Best Seller Top 80 data via Sorftime |
+| `linkfox-sorftime-walmart-category-market` | Retrieve the Walmart US category tree, match natural-language category names, and analyze category markets with returned Best Seller product data via Sorftime |
 | `linkfox-sorftime-walmart-keyword-research` | Research Walmart keywords, product-keyword relationships, related terms, and saved keyword folders via Sorftime |
 | `linkfox-sorftime-walmart-product-analysis` | Find Walmart products by natural-language name and query product details, trends, and variant sales via Sorftime |
 
@@ -273,7 +270,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-1688-procurement` | Run authorized 1688 procurement workflows including OAuth checks, SKU and address lookup, order preview, guarded order creation, payment links, order status, logistics, cancellation, and receipt confirmation |
 | `linkfox-1688-product-detail` | Retrieve 1688 product details by offer ID with one-piece retail prices, wholesale tiers for two or more units, SKU stock, logistics, and supplier data |
 | `linkfox-1688-search-by-image` | Find similar 1688 supplier products using image-based visual search |
-| `linkfox-1688-sourcing` | 1688 Sourcing |
 | `linkfox-ai-mode-google-search` | Ai Mode Google Search |
 | `linkfox-aigc-imagegen` | Aigc Imagegen |
 | `linkfox-aigc-imagegen-brand-gene-extract` | Aigc Imagegen Brand Gene Extract |
@@ -282,11 +278,21 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-aigc-textgen` | Aigc Textgen |
 | `linkfox-aigc-videogen` | Aigc Videogen |
 | `linkfox-aigc-videogen-multi` | Aigc Videogen Multi |
-| `linkfox-ecommerce-compliance-detection` | Ecommerce Compliance Detection |
+| `linkfox-chuhaijiang-tiktok-ads` | Research public TikTok ads and creative assets with filtered discovery, detailed performance data, promoted-product relationships, content-structure analysis, and embeddings |
+| `linkfox-chuhaijiang-tiktok-creator` | Research TikTok creators with multi-filter search, detailed profiles, related livestream/product/video drill-downs, and agency, commerce, and follower-growth rankings |
+| `linkfox-chuhaijiang-tiktok-live` | Research public TikTok livestream commerce with multi-filter discovery, detailed room and performance metrics, and products sold in each livestream |
+| `linkfox-chuhaijiang-tiktok-product` | Research TikTok Shop products with multi-filter search, detailed metrics, creator/live/video/review relationships, three rankings, and image similarity search |
+| `linkfox-chuhaijiang-tiktok-shop` | Research TikTok Shop stores with multi-filter discovery, detailed profiles, creator/product/video relationships, and most-promoted and top-selling rankings |
+| `linkfox-chuhaijiang-tiktok-video` | Research public TikTok videos with multi-filter discovery, detailed performance profiles, promoted-product relationships, and public comment drill-downs |
+| `linkfox-damai-mercado-market-intelligence` | Research Mercado Libre markets across Mexico, Brazil, Argentina, Chile, and Colombia with Damai category, industry, product, sales-trend, image-similarity, and review data through the LinkFox gateway |
 | `linkfox-etsy-category-search` | Etsy Category Search |
 | `linkfox-etsy-product-detail` | Retrieve one public Etsy listing with pricing, images, variants, inventory, shipping, shop, ratings, and review data |
 | `linkfox-etsy-product-query` | Etsy Product Query |
 | `linkfox-etsy-store-query` | Etsy Store Query |
+| `linkfox-geekbi-temu-market-research` | Research Temu category opportunities and buyer-demand keywords by marketplace, demand, revenue, price, supply, semi-managed penetration, and daily, weekly, or monthly growth |
+| `linkfox-geekbi-temu-product` | Search and filter Temu products and retrieve product details and 30-day history via GeekBI, with internal region and category ID resolution |
+| `linkfox-geekbi-temu-search-by-image` | Find visually similar or matching Temu products from an image for product research and competitor discovery |
+| `linkfox-geekbi-temu-shop` | Search and benchmark Temu shops by marketplace, category, sales, revenue, ratings, followers, product count, average order value, hosting mode, and opening date, with internal region and category ID resolution |
 | `linkfox-lingxing-erp` | Lingxing Erp |
 | `linkfox-maidalv-product-tro-detection` | Detect product TRO (Temporary Restraining Order) and trademark/patent/copyright infringement risk from a product image, returning risk level, infringement items, TRO plaintiff info, and an AI legal report |
 | `linkfox-mercado-product-selection` | Query Mercado Libre (Mexico, Brazil, Argentina, Chile, Colombia) product, catalog, keyword, category, trend, seller, review, exchange-rate, and plan-usage data via 24 tools through the LinkFox gateway |
@@ -360,7 +366,6 @@ Get your API key and configure the environment before using any skill.
 | `linkfox-temu-returns-refunds-us` | Temu Returns Refunds Us |
 | `linkfox-temu-store-query` | Temu Store Query |
 | `linkfox-temu-tax-eu` | Temu Tax Eu |
-| `linkfox-tiktok-selection-and-shoppable-video` | Tiktok Selection And Shoppable Video |
 | `linkfox-tiktok-shop-product-detail` | Retrieve one public TikTok Shop product with pricing, sales, SKU inventory, media, seller, reviews, shipping, and promotion data |
 | `linkfox-tsearch-search` | Tsearch Search |
 | `linkfox-wallysmarter-product-detail` | Walmart product detail with historical pricing and sales trends via WallySmarter |

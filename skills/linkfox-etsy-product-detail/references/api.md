@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/etsy/product/detail`
 - **请求方式**：POST，`Content-Type: application/json`
-- **认证方式**：Header `Authorization: <api_key>`；api_key 优先从 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（未配置时按 SKILL.md 的「解决认证和积分问题」处理）
+- **认证方式**：Header `Authorization: <api_key>`；api_key 优先从 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（未配置时按 SKILL.md 的「解决认证和算力问题」处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **透传请求头**：`SESSION_ID`、`MODE_ID`、`APP_NAME`（均从同名环境变量读取，未配置时为空字符串）
 - **超时**：150s
@@ -122,8 +122,8 @@ POST Body（JSON）：
 | 非 Listing 页面、非 Etsy 域名或路径层级过深 | 网关业务错误 | 核对 host，并使用 `/listing/<数字ID>` 加至多一个标题 slug 的路径 |
 | Listing 不存在、不可访问或返回空数组 | 网关业务错误，不应当作“成功空列表” | 核对链接；不要自动改链接连续试探 |
 | 上游返回多个有效 Listing | 网关业务错误 | 视为上游结果异常；本接口不截断、不返回批量结果 |
-| 401 | 鉴权失败 | 按 SKILL.md 的「解决认证和积分问题」处理 |
-| 402 | 积分不足 | 按 SKILL.md 的「解决认证和积分问题」处理 |
+| 401 | 鉴权失败 | 按 SKILL.md 的「解决认证和算力问题」处理 |
+| 402 | 算力不足 | 按 SKILL.md 的「解决认证和算力问题」处理 |
 | 超时或上游异常 | 连接错误、5xx 或业务错误 | 告知用户；不要连续自动重试产生额外费用 |
 
 公开页面结构变化会导致字段缺失、空字符串、null 或偶发误识别。调用方应如实展示，不应自行推断或静默修复。

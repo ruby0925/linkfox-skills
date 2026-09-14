@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/tiktok/shop/product/detail`
 - **请求方式**：POST，`Content-Type: application/json`
-- **认证方式**：Header `Authorization: <api_key>`；api_key 优先从 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（未配置时按 SKILL.md 的「解决认证和积分问题」处理）
+- **认证方式**：Header `Authorization: <api_key>`；api_key 优先从 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（未配置时按 SKILL.md 的「解决认证和算力问题」处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **透传请求头**：`SESSION_ID`、`MODE_ID`、`APP_NAME`（均从同名环境变量读取，未配置时为空字符串）
 - **超时**：150s
@@ -114,8 +114,8 @@ POST Body（JSON）：
 | region 不支持 | 网关业务错误 | 改用文档列出的站点代码 |
 | 商品不存在、地区不可访问或返回空商品数组 | 网关业务错误，不返回“成功空列表” | 核对商品与地区；不要自动轮询其他地区 |
 | 上游返回多个有效商品 | 网关业务错误 | 视为上游结果异常；本接口不截断、不返回批量结果 |
-| 401 | 鉴权失败 | 按 SKILL.md 的「解决认证和积分问题」处理 |
-| 402 | 积分不足 | 按 SKILL.md 的「解决认证和积分问题」处理 |
+| 401 | 鉴权失败 | 按 SKILL.md 的「解决认证和算力问题」处理 |
+| 402 | 算力不足 | 按 SKILL.md 的「解决认证和算力问题」处理 |
 | 超时或上游异常 | 连接错误、5xx 或业务错误 | 告知用户；不要连续自动重试产生额外费用 |
 
 返回字段可能因商品、卖家、地区和页面上下文而缺失。即使商品下架或库存为 0，也可能返回结构化详情。

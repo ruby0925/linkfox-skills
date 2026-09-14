@@ -1,6 +1,6 @@
 ---
 name: linkfox-amazon-store-fba
-description: 亚马逊店铺 Fulfillment by Amazon（FBA）系列（与 linkfox-amazon-store-auth 同系列），经 /spApi/developerProxy 调用 SP-API：FBA Inbound Eligibility（getItemEligibilityPreview）、FBA Inventory（getInventorySummaries/createInventoryItem/deleteInventoryItem/addInventory）、Fulfillment Inbound v2024-03-20（InboundPlan/装箱/放置/运输/货件等）与 v0（prepInstructions/labels/BOL/shipments）、Fulfillment Outbound 2020-07-01（MCF 履约单/预览/退货/tracking/features）。当用户提到 FBA、入仓资格、Inbound Eligibility、FBA 库存摘要、Send to Amazon、Inbound Plan、FBA 货件、MCF、多渠道履约、getItemEligibilityPreview、getInventorySummaries、createInboundPlan、createFulfillmentOrder 时触发。与 External Fulfillment / 普通 Orders 不同。
+description: 亚马逊 FBA 综合管理技能。用于查询商品入仓资格与 FBA 库存，调整库存，并处理 FBA 入仓计划、装箱、放置、运输、货件、标签、提单以及旧版 MCF 多渠道履约订单、退货和跟踪等跨域流程。用户提到亚马逊 FBA、入仓资格、Inbound Eligibility、FBA 库存摘要、Send to Amazon、Inbound Plan、FBA 货件、旧版 MCF、getItemEligibilityPreview、getInventorySummaries、createInboundPlan、createFulfillmentOrder 时触发。若需求专门涉及 Fulfillment Inbound v2024-03-20 入仓流程，优先使用 linkfox-amazon-store-fulfillment-inbound；涉及 Fulfillment Outbound v2026-07-04 新版 MCF，使用 linkfox-amazon-store-fulfillment-outbound；External Fulfillment 和普通卖家订单不属于此技能。
 ---
 
 # Amazon 店铺 Fulfillment by Amazon (FBA)
@@ -26,9 +26,9 @@ description: 亚马逊店铺 Fulfillment by Amazon（FBA）系列（与 linkfox-
 
 **输出策略**：完整响应落盘到 `linkfox/<date>/<session>/data/linkfox-amazon-store-fba-*.json`；>8KB 默认摘要；`--inline` 全量打印。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 
-发生未配置 API Key、401/402、积分不足时，采用 `references/onboarding.md` 引导。
+发生未配置 API Key、401/402、算力不足时，采用 `references/onboarding.md` 引导。
 
 ## Prerequisites
 
@@ -102,9 +102,25 @@ python scripts/fba_api.py '{"api":"listInboundPlans","sellerId":"A1...","region"
 - Inbound 状态机复杂，需按官方工作流顺序调用；冲突常见 **409/422**
 - 限速因接口而异（Eligibility 约 1 rps），注意 **429**
 
-## 积分消耗规则
+## Amazon SP-API 接口保护与重试指引
 
-不消耗积分（以网关实际计费为准）。
+同一店铺连续收到 Amazon SP-API 的 400、403、404 或 429 时，网关会返回 450、453、454 或 459 并短暂冷却。这些自定义状态码不是 Amazon 原生状态，也不表示封号；目的是避免持续异常或高频调用扩大店铺风险。
+
+| 状态与 message | 范围 | 触发与冷却 | 处理 |
+|---|---|---|---|
+| `450`：`400，请求异常，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：20 分钟 | 停止原参数重试，检查必填字段、marketplace、ID、日期和请求体 |
+| `453`：`403，店铺未授权，请先授权` | 店铺全部接口 | 60 秒内超过 2 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 停止该店铺调用，检查授权、权限、店铺归属和区域 |
+| `454`：`404，资源不存在，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 确认资源 ID、所属店铺/站点、资源状态和接口路径 |
+| `459`：`429限流中，请降低频率` | 店铺+接口 | 首次：15 秒；2 分钟内超过 2 次：30 秒；3 分钟内超过 4 次：2 分钟 | 降低并发、分页和轮询频率并逐级退避 |
+
+- 立即停止自动或并发重试，不得通过换脚本或重复创建任务绕过保护；优先遵循 `retryAfter`、`blockedUntil`，没有时按表中时长说明。
+- 450/453/454 必须先修正参数、授权或资源标识，冷却后最多谨慎重试一次；再次触发则停止调用。453 期间停止该店铺全部 SP-API。
+- 保留已有 `reportId`、`feedId` 等任务 ID；写操作结果不确定时先查询状态，不直接重放。
+- 向用户先说明店铺保护，再给原因、处理和等待时间。可回复：“为保护您的亚马逊店铺安全，检测到 Amazon SP-API 连续返回{原因}，当前已进入短暂保护。请先{处理动作}，预计{等待时间}后再试；这不代表封号，也不是套餐或算力限制。”不要只说“LinkFox 限流”或“服务器繁忙”。
+
+## 算力消耗规则
+
+不消耗算力（以网关实际计费为准）。
 
 **Feedback：** `skillName`：`linkfox-amazon-store-fba`
 

@@ -5,7 +5,7 @@
 - **请求地址（店铺榜单）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/shop/rank`
 - **请求地址（店铺详情）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/shop/detail`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 
@@ -23,6 +23,9 @@ POST Body（JSON），所有参数均可选：
 | pageSize | integer | 否 | 每页数量，取值 5-100 |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US`。最大长度 1000 |
 | currency | string | 否 | 货币单位，例如 `USD`。最大长度 1000 |
+| category_ids | array<string> | 否 | 类目 ID 列表筛选；指定后返回对应类目下的成交金额 |
+| revenue_range | string | 否 | 成交金额 / GMV 范围，左闭右开 |
+| shop_type | string | 否 | 店铺类型：`BRAND`（品牌）或 `RETAILER`（零售商） |
 | sortField | object | 否 | 排序条件；不排序时传空对象 `{}` 走默认榜单顺序 |
 
 > 默认按 `revenue`（GMV）降序排列，每条记录带 `rank` 位次。可用排序字段以网关实际接受的为准；若传入不支持的排序字段，回退默认排序，不要尝试其它绕过逻辑。
@@ -34,6 +37,7 @@ POST Body（JSON）：
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | shopId | string | 是 | TikTok 店铺唯一 ID（字符串，避免大整数精度丢失），例如 `7495514739648989419`。可从店铺榜单响应的 `shop_id` 字段获取 |
+| category_id | string | 否 | 类目 ID，可进一步限定返回的类目维度 |
 | region | string | 否 | 地区/市场编码，例如 `US`。最大长度 1000 |
 | dateRange | string | 否 | 时间范围，例如 `last7Day`、`last30Day`。最大长度 1000 |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US`。最大长度 1000 |
@@ -176,8 +180,8 @@ POST Body（JSON）：
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
 | 400 | 参数缺失/非法 | 如详情缺 `shopId` 时返回 `errmsg: shopId 为必填参数`；按 `errmsg` 修正后重试 |
-| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和积分问题** 处理 |
-| 402 | 积分不足 | 按 SKILL.md 的 **解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和算力问题** 处理 |
+| 402 | 算力不足 | 按 SKILL.md 的 **解决认证和算力问题** 处理 |
 | 501 | 上游调用失败 / 参数越界 | 两种形态：①`errmsg` 形如 `调用 Kalodata 接口失败: Kalodata API HTTP 554: `（上游 Kalodata 瞬时错误），用相同参数重试 1-2 次，不要改参数。②`errmsg` 形如 `page_number 范围为 1-5，当前: 999`（榜单参数越界），修正参数后重试 |
 | 其他非 200 值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 

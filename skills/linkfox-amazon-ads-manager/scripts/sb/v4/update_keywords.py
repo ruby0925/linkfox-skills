@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Update SB keywords for V4 campaigns.
+"""Update SB keywords for V4 campaign management.
 
 Required JSON: profileId, region, payload (Amazon-native request body).
-V3 entry points reject an explicitly identified MULTI_AD_GROUP campaign.
+Uses Amazon shared sb/keywords targeting path; this is not a V4->V3 fallback.
 """
 import sys
 from pathlib import Path
@@ -16,6 +16,7 @@ if __name__ == "__main__":
         path="sb/keywords",
         method="PUT",
         content_type="application/json",
+        accept="application/vnd.sbkeywordresponse.v3+json",
         api_version="V4",
         resource_version="V3_SHARED_TARGETING",
     )

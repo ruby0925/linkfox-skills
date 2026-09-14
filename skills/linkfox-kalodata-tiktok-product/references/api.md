@@ -5,7 +5,7 @@
 - **请求地址（商品榜单）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/product/rank`
 - **请求地址（商品详情）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/product/detail`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 
@@ -21,6 +21,16 @@ POST Body（JSON），所有参数均可选：
 | dateRange | string | 否 | 相对日期范围，例如 `last7Day`、`last30Day` |
 | currency | string | 否 | 货币代码，例如 `USD` |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US` |
+| category_ids | array<string> | 否 | 类目 ID 列表筛选 |
+| shop_id | string | 否 | 店铺 ID 筛选 |
+| creator_id | string | 否 | 达人 ID 筛选 |
+| video_id | string | 否 | 返回指定视频关联的商品 |
+| livestream_id | string | 否 | 返回指定直播关联的商品 |
+| revenue_range | string | 否 | 成交金额 / GMV 范围，左闭右开 |
+| is_affiliate | string | 否 | 是否联盟商品：`PUBLIC_PLAN`（是）或 `NON_AFFILIATE`（否） |
+| commission_rate | number | 否 | 联盟商品佣金率，例如 `0.15` |
+| is_tts_product | integer | 否 | 是否全托管商品：`1`（全托管）或 `0`（非全托管） |
+| unit_price_range | string | 否 | 商品价格范围，左闭右开 |
 | sortField | object | 否 | 排序规格对象，省略时使用默认排行 |
 | pageNumber | integer | 否 | 页码，范围 1–5 |
 | pageSize | integer | 否 | 每页条数，范围 5–100 |
@@ -174,8 +184,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段。注意：合法但无数据的请求（如不支持的 `region`）可能返回 200 但响应中**不含 `data` 字段**（空结果），且仍会扣费 |
-| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和积分问题** 处理 |
-| 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和算力问题** 处理 |
+| 402 | 算力不足 | HTTP 402：按 SKILL.md 的 **解决认证和算力问题** 处理 |
 | 501 | 上游调用失败 / 参数错误 | 两种形态：①`errmsg` 形如 `调用 Kalodata 接口失败: Kalodata API HTTP 5xx: `（如 522/554，上游 Kalodata 瞬时错误），用相同参数重试 1-2 次，不要改参数；持续失败联系网关侧确认 Kalodata 上游配置（如服务端 `KALODATA_SECRET_KEY` 是否配置）。②`errmsg` 形如参数校验错误（如 `page_number 范围为 1-5`、`productId` 缺失或非法），修正参数后重试 |
 | 其他非200值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 

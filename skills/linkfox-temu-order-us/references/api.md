@@ -2,7 +2,7 @@
 
 Temu **美国站订单管理**（Partner US **Order / 订单发货** 相关接口），经本 skill `temu_us_proxy`（`POST /temu/proxy`） 转发。Temu 的 `type` 写在 Body，**不是** URL 路径。
 
-> 网关与鉴权：本 skill `scripts/`（`LINKFOXAGENT_API_KEY`、`accessToken` / `storeKey`）。订单场景 token 见 `references/access-token.md`（`tokenPurpose=order-shipping`）。（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+> 网关与鉴权：本 skill `scripts/`（`LINKFOXAGENT_API_KEY`、`accessToken` / `storeKey`）。订单场景 token 见 `references/access-token.md`（`tokenPurpose=order-shipping`）。（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 
 ---
 
@@ -13,7 +13,7 @@ Temu **美国站订单管理**（Partner US **Order / 订单发货** 相关接�
 | 网关根地址 | `${LINKFOX_TOOL_GATEWAY}`（可用 `TEMU_API_BASE_URL` / `STORE_API_BASE_URL` 覆盖） |
 | 订单 OpenAPI | `POST /temu/proxy` |
 | 加签文件下载 | `POST /temu/fileDownload`（`temu_us_file_download.py`） |
-| LinkFox 鉴权 | Header **`Authorization`** 与 **`Token`**（同值）；或 `LINKFOX_AGENT_API_KEY` / `LINKFOXAGENT_API_KEY`；或 JSON `token`（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理） |
+| LinkFox 鉴权 | Header **`Authorization`** 与 **`Token`**（同值）；或 `LINKFOX_AGENT_API_KEY` / `LINKFOXAGENT_API_KEY`；或 JSON `token`（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理） |
 | Temu 鉴权 | Body `accessToken`，或 `storeKey` + `site` + `managementType` + `tokenPurpose` |
 | 默认 | `site=us`，`managementType=semi-managed`，`tokenPurpose=order-shipping` |
 | 上游 OpenAPI（US） | `https://openapi-b-us.temu.com/openapi/router`（网关按 `site` 解析） |

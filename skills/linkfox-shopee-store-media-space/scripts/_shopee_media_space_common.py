@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import base64
+import mimetypes
 import os
 import subprocess
 import sys
@@ -18,6 +20,7 @@ from urllib.request import Request, urlopen
 API_BASE_URL = os.environ.get("LINKFOX_TOOL_GATEWAY") or os.environ.get("SHOPEE_API_BASE_URL") or "https://tool-gateway.linkfox.com"
 STORE_TOKENS_ENDPOINT = f"{API_BASE_URL.rstrip('/')}/shopee/storeTokens"
 DEVELOPER_PROXY_ENDPOINT = f"{API_BASE_URL.rstrip('/')}/shopee/developerProxy"
+UPLOAD_IMAGE_ENDPOINT = f"{API_BASE_URL.rstrip('/')}/shopee/uploadMediaSpaceImage"
 
 REQUIRED_SKILL = "linkfox-shopee-store-auth"
 DEPENDENCY_EXIT_CODE = 42
@@ -55,7 +58,7 @@ def ensure_auth_skill_available(caller: str = "media-space script") -> None:
 def get_api_key() -> str:
     """
     获取配置在环境变量的API Key。
-    如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+    如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
     """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -77,6 +80,10 @@ def call_api(endpoint: str, params: dict) -> dict:
             "Authorization": api_key,
             "Content-Type": "application/json",
             "User-Agent": "LinkFox-Skill/1.0",
+            "SESSION_ID": os.environ.get("SESSION_ID", ""),
+            "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
+            "MODE_ID": os.environ.get("MODE_ID", ""),
+            "APP_NAME": os.environ.get("APP_NAME", ""),
         },
         method="POST",
     )
@@ -102,6 +109,44 @@ def resolve_store_tokens(params: dict) -> dict:
     if merchant_id:
         token_req["merchantId"] = str(merchant_id)
     return call_api(STORE_TOKENS_ENDPOINT, token_req)
+
+
+def upload_media_space_image(params: dict) -> dict:
+    shop_id = str(params.get("shopId") or "").strip()
+    file_path_raw = str(params.get("filePath") or "").strip()
+    if not shop_id:
+        print("Missing required field: shopId", file=sys.stderr)
+        sys.exit(1)
+    if not file_path_raw:
+        print("Missing required field: filePath", file=sys.stderr)
+        sys.exit(1)
+
+    file_path = Path(file_path_raw).expanduser()
+    if not file_path.is_file():
+        print(f"Image file not found: {file_path}", file=sys.stderr)
+        sys.exit(1)
+    file_size = file_path.stat().st_size
+    if file_size <= 0:
+        print("Image file is empty", file=sys.stderr)
+        sys.exit(1)
+    if file_size > 10 * 1024 * 1024:
+        print("Image file must not exceed 10MB", file=sys.stderr)
+        sys.exit(1)
+
+    content_type = str(params.get("contentType") or mimetypes.guess_type(file_path.name)[0] or "")
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    content_type = content_type.lower().strip()
+    if content_type not in allowed_types:
+        print("Only JPEG, PNG, or WebP images are supported", file=sys.stderr)
+        sys.exit(1)
+
+    payload = {
+        "shopId": shop_id,
+        "fileBase64": base64.b64encode(file_path.read_bytes()).decode("ascii"),
+        "fileName": file_path.name,
+        "contentType": content_type,
+    }
+    return call_api(UPLOAD_IMAGE_ENDPOINT, payload)
 
 
 def developer_proxy_call(

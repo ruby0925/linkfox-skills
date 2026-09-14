@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/ruiguan/trademarkGraphicDetection`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 
 ## 请求参数
 
@@ -12,7 +12,7 @@ POST Body（JSON）：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| imageUrl | string | 是 | 产品图片URL或base64编码的图片数据（最大1000字符） |
+| imageUrl | string | 是 | 公开可访问的产品图片HTTP(S) URL（最大1000字符）；服务端下载后转换为Base64，不接受直接传入Base64 |
 | topNumber | integer | 是 | 返回YOLO坐标的最大数量，默认 `5`，最大 `100`。实际返回数量可能少于传参数量 |
 | productTitle | string | 否 | 产品标题，用于上下文感知检测（最大1000字符） |
 | trademarkName | string | 否 | 可能的图形logo名称，用于缩小检索范围（最大1000字符） |
@@ -63,8 +63,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
-| 402 | 积分或余额不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
+| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
+| 402 | 算力或余额不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
 | 其他非200值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 
 错误响应示例：

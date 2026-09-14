@@ -10,7 +10,10 @@ if __name__ == "__main__":
     run_get_token_list(
         __doc__,
         path="sb/budgetRules",
+        accept="application/json",
         response_key="budgetRules",
+        page_size_key="pageSize",
+        response_body_keys=["budgetRulesForAdvertiserResponse"],
         api_version="V4",
         resource_version="SHARED",
     )

@@ -52,7 +52,7 @@ sb/targets/list
 
 - `sb/v3/*`：声明调用方已确认是 Legacy；
 - `sb/v4/*`：声明按 V4 Campaign/Ad Group 结构管理；
-- 输出中的 `amazonResourceVersion` 会标记为 `V3_SHARED_TARGETING` 或 `V3.2_SHARED_TARGETING`。
+- 输出中的 `amazonResourceVersion` 会标记共享资源类别，例如 keyword 的 `V3_SHARED_TARGETING` 或 target 的 `SHARED_TARGETING`。
 
 这不是 V4 自动降级，也不会在失败后切换版本。
 
@@ -62,8 +62,10 @@ sb/targets/list
 - V4 使用 Ad 与独立 Creative Version：
   - `sb/v4/list_ads.py`
   - `sb/v4/create_ads.py`
-  - `sb/v4/list_creatives.py`
+  - `sb/v4/list_creatives.py`（必须传 `adId`，不是全账号 Creative 列表）
   - `sb/v4/create_creatives.py`
+
+SB V4 Creative 支持查询 Creative Version 与创建新版本，没有通用 `update_creatives.py`；不要把 Creative Version 管理描述成完整 CRUD。
 
 不要伪造不存在的 `sb/v3/creatives` 或 `sb/v4/keywords` Amazon 路径。
 

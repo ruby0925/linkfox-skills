@@ -1,6 +1,6 @@
 ---
 name: linkfox-kalodata-tiktok-video
-description: 通过kalodata数据搜索TikTok电商热门带货视频榜单并查询指定视频的详细数据，支持按地区、货币、语言与日期范围查看高排名/高播放/热销带货视频，并可用videoId获取播放、点赞、评论、分享、销售额、GPM及广告投放指标。当用户提到TikTok视频搜索、TikTok视频榜单、TikTok视频排行、TikTok热门视频、TikTok带货视频排行、TikTok爆量视频、TikTok视频详情、TikTok带货视频数据、视频播放量、视频互动数据、TikTok video search, TikTok video ranking, TikTok viral video chart, TikTok video detail, video analytics, kalodata video search/detail时触发此技能。即使用户未明确提及"kalodata"，只要其需求涉及查看TikTok平台热门带货视频榜单或某个TikTok视频的详细带货与互动数据，也应触发此技能。
+description: 通过kalodata数据搜索TikTok电商热门带货视频榜单并查询指定视频的详细数据，支持按地区、货币、语言、日期范围与GMV范围查看高排名/高播放/热销带货视频，并可按GMV排序，或用videoId获取播放、点赞、评论、分享、销售额、GPM及广告投放指标。当用户提到TikTok视频搜索、TikTok视频榜单、TikTok视频排行、TikTok热门视频、TikTok带货视频排行、TikTok爆量视频、TikTok视频详情、TikTok带货视频数据、视频播放量、GMV筛选、视频互动数据、TikTok video search, TikTok video ranking, TikTok viral video chart, TikTok video detail, video analytics, kalodata video search/detail时触发此技能。即使用户未明确提及"kalodata"，只要其需求涉及查看TikTok平台热门带货视频榜单或某个TikTok视频的详细带货与互动数据，也应触发此技能。
 ---
 
 # Kalodata - TikTok Video Search & Detail
@@ -14,7 +14,7 @@ Use the search endpoint when the user wants rankings, hot videos, viral videos, 
 
 ## Core Concepts
 
-The video ranking endpoint returns a paginated leaderboard filtered by `region`, `dateRange`, `language`, `currency`, and optional `sortField`. Each video row includes identity, engagement, revenue, ad-performance, and creator fields. Results are paginated with `pageNumber` (1-5) and `pageSize` (5-100).
+The video ranking endpoint returns a paginated leaderboard filtered by `region`, `dateRange`, `language`, `currency`, and optional GMV range `revenue_range`. Use `sortField` to sort by `revenue`. Each video row includes identity, engagement, revenue, ad-performance, and creator fields. Results are paginated with `pageNumber` (1-5) and `pageSize` (5-100).
 
 The video detail endpoint fetches **one** shoppable TikTok video by `videoId`. It returns the video's engagement metrics, monetization metrics, advertising metrics, creator identity, region, duration, and linked product count. The `videoId` usually comes from the ranking response field `video_id`.
 
@@ -59,7 +59,14 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 | pageSize | integer | No | Page size, 5-100 |
 | language | string | No | Response language, e.g. `zh-CN`, `en-US` |
 | currency | string | No | Currency for monetary metrics, e.g. `USD` |
-| sortField | object | No | Sorting specification; omit for default ranking |
+| category_id | string | No | Category ID filter |
+| shop_id | string | No | Shop ID filter |
+| creator_id | string | No | Creator ID filter |
+| product_id | string | No | Product ID filter |
+| revenue_range | string | No | GMV range because response field `revenue` is total GMV; examples: `1-100`, `>1000`, `<100` |
+| followers_range | string | No | Creator follower range filter |
+| ads_roas | number | No | Advertising ROAS filter |
+| sortField | object | No | GMV sorting specification, e.g. `{"field":"revenue","type":"DESC"}` |
 
 **Video detail (`/kalodata/video/detail`)**
 
@@ -75,7 +82,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 - **API 端点**：`POST /kalodata/video/rank` 或 `POST /kalodata/video/detail`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/kalodata_video_search.py '<JSON 参数>' [--inline]` 或 `python scripts/kalodata_video_detail.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-kalodata-tiktok-video-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -85,7 +92,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq` 或 `ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
@@ -93,7 +100,7 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Usage Examples
 
@@ -102,12 +109,17 @@ Both endpoints may reflect a statistical delay (T+1). See `references/api.md` fo
 {"region":"US","dateRange":"last7Day","pageSize":10,"pageNumber":1,"currency":"USD"}
 ```
 
-**2. Fetch one video's detail**
+**2. Filter by GMV and rank by GMV**
+```json
+{"region":"US","dateRange":"last7Day","revenue_range":"1-100","sortField":{"field":"revenue","type":"DESC"},"pageSize":10,"pageNumber":1,"currency":"USD"}
+```
+
+**3. Fetch one video's detail**
 ```json
 {"videoId":"7659161409279806734","region":"US","dateRange":"last7Day","currency":"USD"}
 ```
 
-**3. Discovery-to-detail workflow**
+**4. Discovery-to-detail workflow**
 ```text
 Run kalodata_video_search.py first, choose a row's video_id, then pass that value as videoId to kalodata_video_detail.py.
 ```
@@ -124,6 +136,7 @@ Run kalodata_video_search.py first, choose a row's video_id, then pass that valu
 ## Important Limitations
 
 - Ranking is not keyword search; it browses leaderboards by region and time window.
+- The backend supports GMV range filtering through `revenue_range`; `revenue` in the response is GMV, not profit or ad spend.
 - Detail requires `videoId`; it cannot find a video by title alone.
 - The ranking response does not include total/page count; result count is `data.length`.
 - `pageNumber` is limited to 1-5 and `pageSize` is limited to 5-100.
@@ -150,11 +163,11 @@ Run kalodata_video_search.py first, choose a row's video_id, then pass that valu
 - TikTok advertising / ad campaign management
 - Video editing, video download, or content creation
 
-## 积分消耗规则
+## 算力消耗规则
 
-每次调用消耗 7.0 积分。
+每次调用消耗 7.0 算力。
 
-> 用户会因积分消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对积分消耗量预期不足时，务必提醒用户，由用户决定是否继续。
+> 用户会因算力消耗而支付费用。请充分评估：当需要高频调用本技能，或用户对算力消耗量预期不足时，务必提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

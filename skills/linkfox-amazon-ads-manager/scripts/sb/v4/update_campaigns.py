@@ -11,7 +11,8 @@ if __name__ == "__main__":
         __doc__,
         path="sb/v4/campaigns",
         method="PUT",
-        content_type="application/json",
+        content_type="application/vnd.sbcampaignresource.v4+json",
+        accept="application/vnd.sbcampaignresource.v4+json",
         api_version="V4",
         resource_version="V4",
     )

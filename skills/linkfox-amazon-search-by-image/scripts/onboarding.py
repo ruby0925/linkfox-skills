@@ -3,7 +3,7 @@
 
 子命令：
   send-code <phone>              发送短信验证码
-  login <phone> <code> [channel] 验证码登录并获取 API key（channel: skill|workbuddy）
+  login <phone> <code> [channel] 验证码登录并获取 API key
   list-plans                     列出当前用户可购买的套餐
   order <plan_id> <method>       下单并渲染支付二维码（method: wechat|alipay）
   query <order_id>               查询订单状态
@@ -251,7 +251,7 @@ def _gateway(method: str, path: str, body: dict | None = None) -> dict:
             if status == 401:
                 raise RuntimeError(f"鉴权失败（401），请检查 LINKFOX_AGENT_API_KEY 或 LINKFOXAGENT_API_KEY：{raw}")
             if status == 402:
-                raise RuntimeError(f"积分余额不足（402），请充值：{raw}")
+                raise RuntimeError(f"算力余额不足（402），请充值：{raw}")
             if status == 403:
                 raise RuntimeError(f"无权限（403）：{raw}")
             last_exc = RuntimeError(f"HTTP {status}: {raw}")
@@ -400,7 +400,7 @@ def _login_v3(phone: str, code: str, channel: str) -> dict:
 
 
 def _login_by_token(access_token: str, refresh_token: str) -> dict:
-    """新用户送积分。失败不阻断。"""
+    """新用户送算力。失败不阻断。"""
     resp = _http_post(f"{_agent_user_base()}/account/loginByToken", {
         "token": access_token, "refreshToken": refresh_token,
         "device": {"aid": "3026344186", "did": "", "type": "Windows",
@@ -410,7 +410,7 @@ def _login_by_token(access_token: str, refresh_token: str) -> dict:
         return {"error": f"loginByToken: {resp.get('_body') or resp['_error']}"}
     if resp.get("errcode") != 200:
         return {"error": f"loginByToken: {resp.get('errmsg') or json.dumps(resp, ensure_ascii=False)}"}
-    print(f"{TAG} loginByToken 成功，新用户积分已触发", file=sys.stderr)
+    print(f"{TAG} loginByToken 成功，新用户算力已触发", file=sys.stderr)
     return {}
 
 
@@ -582,7 +582,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("phone")
     p.add_argument("code", help="短信验证码")
     p.add_argument("--channel", default="skill",
-                   help="渠道，默认 skill；workbuddy 宿主传 workbuddy")
+                   help="渠道，默认 skill")
     p.set_defaults(func=_cmd_login)
 
     sub.add_parser("list-plans", help="列出可购买套餐").set_defaults(func=_cmd_list_plans)

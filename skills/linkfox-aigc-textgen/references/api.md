@@ -12,7 +12,7 @@
 
 - **基础地址**：`${LINKFOX_TOOL_GATEWAY}`，从环境变量读取，未配置时报错退出。
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）。
+- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）。
 - **HTTP 超时**：单次请求超时 150 秒；客户端轮询总时长建议 600 秒。
 
 ---
@@ -103,8 +103,8 @@ HTTP 200 时业务成功与否看响应体 `errcode`/`errorCode`（200=成功）
 | errcode | 含义 | 处理 |
 |---------|------|------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
-| 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
+| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
+| 402 | 算力不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
 | 10009 | 任务不存在 | 检查 taskId 是否正确 |
 | 其他 | 业务异常 | 参考 `errmsg` 字段 |
 

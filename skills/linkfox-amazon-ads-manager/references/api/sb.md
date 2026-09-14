@@ -11,7 +11,7 @@
 | 入口 | Campaign | Ad Group | Ad | Keyword | Target | Creative Version |
 |---|---:|---:|---:|---:|---:|---:|
 | `scripts/sb/v3/` | ✅ Legacy | 查询 | — | ✅ | ✅ | Campaign payload 内嵌 |
-| `scripts/sb/v4/` | ✅ | ✅ | ✅ | ✅（共享路径） | ✅（共享路径） | ✅ |
+| `scripts/sb/v4/` | ✅ | ✅ | ✅ | ✅（共享路径） | ✅（共享路径） | ✅（按 `adId` 查询/创建新版本） |
 
 ## 默认选择
 

@@ -1,6 +1,6 @@
 ---
 name: linkfox-keepa-product-request
-description: 通过ASIN获取亚马逊商品详情，包括价格、标题、主图、上架日期、材质、重量、变体月销量及近12个月的月销数据。当用户查询亚马逊商品详情、ASIN查询、商品定价、销售排名历史、月销量趋势、商品尺寸、FBA费用、产品规格、批量ASIN查询、Keepa product details, ASIN detail lookup, monthly sales data, pricing info, product specifications, FBA fees, batch ASIN query时触发此技能。即使用户未明确提及"Keepa"，只要其需求涉及获取一个或多个亚马逊ASIN的结构化商品数据，也应触发此技能。
+description: 通过ASIN获取亚马逊商品详情，包括价格、标题、Item Highlights（商品亮点）、主图、上架日期、材质、重量、变体月销量及近12个月的月销数据。当用户查询亚马逊商品详情、ASIN查询、Item Highlights、itemHighlights、标题补充信息、商品定价、销售排名历史、月销量趋势、商品尺寸、FBA费用、产品规格、批量ASIN查询、Keepa product details, ASIN detail lookup, monthly sales data, pricing info, product specifications, FBA fees, batch ASIN query时触发此技能。即使用户未明确提及"Keepa"，只要其需求涉及获取一个或多个亚马逊ASIN的结构化商品数据，也应触发此技能。
 ---
 
 # Keepa Product Data Request
@@ -9,13 +9,14 @@ This skill guides you on how to retrieve Amazon product details via the Keepa pr
 
 ## Core Concepts
 
-The Keepa Product Request API returns detailed product listing data from Amazon, sourced through Keepa. Given one or more ASINs and a marketplace, it returns comprehensive product information: pricing, title, main image, listing date, material, weight, dimensions, sales rank, monthly sales units (current and up to 12 months of history), FBA fees, ratings, review counts, category tree, and more.
+The Keepa Product Request API returns detailed product listing data from Amazon, sourced through Keepa. Given one or more ASINs and a marketplace, it returns comprehensive product information: pricing, title, Item Highlights (`itemHighlights`, when available), main image, listing date, material, weight, dimensions, sales rank, monthly sales units (current and up to 12 months of history), FBA fees, ratings, review counts, category tree, and more.
 
 **Key points**:
 - You can query up to **5 ASINs** in a single request by separating them with commas.
 - The `domain` parameter is a numeric marketplace ID (e.g., `1` = Amazon.com US), not a country code.
 - Setting `history` to `1` includes historical sales data (monthly sales for up to 12 prior months, average sales rank over 30/90/180 days). Setting it to `0` returns only current product information.
-- The response does **not** include product descriptions or reviews content.
+- `products[].itemHighlights` is a single string of short product information separate from `title`; it may be `null`, blank, or absent. It requires no extra request parameter and can be returned with `history=0`.
+- The response does **not** include full product descriptions or review content. Item Highlights is not the same as bullet points (`features`) or a full description.
 
 ## Parameter Guide
 
@@ -78,7 +79,7 @@ Whether to include historical data such as monthly sales for the past 12 months 
 
 - **API 端点**：`POST /keepa/productRequest`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/keepa_product_detail.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-keepa-product-request-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -88,13 +89,13 @@ Whether to include historical data such as monthly sales for the past 12 months 
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Display Rules
 
@@ -106,9 +107,12 @@ Whether to include historical data such as monthly sales for the past 12 months 
 6. **Image display**: If `imageUrl` is present, display the product image to help users visually identify the product.
 7. **Error handling**: When a query fails, explain the issue based on the response and suggest corrections (e.g., invalid ASIN format, unsupported marketplace).
 8. **Large batch results**: For batch queries with many ASINs, present a summary table first and offer to show individual product details on request.
+9. **Item Highlights**: Read `products[].itemHighlights` from the full response, not just the stdout summary or `columns`. Display the original value separately from `title`. If it is missing, `null`, or blank, label it "未返回/不可用"; do not infer that the Amazon listing lacks it or reconstruct it from title, bullets, or description.
+
 ## Important Limitations
 
-- **No product descriptions or reviews**: The API does not return product description text or review content.
+- **No full product descriptions or reviews**: The API can return short Item Highlights, but not full product description text or review content.
+- **Item Highlights availability**: Requires a backend deployment that passes through `itemHighlights` and available upstream data. Do not promise a value for every ASIN.
 - **Maximum 5 ASINs per request**: Batch queries are capped at 5 ASINs.
 - **ASIN string length limit**: The `asin` parameter has a maximum length of 300 characters.
 - **Historical data is optional**: Monthly sales history is only returned when `history` is set to `1`.
@@ -121,6 +125,7 @@ Whether to include historical data such as monthly sales for the past 12 months 
 | User Says | Scenario |
 |-----------|----------|
 | "Look up this ASIN", "Get product details for B0XXXXXXXX" | Single ASIN lookup |
+| "查这个 ASIN 的 Item Highlights", "标题之外的商品亮点/补充信息" | Retrieve existing `itemHighlights` separately from `title` |
 | "What's the price of this product on Amazon" | Price query |
 | "How many units does this product sell per month" | Monthly sales check |
 | "Compare these ASINs", "batch lookup these products" | Multi-ASIN comparison |
@@ -134,7 +139,7 @@ Whether to include historical data such as monthly sales for the past 12 months 
 **Not applicable** -- Needs beyond ASIN-level product data:
 
 - Search term / keyword analysis (use ABA data tools instead)
-- Product reviews or listing copywriting content
+- Full product descriptions, review text, or generating new listing copy (retrieving existing `title` and `itemHighlights` is supported)
 - Advertising / PPC campaign data
 - Seller account or store-level analytics
 - Product research without specific ASINs (e.g., "find trending products in kitchen category")
@@ -142,11 +147,11 @@ Whether to include historical data such as monthly sales for the past 12 months 
 
 **Boundary judgment**: When users say "product research" or "competitor analysis", if they have specific ASINs and want structured product data (price, sales, dimensions, category), this skill applies. If they want keyword-level analysis, market-wide trends without specific ASINs, or advertising metrics, this skill does not apply.
 
-## 积分消耗规则
+## 算力消耗规则
 
-按动态规则计费：消耗积分 = 0.045 × 本次商品详情查询消耗的 Keepa token。
+按动态规则计费：消耗算力 = 0.045 × 本次商品详情查询消耗的 Keepa token。
 
-> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量算力，必须提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

@@ -12,6 +12,7 @@ if __name__ == "__main__":
         path="sb/budgetRules",
         method="POST",
         content_type="application/json",
+        accept="application/json",
         api_version="V4",
         resource_version="SHARED",
     )

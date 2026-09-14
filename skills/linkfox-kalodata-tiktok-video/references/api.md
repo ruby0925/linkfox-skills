@@ -5,7 +5,7 @@
 - **请求地址（视频榜单）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/video/rank`
 - **请求地址（视频详情）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/video/detail`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 
@@ -23,9 +23,16 @@ POST Body（JSON），所有参数均可选：
 | pageSize | integer | 否 | 每页数量，取值 5-100 |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US` |
 | currency | string | 否 | 货币单位，例如 `USD` |
-| sortField | object | 否 | 排序条件；省略时走默认榜单顺序 |
+| category_id | string | 否 | 类目 ID 筛选 |
+| shop_id | string | 否 | 店铺 ID 筛选 |
+| creator_id | string | 否 | 达人 ID 筛选 |
+| product_id | string | 否 | 商品 ID 筛选 |
+| revenue_range | string | 否 | GMV 范围；响应中的 `revenue` 即 GMV，例如 `1-100`、`>1000`、`<100` |
+| followers_range | string | 否 | 达人粉丝数范围筛选 |
+| ads_roas | number | 否 | 广告 ROAS 筛选 |
+| sortField | object | 否 | GMV 排序条件，例如 `{"field":"revenue","type":"DESC"}` |
 
-> 该接口用于浏览视频榜单，不支持关键词搜索。可用排序字段以网关实际接受的为准；若传入不支持的排序字段，按服务端 `errmsg` 处理，不要尝试其它绕过逻辑。
+> 该接口用于浏览视频榜单，不支持关键词搜索。后端支持用 `revenue_range` 过滤 GMV。
 
 ### 视频详情：`POST /kalodata/video/detail`
 
@@ -172,8 +179,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和积分问题** 处理 |
-| 402 | 积分不足 | 按 SKILL.md 的 **解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和算力问题** 处理 |
+| 402 | 算力不足 | 按 SKILL.md 的 **解决认证和算力问题** 处理 |
 | 501 | 上游调用失败 / 参数无效 | 若 `errmsg` 包含 Kalodata HTTP 554，用相同参数重试 1-2 次；若因 `videoId` 缺失或无效，核对 ID 是否来自榜单结果 |
 | 其他非 200 值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 
@@ -198,6 +205,11 @@ curl -X POST ${LINKFOX_TOOL_GATEWAY}/kalodata/video/rank \
   -d '{
     "region": "US",
     "dateRange": "last7Day",
+    "revenue_range": "1-100",
+    "sortField": {
+      "field": "revenue",
+      "type": "DESC"
+    },
     "pageSize": 10,
     "pageNumber": 1,
     "currency": "USD"

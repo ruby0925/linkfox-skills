@@ -45,7 +45,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/campaigns/list"
-ENTITY_CONTENT_TYPE = "application/vnd.spcampaign.v3+json"
+ENTITY_CONTENT_TYPE = "application/vnd.spCampaign.v3+json"
 RESPONSE_KEY = "campaigns"
 
 FILTER_KEYS = [

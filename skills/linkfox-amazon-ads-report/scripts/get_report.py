@@ -33,7 +33,7 @@ Optional parameters:
   - timeUnit          DAILY / SUMMARY，默认 SUMMARY
   - format            默认 GZIP_JSON（DSP 等类型支持 CSV）
   - pollInterval      默认 30 秒
-  - maxAttempts       默认 20
+  - maxAttempts       默认 15
   - skipDepCheck      跳过依赖检查（默认 false）
   - serveExtractedFileHttp / serveHost / servePort / serveSeconds
                       本机 HTTP 暴露已解压文件，默认开启 300s
@@ -66,7 +66,7 @@ API_BASE_URL = (
 DEVELOPER_PROXY_ENDPOINT = f"{API_BASE_URL}/amazonAds/developerProxy"
 
 DEFAULT_POLL_INTERVAL = 30
-DEFAULT_MAX_ATTEMPTS = 20
+DEFAULT_MAX_ATTEMPTS = 15
 
 REQUIRED_SKILL = "linkfox-amazon-ads-auth"
 DEPENDENCY_EXIT_CODE = 42
@@ -133,7 +133,7 @@ def ensure_auth_skill_available() -> None:
 def get_api_key():
     """
     获取配置在环境变量的API Key。
-    如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+    如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
     """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -155,6 +155,10 @@ def call_api(endpoint: str, params: dict) -> dict:
             "Authorization": api_key,
             "Content-Type": "application/json",
             "User-Agent": "LinkFox-Skill/1.0",
+            "SESSION_ID": os.environ.get("SESSION_ID", ""),
+            "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
+            "MODE_ID": os.environ.get("MODE_ID", ""),
+            "APP_NAME": os.environ.get("APP_NAME", ""),
         },
         method="POST",
     )

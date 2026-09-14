@@ -1,6 +1,6 @@
 ---
 name: linkfox-amazon-store-fulfillment-outbound
-description: 亚马逊 Multi-Channel Fulfillment（MCF）出仓履约 Skill，经 LinkFox /spApi/developerProxy 调用 Fulfillment Outbound API v2026-07-04，并提供该文档角色列表关联的 Invoices v2026-06-25 getInvoiceHeaders；支持配送报价与预览、创建/查询/列出/更新/取消履约订单、动态沙箱订单/包裹状态更新及发票头分页查询。用户提到 Fulfillment Outbound、MCF、多渠道配送、getOffers、getOrderPreview、createOrder、getInvoiceHeaders、Amazon 库存配送到站外客户、订单包裹与跟踪、签收证明或投递照片、receivedBy、locker/drop-off location、商品序列号/unitIdentifiers、v2026-07-04 时触发。与 External Fulfillment、普通 Orders API 和旧版 v2020-07-01 不同。
+description: 亚马逊 Multi-Channel Fulfillment（MCF）新版出仓履约管理。用于获取配送报价和订单预览，创建、查询、列出、更新或取消履约订单，查看包裹与跟踪、签收证明、投递照片、收件人及 locker/drop-off 信息，并查询相关发票头。用户提到 Fulfillment Outbound、MCF、多渠道配送、亚马逊库存配送到站外客户、配送报价、getOffers、getOrderPreview、createOrder、getInvoiceHeaders、receivedBy、unitIdentifiers、v2026-07-04 时触发。即使未明确说“MCF API”，只要希望用亚马逊库存履约非亚马逊渠道订单，也应触发此技能；External Fulfillment、普通 Orders API 和旧版 v2020-07-01 不属于此技能。
 ---
 
 # Amazon 店铺 Fulfillment Outbound
@@ -90,9 +90,25 @@ Use this Skill for Amazon Multi-Channel Fulfillment workflows on Fulfillment Out
 
 Report issues with `skillName: linkfox-amazon-store-fulfillment-outbound`, operation, masked IDs, resolved path, gateway status, and Amazon response summary. Never include credentials.
 
-## 积分消耗规则
+## Amazon SP-API 接口保护与重试指引
 
-不消耗积分（以网关实际计费为准）。
+同一店铺连续收到 Amazon SP-API 的 400、403、404 或 429 时，网关会返回 450、453、454 或 459 并短暂冷却。这些自定义状态码不是 Amazon 原生状态，也不表示封号；目的是避免持续异常或高频调用扩大店铺风险。
+
+| 状态与 message | 范围 | 触发与冷却 | 处理 |
+|---|---|---|---|
+| `450`：`400，请求异常，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：20 分钟 | 停止原参数重试，检查必填字段、marketplace、ID、日期和请求体 |
+| `453`：`403，店铺未授权，请先授权` | 店铺全部接口 | 60 秒内超过 2 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 停止该店铺调用，检查授权、权限、店铺归属和区域 |
+| `454`：`404，资源不存在，请优化您的参数` | 店铺+接口 | 60 秒内超过 3 次：5 分钟；10 分钟内超过 4 次：30 分钟 | 确认资源 ID、所属店铺/站点、资源状态和接口路径 |
+| `459`：`429限流中，请降低频率` | 店铺+接口 | 首次：15 秒；2 分钟内超过 2 次：30 秒；3 分钟内超过 4 次：2 分钟 | 降低并发、分页和轮询频率并逐级退避 |
+
+- 立即停止自动或并发重试，不得通过换脚本或重复创建任务绕过保护；优先遵循 `retryAfter`、`blockedUntil`，没有时按表中时长说明。
+- 450/453/454 必须先修正参数、授权或资源标识，冷却后最多谨慎重试一次；再次触发则停止调用。453 期间停止该店铺全部 SP-API。
+- 保留已有 `reportId`、`feedId` 等任务 ID；写操作结果不确定时先查询状态，不直接重放。
+- 向用户先说明店铺保护，再给原因、处理和等待时间。可回复：“为保护您的亚马逊店铺安全，检测到 Amazon SP-API 连续返回{原因}，当前已进入短暂保护。请先{处理动作}，预计{等待时间}后再试；这不代表封号，也不是套餐或算力限制。”不要只说“LinkFox 限流”或“服务器繁忙”。
+
+## 算力消耗规则
+
+不消耗算力（以网关实际计费为准）。
 
 ---
 *更多跨境 Skill：[LinkFox Skills](https://skill.linkfox.com/)*

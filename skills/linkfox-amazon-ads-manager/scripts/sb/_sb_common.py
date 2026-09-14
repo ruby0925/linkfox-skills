@@ -241,6 +241,7 @@ def run_get_offset_list(
     usage: str,
     *,
     path: str,
+    accept: str | None = None,
     response_key: str,
     query_keys: list[str],
     api_version: str = "V3",
@@ -286,6 +287,7 @@ def run_get_offset_list(
             body=None,
             content_type=None,
             query_string=urlencode(query),
+            accept=accept,
         )
         if "error" in resp:
             _emit_list(
@@ -355,6 +357,7 @@ def run_post_token_list(
     *,
     path: str,
     content_type: str,
+    accept: str | None = None,
     response_key: str,
     api_version: str,
     resource_version: str,
@@ -381,6 +384,7 @@ def run_post_token_list(
         fetch_all=_parse_bool(params.get("fetchAll"), default=True, field="fetchAll"),
         max_pages=int(params.get("maxPages") or DEFAULT_MAX_PAGES),
         access_token=access_token,
+        accept=accept,
     )
     _emit_list(
         result,
@@ -394,22 +398,31 @@ def run_get_token_list(
     usage: str,
     *,
     path: str,
+    accept: str | None = None,
     response_key: str,
     api_version: str,
     resource_version: str,
     params: dict[str, Any] | None = None,
+    page_size_key: str | None = None,
+    response_body_keys: list[str] | None = None,
 ) -> None:
     """Run GET list resources that paginate with a nextToken query."""
     params = params if params is not None else parse_argv_params(usage)
     profile_id, region, access_token = _prepare(params, api_version=api_version)
     token = params.get("nextToken")
+    page_size = max(1, min(int(params.get("pageSize") or params.get("maxResults") or DEFAULT_PAGE_SIZE), 100))
     fetch_all = _parse_bool(params.get("fetchAll"), default=True, field="fetchAll")
     max_pages = int(params.get("maxPages") or DEFAULT_MAX_PAGES)
     items: list[Any] = []
     pages = 0
     truncated = False
     while True:
-        query = urlencode({"nextToken": token}) if token else None
+        query_params: dict[str, str] = {}
+        if page_size_key:
+            query_params[page_size_key] = str(page_size)
+        if token:
+            query_params["nextToken"] = str(token)
+        query = urlencode(query_params) if query_params else None
         resp = _developer_proxy_call(
             region=region,
             path=path,
@@ -419,6 +432,7 @@ def run_get_token_list(
             body=None,
             content_type=None,
             query_string=query,
+            accept=accept,
         )
         status = resp.get("httpStatus")
         if "error" in resp or status is None or status // 100 != 2:
@@ -447,7 +461,13 @@ def run_get_token_list(
                 resource_version=resource_version,
             )
             return
-        page_items = parsed.get(response_key) or parsed.get(f"{response_key}Details") or []
+        keys = response_body_keys or [response_key, f"{response_key}Details"]
+        page_items = []
+        for key in keys:
+            candidate = parsed.get(key)
+            if isinstance(candidate, list):
+                page_items = candidate
+                break
         if isinstance(page_items, list):
             items.extend(page_items)
         pages += 1
@@ -471,6 +491,7 @@ def run_mutation(
     path: str,
     method: str,
     content_type: str,
+    accept: str | None = None,
     api_version: str,
     resource_version: str,
     params: dict[str, Any] | None = None,
@@ -486,6 +507,7 @@ def run_mutation(
         content_type=content_type,
         payload=params["payload"],
         access_token=access_token,
+        accept=accept,
     )
     status = result.get("httpStatus")
     if "error" in result or status is None or status // 100 != 2:

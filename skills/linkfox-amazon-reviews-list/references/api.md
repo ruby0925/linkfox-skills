@@ -2,11 +2,14 @@
 
 ## 调用规范
 
-- **请求地址**：`${LINKFOX_TOOL_GATEWAY}/amazon/reviews/list`
+- **异步提交**：`${LINKFOX_TOOL_GATEWAY}/amazon/reviews/async/submit`
+- **异步查询**：`${LINKFOX_TOOL_GATEWAY}/amazon/reviews/async/result`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 
-## 请求参数
+本 Skill 只使用异步提交和查询接口。
+
+## 异步提交
 
 POST Body（JSON）：
 
@@ -27,7 +30,64 @@ POST Body（JSON）：
 
 说明：若 `star1Num` ~ `star5Num` 均未传，则 1~5 星默认各抓取 `10` 条；若已传任意一个星级数量，则其它未传星级默认 `0`。
 
-## 响应结构
+无需传 `provider`。后端根据 `domainCode` 自动选择 Pango 或 Apify，实际供应商在提交和查询响应的 `provider` 字段中返回。
+
+提交成功响应：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| taskId | string | 后续查询使用的任务ID |
+| provider | string | 实际选择的供应商 |
+| status | string | 初始状态，通常为 `PENDING` |
+| pollAfterMillis | integer | 建议下次查询前等待的毫秒数 |
+
+提交接口只调用一次并立即返回 `taskId`。任务未完成或单次查询失败均不得重新提交。
+
+脚本会在本地任务标记中附加经验时间提示：Pango 通常约 `10~30` 秒、Apify 通常约 `15~60` 秒完成，并通过 `suggestedNextCheckAfterSeconds` 提示首次查询时间。该时间仅为当前实测经验，不是 SLA；Agent 应优先继续其他工作，到建议时间再查询。
+
+## 异步查询
+
+请求体：
+
+```json
+{
+  "taskId": "异步提交返回的任务ID"
+}
+```
+
+查询响应：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| taskId | string | 任务ID |
+| provider | string | 实际使用的供应商 |
+| status | string | `PENDING`、`RUNNING`、`SUCCEEDED`、`FAILED` 或 `CANCELLED` |
+| error | string | 任务失败原因，仅失败时存在 |
+| result | object | 成功后的评论结果 |
+| pollAfterMillis | integer | 建议下次查询前等待的毫秒数；结束后为0 |
+| createdAt | integer | 任务创建时间，Unix毫秒 |
+| startedAt | integer | 任务开始时间，Unix毫秒 |
+| completedAt | integer | 任务完成时间，Unix毫秒 |
+| expiresAt | integer | 任务结果过期时间，Unix毫秒 |
+| costToken | integer | 本次查询的Token消耗；成功结果仅首次领取时产生 |
+
+处理规则：
+
+- 默认脚本首次执行只提交并立即返回；后续每次执行只查询一次结果，不循环、不休眠，使 Agent 可以继续其他工作。
+- 可以用原提交参数再次执行脚本并从缓存恢复任务，也可以直接传入 `{"taskId":"..."}` 查询。
+- `PENDING`、`RUNNING`：从任务创建时间起最多观察 `200` 秒；窗口内保留同一个 `taskId`，继续其他工作，约 `10~20` 秒后再查询，不按 `pollAfterMillis` 忙轮询。
+- 临时查询失败（网络异常、服务暂时不可用等）保留原任务，在观察窗口内稍后查询同一 `taskId`；不缓存为最终结果、不重新提交。认证/参数错误或明确的任务不存在则停止。
+- `SUCCEEDED`：读取 `result` 并结束。
+- `FAILED`：读取 `error` 并结束，不自动重新提交。
+- `CANCELLED`：任务等待异步执行资源超时，尚未调用供应商。向用户友好说明当前评论服务可能请求较多、任务已自动取消且未产生费用，建议稍后重新提交；本次执行不自动重新提交。
+- 未读取任务从提交时间起保留 4 小时；首次读取到任一终态后，后端立即删除该任务。脚本将成功结果保存到文件，缓存仅记录“已领取”和文件路径，不再缓存一份评论正文。
+- 原参数与 `taskId` 在同一工作目录内共用任务记录；24h 本地缓存有效期内重复执行返回 `ALREADY_RECEIVED`、`resultFile`、`fileExists` 和本次 `costToken: 0`，不再发起后端查询。`ALREADY_RECEIVED` 是脚本本地状态，不是后端状态。应读取 `resultFile`；文件已丢失则提示用户，不自动重新抓取。
+- 超过 `200` 秒仍未完成时返回 `POLL_TIMEOUT` 并停止自动查询。用户可以选择继续查询同一个 `taskId`，或停止查询；不得自动提交新任务。
+- 当前没有手动取消端点。后端只自动取消尚未调用供应商的 `PENDING` 任务；停止查询不会取消已进入 `RUNNING` 的上游调用。
+- 任务不存在或已过期：结束并提示用户；只有用户明确要求重试时才重新提交。
+- 调用前的积分公式只用于预估。实际扣费只认首次 `SUCCEEDED` 查询响应的 `X-Cost-Token`/`costToken`；提交、`PENDING`、`RUNNING`、`FAILED`、`CANCELLED`、`POLL_TIMEOUT` 均不得由客户端推算或补记费用。
+
+## 评论结果结构
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -76,8 +136,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和积分问题** 处理。|
-| 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。|
+| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和算力问题** 处理。|
+| 402 | 算力不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理。|
 | 其他非200值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 
 错误响应示例：
@@ -91,8 +151,10 @@ POST Body（JSON）：
 
 ## curl 示例（美国站）
 
+### 1. 提交
+
 ```bash
-curl -X POST https://tool-gateway.linkfox.com/amazon/reviews/list \
+curl -X POST https://tool-gateway.linkfox.com/amazon/reviews/async/submit \
   -H "Authorization: $LINKFOXAGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -105,6 +167,17 @@ curl -X POST https://tool-gateway.linkfox.com/amazon/reviews/list \
     "star5Num": 0,
     "sortBy": "recent",
     "reviewerType": "all_reviews"
+  }'
+```
+
+### 2. 查询
+
+```bash
+curl -X POST https://tool-gateway.linkfox.com/amazon/reviews/async/result \
+  -H "Authorization: $LINKFOXAGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "taskId": "提交接口返回的任务ID"
   }'
 ```
 

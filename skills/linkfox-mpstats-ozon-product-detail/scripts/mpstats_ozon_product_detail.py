@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MPSTATS Ozon Product Detail (Batch) - LinkFox Skill
+MPSTATS Ozon Product Detail (Single SKU) - LinkFox Skill
 调用 /mpstats/ozon/productDetail 接口。
 
 Usage:
@@ -45,7 +45,7 @@ def get_api_url():
 def get_api_key():
     """
     获取配置在环境变量的API Key。
-    如果获取不到，按 SKILL.md 的 **## 解决认证和积分问题** 处理。
+    如果获取不到，按 SKILL.md 的 **## 解决认证和算力问题** 处理。
     """
     key = os.environ.get("LINKFOX_AGENT_API_KEY") or os.environ.get("LINKFOXAGENT_API_KEY")
     if not key:
@@ -57,6 +57,31 @@ def get_api_key():
     return key
 
 
+def normalize_params(params):
+    if not isinstance(params, dict):
+        raise ValueError("parameters must be a JSON object")
+    if "productIds" in params:
+        raise ValueError("use productId for one Ozon SKU; productIds arrays are not accepted")
+    if "productId" not in params:
+        raise ValueError("missing required parameter: productId")
+
+    product_id = params["productId"]
+    if isinstance(product_id, bool) or product_id is None:
+        raise ValueError("productId must be a single integer or non-empty string")
+    if isinstance(product_id, (list, dict)):
+        raise ValueError("productId must be a single ID, not an array or object")
+    if not isinstance(product_id, (int, str)):
+        raise ValueError("productId must be a single integer or non-empty string")
+    if isinstance(product_id, str):
+        product_id = product_id.strip()
+        if not product_id:
+            raise ValueError("productId must be a non-empty string or integer")
+
+    normalized = dict(params)
+    normalized["productId"] = product_id
+    return normalized
+
+
 def call_api(params):
     api_url = get_api_url()
     api_key = get_api_key()
@@ -66,6 +91,7 @@ def call_api(params):
         "Content-Type": "application/json",
         "User-Agent": "LinkFox-Skill/2.0",
         "SESSION_ID": os.environ.get("SESSION_ID", ""),
+        "MESSAGE_ID": os.environ.get("MESSAGE_ID", ""),
         "MODE_ID": os.environ.get("MODE_ID", ""),
         "APP_NAME": os.environ.get("APP_NAME", ""),
     }
@@ -321,9 +347,12 @@ def main():
         sys.exit(1)
 
     try:
-        params = json.loads(argv[0])
+        params = normalize_params(json.loads(argv[0]))
     except json.JSONDecodeError as e:
         print(f"Invalid parameter format: {e}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Invalid parameters: {e}", file=sys.stderr)
         sys.exit(1)
 
     cache_path = _cache_path(params)

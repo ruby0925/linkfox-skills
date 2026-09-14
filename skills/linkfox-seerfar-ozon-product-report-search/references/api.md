@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/seerfar/ozon/productReportSearch`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 从环境变量 `LINKFOX_AGENT_API_KEY` 或 `LINKFOXAGENT_API_KEY` 读取（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/1.0`；HTTP 超时 150s
 
 ## 请求参数
@@ -192,8 +192,8 @@ POST Body（JSON）。以下字段与接口 `inputSchema` 一致。除 `page` �
 |---------|------|----------|
 | 200 | 成功 | 正常解析 `data` / `products` 字段 |
 | 400 | 参数错误 | 查看 `errmsg`；常见为缺 `page`、`searchDate` 格式错误、类目 ID 不合法等 |
-| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
-| 402 | 计费失败 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理。 |
+| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
+| 402 | 计费失败 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理。 |
 | 1003 | 请求过于频繁 | 限流，等待后重试，不要通过减小 `pageSize` 绕过 |
 | 其他非 200 值 | 业务异常 | 查看 `errmsg` 获取具体原因 |
 

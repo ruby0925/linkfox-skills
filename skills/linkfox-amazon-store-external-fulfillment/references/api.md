@@ -196,7 +196,7 @@
 
 | 现象 | 处理 |
 |------|------|
-| 401/402 / 积分不足 | 见 `references/onboarding.md` |
+| 401/402 / 算力不足 | 见 `references/onboarding.md` |
 | 403 | 角色/allowlist/签名问题，非 onboarding 范围 |
 | 1005 路径拒绝 | 后端放行 `externalFulfillment/` |
 | 409 / 422 | 履约状态机冲突或参数不可处理，检查当前 shipment status |

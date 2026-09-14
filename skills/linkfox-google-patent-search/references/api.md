@@ -4,7 +4,7 @@
 
 - **请求地址**：`${LINKFOX_TOOL_GATEWAY}/googlePatent/search`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置 按 SKILL.md 的 **## 解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置 按 SKILL.md 的 **## 解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`，超时 150s（与脚本一致），透传 `SESSION_ID` / `MODE_ID` / `APP_NAME`
 
 ## 请求参数
@@ -94,8 +94,8 @@ POST Body（JSON）：
 |---------|------|----------|
 | 200 | 成功 | 正常解析 `organicResults`、`searchInformation` 等业务字段 |
 | 400 | 参数错误 | 检查 `q` 是否提供、`num` 是否在 10–100 范围、日期格式是否正确 |
-| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和积分问题** 处理 |
-| 402 | 积分不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error：按 SKILL.md 的 **## 解决认证和算力问题** 处理 |
+| 402 | 算力不足 | HTTP 402：按 SKILL.md 的 **## 解决认证和算力问题** 处理 |
 | 501 | 无权限或套餐配额耗尽 | 当前 Key 未开通谷歌专利检索权限或配额已用尽。属权限/套餐问题（非单纯余额不足），充值无法解决，不要重试，提示用户开通/启用对应 API 套餐后重试 |
 | 其他非200值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 

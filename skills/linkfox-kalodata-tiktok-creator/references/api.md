@@ -5,7 +5,7 @@
 - **请求地址（达人榜单）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/creator/rank`
 - **请求地址（达人详情）**：`${LINKFOX_TOOL_GATEWAY}/kalodata/creator/detail`
 - **请求方式**：POST，Content-Type: application/json
-- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和积分问题** 处理）
+- **认证方式**：Header `Authorization: <api_key>`，api_key 优先从环境变量 `LINKFOX_AGENT_API_KEY` 读取，回退 `LINKFOXAGENT_API_KEY`（如未配置，按 SKILL.md 的 **解决认证和算力问题** 处理）
 - **User-Agent**：`LinkFox-Skill/2.0`
 - **超时**：150s
 
@@ -23,6 +23,12 @@ POST Body（JSON），所有参数均可选：
 | pageSize | integer | 否 | 每页数量，取值 5-100 |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US` |
 | currency | string | 否 | 货币单位，例如 `USD` |
+| category_ids | array<integer> | 否 | 类目 ID 列表筛选 |
+| shop_id | string | 否 | 店铺 ID 筛选 |
+| revenue_range | string | 否 | 成交金额 / GMV 范围筛选 |
+| creator_type | string | 否 | 达人类型筛选 |
+| followers_range | string | 否 | 粉丝数范围筛选 |
+| engagement_rate | string | 否 | 互动率筛选 |
 | sortField | object | 否 | 排序条件；不排序时传空对象 `{}` 走默认榜单顺序 |
 
 > 默认按 `revenue`（GMV）降序排列。可用排序字段以网关实际接受的为准；若传入不支持的排序字段，回退默认排序，不要尝试其它绕过逻辑。
@@ -34,6 +40,8 @@ POST Body（JSON）：
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | creatorId | string | 是 | 达人唯一 ID，例如 `7153432386608251946`，可从达人榜单响应的 `creator_id` 获取 |
+| shop_id | string | 否 | 店铺 ID 筛选 |
+| category_ids | array<integer> | 否 | 类目 ID 列表筛选 |
 | region | string | 否 | 地区/市场编码，例如 `US` |
 | dateRange | string | 否 | 时间范围，例如 `last7Day`、`last30Day` |
 | language | string | 否 | 返回语言，例如 `zh-CN`、`en-US` |
@@ -177,8 +185,8 @@ POST Body（JSON）：
 | errcode | 含义 | 处理建议 |
 |---------|------|----------|
 | 200 | 成功 | 正常解析业务字段 |
-| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和积分问题** 处理 |
-| 402 | 积分不足 | 按 SKILL.md 的 **解决认证和积分问题** 处理 |
+| 401 | 认证失败 | HTTP 401 或 authorized error；按 SKILL.md 的 **解决认证和算力问题** 处理 |
+| 402 | 算力不足 | 按 SKILL.md 的 **解决认证和算力问题** 处理 |
 | 501 | 上游调用失败 / 参数无效 | 若 `errmsg` 包含 Kalodata HTTP 554，用相同参数重试 1-2 次；若因 `creatorId` 缺失或无效，核对 ID 是否来自榜单结果 |
 | 其他非 200 值 | 业务异常 | 参考 `errmsg` 字段获取具体错误原因 |
 

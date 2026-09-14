@@ -45,7 +45,7 @@ from _common import (  # noqa: E402
 )
 
 ENTITY_PATH = "sp/adGroups/list"
-ENTITY_CONTENT_TYPE = "application/vnd.spadgroup.v3+json"
+ENTITY_CONTENT_TYPE = "application/vnd.spAdGroup.v3+json"
 RESPONSE_KEY = "adGroups"
 
 FILTER_KEYS = [

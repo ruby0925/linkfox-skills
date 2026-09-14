@@ -13,9 +13,25 @@ This tool retrieves real customer reviews for a given Amazon ASIN across **15 ma
 
 ## 调用方式
 
-- **API 端点**：`POST /amazon/reviews/list`（完整参数/响应/错误码见 `references/api.md`）
-- **Python 脚本**：`python scripts/amazon_reviews.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **异步提交端点**：`POST /amazon/reviews/async/submit`
+- **轮询查询端点**：`POST /amazon/reviews/async/result`
+- **完整参数、响应和错误码**：见 `references/api.md`
+- **Python 脚本**：`python scripts/amazon_reviews.py '<JSON 参数>' [--inline]`；每次只提交或查询一次并立即返回
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+
+### 异步调用流程
+
+1. 首次执行脚本只调用 `/amazon/reviews/async/submit`，保存并立即返回 `taskId`，不得在同一次脚本调用内等待结果。不要因任务仍在运行或单次查询失败而重新提交。
+2. 提交参数与原评论参数一致，不传 `provider`；后端根据 `domainCode` 自动选择 Pango 或 Apify，实际供应商可从响应的 `provider` 查看。
+3. Agent 可继续执行用户请求中的其他独立工作；需要结果时，使用原参数再次执行脚本，或传入 `{"taskId":"..."}`。每次执行只调用一次 `/amazon/reviews/async/result` 并立即返回，不在脚本内部循环或休眠。
+4. 根据当前实测经验，Pango 通常约 `10~30` 秒、Apify 通常约 `15~60` 秒返回，这不是 SLA。脚本会返回 `estimatedReadyInSeconds` 和 `suggestedNextCheckAfterSeconds`；优先继续其他工作，到建议时间再查询，不要按接口的最小轮询间隔忙轮询。
+5. 从任务创建时间起最多观察 `200` 秒。窗口内若为 `PENDING` 或 `RUNNING`，保留原 `taskId`，继续其他工作，约 `10~20` 秒后再查询；`SUCCEEDED`：读取 `result`；`FAILED`：向用户说明 `error` 并停止；`CANCELLED`：友好说明当前评论服务可能请求较多、任务在等待执行资源时已自动取消且未产生费用，建议稍后重新提交。
+6. 超过 `200` 秒仍为 `PENDING` 或 `RUNNING` 时返回 `POLL_TIMEOUT` 并停止自动查询，让用户选择：继续查询同一个 `taskId`，或停止查询并放弃本次结果。不得自动提交新任务。当前没有手动取消端点；后端只会自动取消等待执行资源超时且尚未调用供应商的 `PENDING` 任务，已进入 `RUNNING` 的任务仍可能完成并产生费用。
+7. 未读取任务从提交起最多保留 `4` 小时；首次读取到 `SUCCEEDED`、`FAILED` 或 `CANCELLED` 终态后，后端立即删除任务。脚本将成功结果保存到本地文件，任务缓存只保留“已领取”和文件路径。原参数与 `taskId` 在同一工作目录内共用任务记录；24h 本地缓存有效期内再次执行会返回 `ALREADY_RECEIVED`、`resultFile` 和本次 `costToken: 0`，应读取该文件，不再查后端或重新提交。文件不存在时也不得自动重新抓取。
+8. 查询返回“任务不存在或已过期”时停止，不得自动创建新的付费任务。只有用户明确要求重试时才能重新提交。
+9. 提交、`PENDING`、`RUNNING`、`FAILED`、`CANCELLED` 和 `POLL_TIMEOUT` 均不得按预计公式记为实际消耗；实际扣费只认首次成功领取结果时响应返回的 `X-Cost-Token`/`costToken`，不得由 Agent 自行推算或补记。
+
+脚本只执行上述异步流程，并在本地缓存未完成的 `taskId` 以便后续查询。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-amazon-reviews-list-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -25,30 +41,31 @@ This tool retrieves real customer reviews for a given Amazon ASIN across **15 ma
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Parameter Guide
 
 | Parameter | Type | Required | Scope | Description | Default |
 |-----------|------|----------|-------|-------------|---------|
-| asin | string | Yes | All | Amazon product ASIN | - |
-| star1Num | integer | No | Main endpoint | 1-star reviews to fetch (0-100) | 10 |
-| star2Num | integer | No | Main endpoint | 2-star reviews to fetch (0-100) | 10 |
-| star3Num | integer | No | Main endpoint | 3-star reviews to fetch (0-100) | 10 |
-| star4Num | integer | No | Main endpoint | 4-star reviews to fetch (0-100) | 10 |
-| star5Num | integer | No | Main endpoint | 5-star reviews to fetch (0-100) | 10 |
+| taskId | string | Yes | Async result | Task ID returned by async submit | - |
+| asin | string | Yes | Async submit | Amazon product ASIN | - |
+| star1Num | integer | No | Async submit | 1-star reviews to fetch (0-100) | 10 |
+| star2Num | integer | No | Async submit | 2-star reviews to fetch (0-100) | 10 |
+| star3Num | integer | No | Async submit | 3-star reviews to fetch (0-100) | 10 |
+| star4Num | integer | No | Async submit | 4-star reviews to fetch (0-100) | 10 |
+| star5Num | integer | No | Async submit | 5-star reviews to fetch (0-100) | 10 |
 | sortBy | string | No | All | `recent` (newest) or `helpful` (most helpful) | `recent` |
 | formatType | string | No | All | `all_formats` or `current_format` | `all_formats` |
-| domainCode | string | No | Main endpoint | Marketplace code (see Supported Marketplaces); use `com` for US | `com` |
-| filterByKeyword | string | No | Main endpoint | Filter reviews by keyword (max 1000 chars) | - |
-| reviewerType | string | No | Main endpoint | `all_reviews` or `avp_only_reviews` (verified only) | `all_reviews` |
-| mediaType | string | No | Main endpoint | `all_contents` or `media_reviews_only` | `all_contents` |
+| domainCode | string | No | Async submit | Marketplace code (see Supported Marketplaces); use `com` for US | `com` |
+| filterByKeyword | string | No | Async submit | Filter reviews by keyword (max 1000 chars) | - |
+| reviewerType | string | No | Async submit | `all_reviews` or `avp_only_reviews` (verified only) | `all_reviews` |
+| mediaType | string | No | Async submit | `all_contents` or `media_reviews_only` | `all_contents` |
 
 ### Star Count Defaults
 
@@ -114,7 +131,7 @@ Use `domainCode` for every supported marketplace. Always confirm the user's inte
 
 - **One ASIN per request**: Only a single ASIN can be queried at a time.
 - **Per-star cap**: Each star rating returns max 100 reviews per request.
-- **Parameter scope**: `filterByKeyword`, `reviewerType`, `mediaType` are available on `/amazon/reviews/list`, including `domainCode: "com"`.
+- **Parameter scope**: `filterByKeyword`, `reviewerType`, `mediaType` are available on async submit, including `domainCode: "com"`.
 - **No historical snapshots**: Reviews are fetched in real-time.
 - **Review text language**: Reviews are returned in their original language as posted.
 
@@ -146,19 +163,21 @@ Use `domainCode` for every supported marketplace. Always confirm the user's inte
 
 **Boundary judgment**: If "product research" or "competitor analysis" boils down to reading customer reviews for specific ASINs, this skill applies. If it involves search volume, keyword rankings, sales estimates, or market sizing, it does not.
 
-## 积分消耗规则
+## 算力消耗规则
 
 按计划抓取页数动态计费。设 `P = Σ min(ceil(各星级请求评论数 / 10), 10)`，则：
 
 - 计费 Token：`21000 × P`。
-- **实际消耗积分 = `ceil((21000 × P) / 2000) = ceil(10.5 × P)`**，按每次请求分别向上取整。
-- 未传任何星级数量时，1~5 星默认各抓取 10 条，`P = 5`，消耗 `53` 积分。
-- 传入任意星级数量后，未传星级按 `0`；五个星级均显式传 `0` 时，`P = 0`，不调用供应商且消耗 `0` 积分。
+- **实际消耗算力 = `ceil((21000 × P) / 2000) = ceil(10.5 × P)`**，按每次请求分别向上取整。
+- 未传任何星级数量时，1~5 星默认各抓取 10 条，`P = 5`，消耗 `53` 算力。
+- 传入任意星级数量后，未传星级按 `0`；五个星级均显式传 `0` 时，`P = 0`，不调用供应商且消耗 `0` 算力。
 - 请求成功但结果为空，或经关键词、认证购买、媒体筛选后为空，仍按计划页数计费；部分子任务失败但整体成功时仍按全部计划页数计费；调用完全失败不计费。
 
-常见消耗：1 页 `11` 积分，2 页 `21` 积分，5 页 `53` 积分，10 页 `105` 积分。
+常见消耗：1 页 `11` 算力，2 页 `21` 算力，5 页 `53` 算力，10 页 `105` 算力。
 
-> **重要**：费用按请求的抓取页数计算，而不是按最终返回评论数计算。请求多个星级或大量评论前必须向用户说明预计页数和积分消耗。
+> **重要**：费用按请求的抓取页数计算，而不是按最终返回评论数计算。请求多个星级或大量评论前必须向用户说明预计页数和算力消耗。
+
+> 上述公式只用于调用前预估。实际是否扣费及扣费数额只以首次成功领取结果时返回的 `X-Cost-Token`/`costToken` 为准；提交、处理中、失败或超时不得按预估值计为已消耗。
 
 **Feedback:**
 

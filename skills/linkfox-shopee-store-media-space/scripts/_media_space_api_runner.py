@@ -12,6 +12,7 @@ from _shopee_media_space_common import (
     ensure_auth_skill_available,
     merge_shopee_body,
     qs_add,
+    upload_media_space_image,
 )
 
 
@@ -94,6 +95,12 @@ def run_media_space_api(api_name: str, params: dict, caller: Optional[str] = Non
 
     if not params.get("skipDepCheck"):
         ensure_auth_skill_available(caller or f"{api_name}.py")
+
+    if api_name == "upload_image":
+        return {
+            "api": api_name,
+            "uploadMediaSpaceImage": upload_media_space_image(params),
+        }
 
     method = spec["method"]
     path = spec["path"]

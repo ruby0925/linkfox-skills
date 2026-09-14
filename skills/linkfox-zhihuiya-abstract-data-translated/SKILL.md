@@ -76,13 +76,13 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 2. **Indicate language**: Mention the translation language in the output header so users know which language the results are in.
 3. **Family patent notice**: If `pnRelated` is present in any result, explicitly inform the user that the abstract was sourced from a family patent and show the substitute publication number.
 4. **Long abstracts**: For very long abstracts, display the full text without truncation so users can review the complete content.
-5. **Error handling**: When a query fails or returns no results, explain the likely cause (e.g., invalid patent number, patent not found in database) and suggest corrections.
+5. **Error handling**: Report the actual error. An empty translation result means the requested translation was not returned; it does not establish that the patent is absent or that all same-language requests are unsupported. If the user needs the original abstract, use `/zhihuiya/simpleBibliography` and verify the returned patent and text language. Keep the requested target language; do not silently switch it or substitute a family patent.
 6. **No subjective commentary**: Present the translated text as-is without adding interpretation or legal analysis of the patent content.
 ## 调用方式
 
 - **API 端点**：`POST /zhihuiya/abstractDataTranslated`（完整参数/响应/错误码见 `references/api.md`）
 - **Python 脚本**：`python scripts/zhihuiya_abstract_translated.py '<JSON 参数>' [--inline]`
-- **成本约束**：本工具会消耗积分；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力；同一会话同一参数组合默认只调用一次，脚本带 24h 本地缓存。失败/空结果不得自动换关键词、翻页或改邮编连续试探；需要继续检索时先向用户说明会产生额外消耗。
 
 **输出策略（脚本默认行为）**：
 - **始终**将完整响应写入 `<cwd>/linkfox/<YYYY-MM-DD>/<session>/data/linkfox-zhihuiya-abstract-data-translated-<timestamp>.json`（`<cwd>` 为脚本执行时的工作目录，在 Claude Code 里即当前项目目录；`<session>` 取自环境变量 `SESSION_ID`，按用户任务自动聚合；**禁止写入 /tmp**，当前目录不可写则报错）
@@ -92,13 +92,13 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 
 **读数据建议**：先看摘要判断是否足够；需要具体字段时优先用 `jq`或`ConvertFrom-Json` 从保存的 json 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## Important Limitations
 
@@ -127,11 +127,11 @@ Parameters: `patentId = "111111,222222,333333"`, `lang = "en"`
 - Patent legal status, citation analysis, or landscape reports
 - Patent valuation or infringement analysis
 
-## 积分消耗规则
+## 算力消耗规则
 
-按动态规则计费：消耗积分 = 81 × 返回data条数。每条为 1 条专利摘要翻译结果
+按动态规则计费：消耗算力 = 81 × 返回data条数。每条为 1 条专利摘要翻译结果
 
-> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量积分，必须提醒用户，由用户决定是否继续。
+> **重要**：本技能的服务按倍数动态计算，可能一次性消耗大量算力，必须提醒用户，由用户决定是否继续。
 
 **Feedback:**
 

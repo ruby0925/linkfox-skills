@@ -48,7 +48,7 @@ Read `references/api.md` for endpoint details and `references/workflow.md` befor
 - **API 端点**：`POST /alibaba1688/{authorizeUrl|authorizedStores|receiveAddressList|sku|orderPreview|createOrder|paymentUrl|orderStatus|logistics|logisticsTrace|confirmReceive|cancelOrder|invoiceAmount|invoiceApply}`（完整参数、响应和错误处理见 `references/api.md`）
 - **Python 脚本**：`python scripts/<script_name>.py '<JSON 参数>' [--inline] [--save] [--no-save]`
 - **Windows 推荐**：`$env:PAYLOAD = '<JSON 参数>'` 后运行 `python scripts/<script_name>.py --payload-env PAYLOAD [--inline] [--save]`
-- **成本约束**：本工具会消耗积分。失败、空结果、参数不完整或授权不足时，不得自动连续试探、换参数重试或轮询；需要继续查询时先向用户说明会产生额外消耗。
+- **成本约束**：本工具会消耗算力。失败、空结果、参数不完整或授权不足时，不得自动连续试探、换参数重试或轮询；需要继续查询时先向用户说明会产生额外消耗。
 - **缓存约束**：本采购 Skill 不做 24h 响应缓存；授权、价格、库存、订单状态和物流以实时返回为准，高风险写操作更不能缓存。
 - **授权约束**：除 `authorize_url.py` 和 `authorized_stores.py` 外，脚本会在调用目标接口前自动检查当前用户的 ACTIVE 1688 授权；没有 ACTIVE 且未过期授权时不会调用目标 endpoint。
 - **授权刷新**：accessToken 临期或已过期时后端会用该用户自己的 refreshToken 自动刷新，调用 `authorizedStores` 或采购接口时都会触发，Skill 与用户无需介入。只有 refreshToken 为空、失效或刷新失败（`authorizedStores` 返回 `expired=true`）时才需要重新走 `authorize_url.py` 授权；不要向用户展示或播报 token 有效期、过期时间、刷新窗口等内部授权细节。
@@ -77,13 +77,13 @@ python scripts/authorized_stores.py --payload-env PAYLOAD --inline
 
 **读数据建议**：先看 stdout 摘要判断是否足够；需要保存完整响应再加 `--save`，之后优先用 `jq` 或 `ConvertFrom-Json` 从保存的 JSON 文件按需抽取，避免整份 JSON 进入上下文。
 
-## 解决认证和积分问题
+## 解决认证和算力问题
 发生以下异常情况时，采用 references/onboarding.md 引导解决问题：
 
 ### 异常情况
 - **未配置API Key**：环境变量未配置 `LINKFOX_AGENT_API_KEY`，也未配置 `LINKFOXAGENT_API_KEY`。
 - **响应401或402状态码**
-- **响应提示积分或余额不足**：消息含"积分余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
+- **响应提示算力或余额不足**：消息含"算力余额不足/计费不足/余额不足/quota exceeded/insufficient balance/套餐到期/需充值/请充值"，或类似含义的内容。
 
 ## High-Risk Confirmation
 
